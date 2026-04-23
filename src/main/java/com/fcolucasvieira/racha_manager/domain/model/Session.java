@@ -38,6 +38,14 @@ public class Session {
         }
     }
 
+    public void updateTeams(List<Team> teams) {
+        if(teams == null){
+            throw new IllegalArgumentException("Teams cannot be null");
+        }
+
+        this.teams = teams;
+    }
+
     public void validatePlayerForAddition(PlayerEntity player) {
         if(player == null || player.getId() == null) {
             throw new IllegalArgumentException("Player cannot be null");
@@ -49,13 +57,5 @@ public class Session {
         if (containsPlayer) {
             throw new IllegalArgumentException("Player already in session");
         }
-    }
-
-    public void updateTeams(List<Team> teams) {
-        if(teams == null){
-            throw new IllegalArgumentException("Teams cannot be null");
-        }
-
-        this.teams = teams;
     }
 }

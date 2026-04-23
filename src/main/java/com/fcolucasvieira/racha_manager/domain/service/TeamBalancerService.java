@@ -15,7 +15,6 @@ public class TeamBalancerService {
     private static final int TEAM_SIZE = 4;
 
     public List<Team> balance(Session session) {
-
         List<PlayerEntity> players = new ArrayList<>(session.getActivePlayers());
 
         if(session.getTeams().isEmpty()) {
@@ -34,6 +33,7 @@ public class TeamBalancerService {
 
             teams.add(team);
         }
+
         return teams;
     }
 }
