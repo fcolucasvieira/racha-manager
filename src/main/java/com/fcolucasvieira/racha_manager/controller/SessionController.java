@@ -1,5 +1,6 @@
 package com.fcolucasvieira.racha_manager.controller;
 
+import com.fcolucasvieira.racha_manager.dto.CreateSessionResponse;
 import com.fcolucasvieira.racha_manager.dto.SessionActivePlayerResponse;
 import com.fcolucasvieira.racha_manager.dto.SessionTeamResponse;
 import com.fcolucasvieira.racha_manager.mapper.SessionMapper;
@@ -24,9 +25,10 @@ public class SessionController {
     private final SessionMapper sessionMapper;
 
     @PostMapping
-    public ResponseEntity<UUID> createSession() {
-        UUID response = createUseCase.execute();
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<CreateSessionResponse> createSession() {
+        UUID id = createUseCase.execute();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new CreateSessionResponse(id));
     }
 
     @PostMapping("/{sessionId}/players/{playerId}")

@@ -10,6 +10,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class PlayerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
