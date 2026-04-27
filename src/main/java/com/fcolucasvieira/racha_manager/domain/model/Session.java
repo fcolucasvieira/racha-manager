@@ -58,4 +58,17 @@ public class Session {
             throw new IllegalArgumentException("Player already in session");
         }
     }
+
+    public void reorderPlayers(List<PlayerEntity> newOrder) {
+        if(newOrder == null) {
+            throw new IllegalArgumentException("Player list can't be null");
+        }
+
+        if(newOrder.size() != this.activePlayers.size()) {
+            throw new IllegalArgumentException("Invalid reorder size");
+        }
+
+        this.activePlayers.clear();
+        this.activePlayers.addAll(newOrder);
+    }
 }

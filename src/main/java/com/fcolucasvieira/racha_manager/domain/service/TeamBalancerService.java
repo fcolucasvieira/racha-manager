@@ -3,6 +3,8 @@ package com.fcolucasvieira.racha_manager.domain.service;
 import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.parser.TE;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
+@Slf4j
 public class TeamBalancerService {
 
     private static final int TEAM_SIZE = 4;
@@ -17,8 +20,12 @@ public class TeamBalancerService {
     public List<Team> balance(Session session) {
         List<PlayerEntity> players = new ArrayList<>(session.getActivePlayers());
 
-        if(session.getTeams().isEmpty()) {
+        if(players.size() == TEAM_SIZE * 2) {
             Collections.shuffle(players);
+            log.info("Shuffle performed successfully");
+
+            session.reorderPlayers(players);
+            log.info("Active player reordering performed after shuffling");
         }
 
         List<Team> teams = new ArrayList<>();
