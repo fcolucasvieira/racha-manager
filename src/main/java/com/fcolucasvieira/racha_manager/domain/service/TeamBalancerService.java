@@ -4,7 +4,6 @@ import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.parser.TE;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

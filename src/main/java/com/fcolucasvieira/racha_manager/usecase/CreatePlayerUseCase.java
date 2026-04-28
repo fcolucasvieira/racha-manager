@@ -10,14 +10,15 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CreatePlayerUseCase {
-    private final PlayerRepository playerRepository;
+
+    private final PlayerRepository repository;
 
     public UUID execute(String name) {
         PlayerEntity player = PlayerEntity.builder()
                 .name(name)
                 .build();
 
-        playerRepository.save(player);
+        repository.save(player);
 
         return player.getId();
     }

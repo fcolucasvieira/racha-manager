@@ -17,7 +17,7 @@ public class GetTeamsInSessionUseCase {
 
     public List<Team> execute(UUID sessionId) {
         Session session = repository.findById(sessionId)
-                .orElseThrow(() ->new IllegalArgumentException("Session not found: " + sessionId));
+                .orElseThrow(() -> new IllegalArgumentException("Session not found: " + sessionId));
 
         return session.getTeams();
     }

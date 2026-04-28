@@ -8,6 +8,7 @@ import java.util.UUID;
 @Table(name = "players")
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
