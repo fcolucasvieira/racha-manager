@@ -28,7 +28,7 @@ public class RemovePlayerFromSessionUseCase {
 
         sessionRepository.save(session);
 
-        return  teams;
+        return teams;
     }
 
 }

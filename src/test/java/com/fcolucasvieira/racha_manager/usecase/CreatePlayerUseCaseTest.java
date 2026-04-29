@@ -26,7 +26,7 @@ class CreatePlayerUseCaseTest {
     private CreatePlayerUseCase useCase;
 
     @Test
-    void successfully() {
+    void shouldCreatePlayerSuccessfully() {
         // arrange
         String name = "Lucas";
 

@@ -21,33 +21,82 @@ class TeamBalancerServiceTest {
         service = new TeamBalancerService();
     }
 
-    // Helper
+    // helper
     private PlayerEntity createPlayer() {
         UUID playerId = UUID.randomUUID();
         return new PlayerEntity(playerId, "Player " + playerId);
     }
 
     @Test
+    void shouldReturnEmptyWhenNoPlayers() {
+        Session session = new Session();
+
+        List<Team> teams = service.balance(session);
+
+        assertTrue(teams.isEmpty());
+    }
+
+    @Test
     void shouldCreateTeamsWithFourPlayersEachOnFirstBalance() {
-        // Arrange
         Session session = new Session();
 
         for (int i = 0; i < 8; i++) {
             session.addPlayer(createPlayer());
         }
 
-        // Act
         List<Team> teams = service.balance(session);
 
-        // Assert
         assertEquals(2, teams.size());
         assertEquals(4, teams.get(0).getPlayers().size());
         assertEquals(4, teams.get(1).getPlayers().size());
     }
 
+    // shuffle
+
     @Test
-    void shouldNotShufflePlayersAfterFirstBalance() {
-        // Arrange
+    void shouldShufflePlayersOnFirstBalanceWhenEightOrMorePlayers() {
+        Session session = new Session();
+
+        List<PlayerEntity> originalOrder = new ArrayList<>();
+
+        for (int i = 0; i < 8; i++) {
+            PlayerEntity player = createPlayer();
+            originalOrder.add(player);
+            session.addPlayer(player);
+        }
+
+        List<Team> teams = service.balance(session);
+
+        List<PlayerEntity> result = teams.stream()
+                .flatMap(t -> t.getPlayers().stream())
+                .toList();
+
+        assertNotEquals(originalOrder, result); // pode falhar raramente (aceitável)
+    }
+
+    @Test
+    void shouldNotShuffleWhenLessThanEightPlayers() {
+        Session session = new Session();
+
+        List<PlayerEntity> original = new ArrayList<>();
+
+        for (int i = 0; i < 6; i++) {
+            PlayerEntity player = createPlayer();
+            original.add(player);
+            session.addPlayer(player);
+        }
+
+        List<Team> teams = service.balance(session);
+
+        List<PlayerEntity> result = teams.stream()
+                .flatMap(t -> t.getPlayers().stream())
+                .toList();
+
+        assertEquals(original, result);
+    }
+
+    @Test
+    void shouldShuffleAfterFirstBalance() {
         Session session = new Session();
 
         for (int i = 0; i < 8; i++) {
@@ -61,20 +110,17 @@ class TeamBalancerServiceTest {
                 .flatMap(t -> t.getPlayers().stream())
                 .toList();
 
-        // Act
         List<Team> secondBalance = service.balance(session);
 
-        // Assert
         List<PlayerEntity> secondOrder = secondBalance.stream()
                 .flatMap(t -> t.getPlayers().stream())
                 .toList();
 
-        assertEquals(firstOrder, secondOrder);
+        assertNotEquals(firstOrder, secondOrder);
     }
 
     @Test
     void shouldPlaceNewPlayerAtEndOfQueue() {
-        // Arrange
         Session session = new Session();
 
         for (int i = 0; i < 8; i++) {
@@ -85,11 +131,9 @@ class TeamBalancerServiceTest {
 
         PlayerEntity newPlayer = createPlayer();
 
-        // Act
         session.addPlayer(newPlayer);
         List<Team> teams = service.balance(session);
 
-        // Assert
         List<PlayerEntity> allPlayers = teams.stream()
                 .flatMap(t -> t.getPlayers().stream())
                 .toList();
@@ -98,41 +142,7 @@ class TeamBalancerServiceTest {
     }
 
     @Test
-    void shouldRebalanceTeamsAfterPlayerRemoval() {
-        // Arrange
-        Session session = new Session();
-
-        List<PlayerEntity> players = new ArrayList<>();
-
-        for (int i = 0; i < 9; i++) {
-            PlayerEntity player = createPlayer();
-            players.add(player);
-            session.addPlayer(player);
-        }
-
-        session.updateTeams(service.balance(session));
-
-        UUID removedId = players.get(8).getId();
-
-        // Act
-        session.removePlayer(removedId);
-        List<Team> teams = service.balance(session);
-
-        // Assert
-        assertEquals(2, teams.size());
-        assertEquals(4, teams.get(0).getPlayers().size());
-        assertEquals(4, teams.get(1).getPlayers().size());
-
-        boolean stillExists = teams.stream()
-                .flatMap(t -> t.getPlayers().stream())
-                .anyMatch(p -> p.getId().equals(removedId));
-
-        assertFalse(stillExists);
-    }
-
-    @Test
     void shouldMaintainQueueOrderWhenPlayersAreAdded() {
-        // Arrange
         Session session = new Session();
 
         PlayerEntity p1 = createPlayer();
@@ -149,7 +159,6 @@ class TeamBalancerServiceTest {
 
         PlayerEntity p5 = createPlayer();
 
-        // Act
         session.addPlayer(p5);
         List<Team> teams = service.balance(session);
 
@@ -157,7 +166,80 @@ class TeamBalancerServiceTest {
                 .flatMap(t -> t.getPlayers().stream())
                 .toList();
 
-        // Assert
         assertEquals(List.of(p1, p2, p3, p4, p5), result);
+    }
+
+    // Times incompletos
+
+    @Test
+    void shouldCreateIncompleteTeamWhenNotMultipleOfFour() {
+        Session session = new Session();
+
+        for (int i = 0; i < 10; i++) {
+            session.addPlayer(createPlayer());
+        }
+
+        List<Team> teams = service.balance(session);
+
+        assertEquals(3, teams.size());
+        assertEquals(4, teams.get(0).getPlayers().size());
+        assertEquals(4, teams.get(1).getPlayers().size());
+        assertEquals(2, teams.get(2).getPlayers().size());
+    }
+
+    // remoção
+
+    @Test
+    void shouldRebalanceTeamsAfterPlayerRemoval() {
+        Session session = new Session();
+
+        List<PlayerEntity> players = new ArrayList<>();
+
+        for (int i = 0; i < 9; i++) {
+            PlayerEntity player = createPlayer();
+            players.add(player);
+            session.addPlayer(player);
+        }
+
+        session.updateTeams(service.balance(session));
+
+        UUID removedId = players.get(8).getId();
+
+        session.removePlayer(removedId);
+        List<Team> teams = service.balance(session);
+
+        assertEquals(2, teams.size());
+        assertEquals(4, teams.get(0).getPlayers().size());
+        assertEquals(4, teams.get(1).getPlayers().size());
+
+        boolean stillExists = teams.stream()
+                .flatMap(t -> t.getPlayers().stream())
+                .anyMatch(p -> p.getId().equals(removedId));
+
+        assertFalse(stillExists);
+    }
+
+    // consistência
+
+    @Test
+    void shouldMaintainConsistencyAcrossMultipleOperations() {
+        Session session = new Session();
+
+        for (int i = 0; i < 8; i++) {
+            session.addPlayer(createPlayer());
+        }
+
+        session.updateTeams(service.balance(session));
+
+        PlayerEntity p9 = createPlayer();
+        session.addPlayer(p9);
+
+        session.removePlayer(p9.getId());
+
+        List<Team> teams = service.balance(session);
+
+        assertEquals(2, teams.size());
+        assertEquals(4, teams.get(0).getPlayers().size());
+        assertEquals(4, teams.get(1).getPlayers().size());
     }
 }

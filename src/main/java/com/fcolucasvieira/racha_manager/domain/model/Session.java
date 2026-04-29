@@ -1,5 +1,6 @@
 package com.fcolucasvieira.racha_manager.domain.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
+@AllArgsConstructor
 public class Session {
 
     private final UUID id;

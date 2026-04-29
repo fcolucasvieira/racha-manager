@@ -26,7 +26,7 @@ class CreateSessionUseCaseTest {
     private CreateSessionUseCase useCase;
 
     @Test
-    void successfully() {
+    void shouldCreateSessionSuccessfully() {
         // act
         UUID result = useCase.execute();
 
