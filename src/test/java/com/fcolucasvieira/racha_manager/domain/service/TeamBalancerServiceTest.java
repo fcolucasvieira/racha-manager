@@ -24,7 +24,13 @@ class TeamBalancerServiceTest {
     // helper
     private PlayerEntity createPlayer() {
         UUID playerId = UUID.randomUUID();
-        return new PlayerEntity(playerId, "Player " + playerId);
+        return new PlayerEntity(playerId, "Player");
+    }
+
+    private List<PlayerEntity> extractPlayers(List<Team> teams) {
+        return teams.stream()
+                .flatMap(team -> team.getPlayers().stream())
+                .toList();
     }
 
     @Test
@@ -54,7 +60,7 @@ class TeamBalancerServiceTest {
     // shuffle
 
     @Test
-    void shouldShufflePlayersOnFirstBalanceWhenEightOrMorePlayers() {
+    void shouldShufflePlayersOnFirstBalanceWhenEightPlayers() {
         Session session = new Session();
 
         List<PlayerEntity> originalOrder = new ArrayList<>();
@@ -65,13 +71,13 @@ class TeamBalancerServiceTest {
             session.addPlayer(player);
         }
 
-        List<Team> teams = service.balance(session);
+        service.balance(session);
 
-        List<PlayerEntity> result = teams.stream()
-                .flatMap(t -> t.getPlayers().stream())
-                .toList();
+        List<PlayerEntity> result = session.getActivePlayers();
 
-        assertNotEquals(originalOrder, result); // pode falhar raramente (aceitável)
+        assertTrue(session.isShuffled());
+        assertEquals(originalOrder.size(), result.size());
+        assertTrue(result.containsAll(originalOrder));
     }
 
     @Test
@@ -88,15 +94,13 @@ class TeamBalancerServiceTest {
 
         List<Team> teams = service.balance(session);
 
-        List<PlayerEntity> result = teams.stream()
-                .flatMap(t -> t.getPlayers().stream())
-                .toList();
+        List<PlayerEntity> result = extractPlayers(teams);
 
         assertEquals(original, result);
     }
 
     @Test
-    void shouldShuffleAfterFirstBalance() {
+    void shouldNotShuffleAfterFirstBalance() {
         Session session = new Session();
 
         for (int i = 0; i < 8; i++) {
@@ -106,17 +110,31 @@ class TeamBalancerServiceTest {
         List<Team> firstBalance = service.balance(session);
         session.updateTeams(firstBalance);
 
-        List<PlayerEntity> firstOrder = firstBalance.stream()
-                .flatMap(t -> t.getPlayers().stream())
-                .toList();
+        List<PlayerEntity> firstOrder = extractPlayers(firstBalance);
 
         List<Team> secondBalance = service.balance(session);
+        List<PlayerEntity> secondOrder = extractPlayers(secondBalance);
 
-        List<PlayerEntity> secondOrder = secondBalance.stream()
-                .flatMap(t -> t.getPlayers().stream())
-                .toList();
+        assertEquals(firstOrder, secondOrder);
+    }
 
-        assertNotEquals(firstOrder, secondOrder);
+    @Test
+    void shouldShuffleOnlyOnceEvenIfBalanceIsCalledMultipleTimes() {
+        Session session = new Session();
+
+        for (int i = 0; i < 8; i++) {
+            session.addPlayer(createPlayer());
+        }
+
+        service.balance(session);
+
+        boolean firstState = session.isShuffled();
+
+        service.balance(session);
+        service.balance(session);
+
+        assertTrue(firstState);
+        assertTrue(session.isShuffled());
     }
 
     @Test
@@ -134,9 +152,7 @@ class TeamBalancerServiceTest {
         session.addPlayer(newPlayer);
         List<Team> teams = service.balance(session);
 
-        List<PlayerEntity> allPlayers = teams.stream()
-                .flatMap(t -> t.getPlayers().stream())
-                .toList();
+        List<PlayerEntity> allPlayers = extractPlayers(teams);
 
         assertEquals(newPlayer, allPlayers.get(allPlayers.size() - 1));
     }
@@ -162,14 +178,12 @@ class TeamBalancerServiceTest {
         session.addPlayer(p5);
         List<Team> teams = service.balance(session);
 
-        List<PlayerEntity> result = teams.stream()
-                .flatMap(t -> t.getPlayers().stream())
-                .toList();
+        List<PlayerEntity> result = extractPlayers(teams);
 
         assertEquals(List.of(p1, p2, p3, p4, p5), result);
     }
 
-    // Times incompletos
+    // times incompletos
 
     @Test
     void shouldCreateIncompleteTeamWhenNotMultipleOfFour() {
@@ -212,8 +226,7 @@ class TeamBalancerServiceTest {
         assertEquals(4, teams.get(0).getPlayers().size());
         assertEquals(4, teams.get(1).getPlayers().size());
 
-        boolean stillExists = teams.stream()
-                .flatMap(t -> t.getPlayers().stream())
+        boolean stillExists = extractPlayers(teams).stream()
                 .anyMatch(p -> p.getId().equals(removedId));
 
         assertFalse(stillExists);

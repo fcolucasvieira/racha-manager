@@ -17,14 +17,19 @@ public class TeamBalancerService {
     private static final int TEAM_SIZE = 4;
 
     public List<Team> balance(Session session) {
-        List<PlayerEntity> players = new ArrayList<>(session.getActivePlayers());
 
-        if(players.size() == TEAM_SIZE * 2) {
-            Collections.shuffle(players);
+        List<PlayerEntity> players = session.getActivePlayers();
+
+        if(players.size() == TEAM_SIZE * 2 && !session.isShuffled()) {
+            List<PlayerEntity> shuffled = new ArrayList<>(players);
+            Collections.shuffle(shuffled);
+
+            session.reorderPlayers(shuffled);
+            session.markAsShuffled();
+
+            players = shuffled;
+
             log.info("Shuffle performed successfully");
-
-            session.reorderPlayers(players);
-            log.info("Active player reordering performed after shuffling");
         }
 
         List<Team> teams = new ArrayList<>();

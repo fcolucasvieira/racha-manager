@@ -14,11 +14,13 @@ public class Session {
     private final UUID id;
     private final List<PlayerEntity> activePlayers;
     private List<Team> teams;
+    private boolean shuffled;
 
     public Session() {
         this.id = UUID.randomUUID();
         this.activePlayers = new ArrayList<>();
         this.teams = new ArrayList<>();
+        this.shuffled = false;
     }
 
     public void addPlayer(PlayerEntity player) {
@@ -46,9 +48,16 @@ public class Session {
         }
 
         this.teams = teams;
+
+        this.activePlayers.clear();
+        this.activePlayers.addAll(
+                teams.stream()
+                        .flatMap(team -> team.getPlayers().stream())
+                        .toList()
+        );
     }
 
-    public void validatePlayerForAddition(PlayerEntity player) {
+    private void validatePlayerForAddition(PlayerEntity player) {
         if(player == null || player.getId() == null) {
             throw new IllegalArgumentException("Player cannot be null");
         }
@@ -72,5 +81,9 @@ public class Session {
 
         this.activePlayers.clear();
         this.activePlayers.addAll(newOrder);
+    }
+
+    public void markAsShuffled() {
+        this.shuffled = true;
     }
 }
