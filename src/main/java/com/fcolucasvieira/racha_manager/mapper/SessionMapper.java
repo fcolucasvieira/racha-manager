@@ -1,7 +1,9 @@
 package com.fcolucasvieira.racha_manager.mapper;
 
+import com.fcolucasvieira.racha_manager.domain.model.Match;
 import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
+import com.fcolucasvieira.racha_manager.dto.MatchResponse;
 import com.fcolucasvieira.racha_manager.dto.SessionActivePlayerResponse;
 import com.fcolucasvieira.racha_manager.dto.SessionTeamResponse;
 import org.springframework.stereotype.Component;
@@ -41,5 +43,12 @@ public class SessionMapper {
         return players.stream()
                 .map(PlayerEntity::getName)
                 .toList();
+    }
+
+    public MatchResponse toMatchResponse(Match match) {
+        return new MatchResponse(
+                toTeamResponse(match.getTeamA()),
+                toTeamResponse(match.getTeamB())
+        );
     }
 }

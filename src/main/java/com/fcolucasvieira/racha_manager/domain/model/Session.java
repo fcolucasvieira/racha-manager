@@ -14,12 +14,15 @@ public class Session {
     private final UUID id;
     private final List<PlayerEntity> activePlayers;
     private List<Team> teams;
+    private List<Team> queue;
+    private Match currentMatch;
     private boolean shuffled;
 
     public Session() {
         this.id = UUID.randomUUID();
         this.activePlayers = new ArrayList<>();
         this.teams = new ArrayList<>();
+        this.queue = new ArrayList<>();
         this.shuffled = false;
     }
 
@@ -42,6 +45,19 @@ public class Session {
         }
     }
 
+    private void validatePlayerForAddition(PlayerEntity player) {
+        if(player == null || player.getId() == null) {
+            throw new IllegalArgumentException("Player cannot be null");
+        }
+
+        boolean containsPlayer = activePlayers.stream()
+                .anyMatch(p -> p.getId().equals(player.getId()));
+
+        if (containsPlayer) {
+            throw new IllegalArgumentException("Player already in session");
+        }
+    }
+
     public void updateTeams(List<Team> teams) {
         if(teams == null){
             throw new IllegalArgumentException("Teams cannot be null");
@@ -57,19 +73,6 @@ public class Session {
         );
     }
 
-    private void validatePlayerForAddition(PlayerEntity player) {
-        if(player == null || player.getId() == null) {
-            throw new IllegalArgumentException("Player cannot be null");
-        }
-
-        boolean containsPlayer = activePlayers.stream()
-                .anyMatch(p -> p.getId().equals(player.getId()));
-
-        if (containsPlayer) {
-            throw new IllegalArgumentException("Player already in session");
-        }
-    }
-
     public void reorderPlayers(List<PlayerEntity> newOrder) {
         if(newOrder == null) {
             throw new IllegalArgumentException("Player list can't be null");
@@ -81,6 +84,37 @@ public class Session {
 
         this.activePlayers.clear();
         this.activePlayers.addAll(newOrder);
+    }
+
+    public void startQueue() {
+        if(teams.size() < 2){
+            throw new IllegalStateException("Not enough teams to start");
+        }
+
+        this.queue = new ArrayList<>(teams);
+
+        Team t1 = queue.removeFirst();
+        Team t2 = queue.removeFirst();
+
+        this.currentMatch = new Match(t1, t2);
+    }
+
+    public void finishMatch(int winnerTeamNumber) {
+        if (currentMatch == null) {
+            throw new IllegalStateException("No match in progress");
+        }
+
+        Team winner = currentMatch.getTeamA().getNumber() == winnerTeamNumber
+                ? currentMatch.getTeamA()
+                : currentMatch.getTeamB();
+
+        Team loser = currentMatch.getLoser(winner);
+
+        queue.add(loser);
+
+        Team next = queue.removeFirst();
+
+        currentMatch = new Match(winner, next);
     }
 
     public void markAsShuffled() {
