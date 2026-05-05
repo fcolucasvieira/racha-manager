@@ -17,6 +17,10 @@ public class GetCurrentMatchUseCase {
         Session session = repository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
 
+        if (session.getCurrentMatch() == null) {
+            throw new IllegalStateException("Match not started");
+        }
+
         return  session.getCurrentMatch();
     }
 }

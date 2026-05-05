@@ -1,6 +1,5 @@
 package com.fcolucasvieira.racha_manager.domain.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -8,7 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
 public class Session {
 
     private final UUID id;
@@ -28,7 +26,6 @@ public class Session {
 
     public void addPlayer(PlayerEntity player) {
         validatePlayerForAddition(player);
-
         activePlayers.add(player);
     }
 
@@ -37,10 +34,10 @@ public class Session {
             throw new IllegalArgumentException("Player ID cannot be null");
         }
 
-        boolean playerRemoved = activePlayers
+        boolean removed = activePlayers
                 .removeIf(p -> p.getId().equals(playerId));
 
-        if(!playerRemoved){
+        if(!removed){
             throw new IllegalArgumentException("Player not found in session");
         }
     }
@@ -50,10 +47,10 @@ public class Session {
             throw new IllegalArgumentException("Player cannot be null");
         }
 
-        boolean containsPlayer = activePlayers.stream()
-                .anyMatch(p -> p.getId().equals(player.getId()));
+        boolean alreadyExists = activePlayers.stream()
+                .anyMatch(p-> p.getId().equals(player.getId()));
 
-        if (containsPlayer) {
+        if (alreadyExists) {
             throw new IllegalArgumentException("Player already in session");
         }
     }
@@ -64,13 +61,6 @@ public class Session {
         }
 
         this.teams = teams;
-
-        this.activePlayers.clear();
-        this.activePlayers.addAll(
-                teams.stream()
-                        .flatMap(team -> team.getPlayers().stream())
-                        .toList()
-        );
     }
 
     public void reorderPlayers(List<PlayerEntity> newOrder) {
@@ -86,19 +76,26 @@ public class Session {
         this.activePlayers.addAll(newOrder);
     }
 
+    // regras de negócio (fila) em session
     public void startQueue() {
+        if (currentMatch != null) {
+            throw new IllegalStateException("Queue already started");
+        }
+
         if(teams.size() < 2){
             throw new IllegalStateException("Not enough teams to start");
         }
 
         this.queue = new ArrayList<>(teams);
 
+        // armazena os dois primeiros times da fila (jogo atual)
         Team t1 = queue.removeFirst();
         Team t2 = queue.removeFirst();
 
         this.currentMatch = new Match(t1, t2);
     }
 
+    // regras de negócio (fila) em session
     public void finishMatch(int winnerTeamNumber) {
         if (currentMatch == null) {
             throw new IllegalStateException("No match in progress");
@@ -110,8 +107,16 @@ public class Session {
 
         Team loser = currentMatch.getLoser(winner);
 
+        // loser vai pro final da fila
         queue.add(loser);
 
+        // se não tiver próximo, encerra
+        if (queue.isEmpty()) {
+            currentMatch = null;
+            return;
+        }
+
+        // armazena o primeiro time da fila (time atual a jogar)
         Team next = queue.removeFirst();
 
         currentMatch = new Match(winner, next);

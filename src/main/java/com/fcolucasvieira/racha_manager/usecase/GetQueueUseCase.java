@@ -18,6 +18,6 @@ public class GetQueueUseCase {
         Session session = repository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
 
-        return  session.getQueue();
+        return session.getQueue();
     }
 }

@@ -5,13 +5,12 @@ import lombok.*;
 
 import java.util.UUID;
 
-@Table(name = "players")
 @Entity
+@Table(name = "players")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class PlayerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -19,4 +18,16 @@ public class PlayerEntity {
 
     @Column(nullable = false)
     private String name;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PlayerEntity that)) return false;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }

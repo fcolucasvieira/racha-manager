@@ -15,10 +15,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AddPlayerToSessionUseCase {
+
     private final SessionRepository sessionRepository;
     private final PlayerRepository playerRepository;
     private final TeamBalancerService teamBalancerService;
-
 
     public List<Team> execute(UUID sessionId, UUID playerId) {
         Session session = sessionRepository.findById(sessionId)
