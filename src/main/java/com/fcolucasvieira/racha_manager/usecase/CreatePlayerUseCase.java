@@ -14,9 +14,7 @@ public class CreatePlayerUseCase {
     private final PlayerRepository repository;
 
     public UUID execute(String name) {
-        PlayerEntity player = PlayerEntity.builder()
-                .name(name)
-                .build();
+        PlayerEntity player = new PlayerEntity(name);
 
         repository.save(player);
 

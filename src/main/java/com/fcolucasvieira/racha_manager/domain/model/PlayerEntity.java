@@ -19,6 +19,14 @@ public class PlayerEntity {
     @Column(nullable = false)
     private String name;
 
+    public PlayerEntity(String name) {
+        if(name == null){
+            throw new IllegalArgumentException("Name cannot be null");
+        }
+
+        this.name = name;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
