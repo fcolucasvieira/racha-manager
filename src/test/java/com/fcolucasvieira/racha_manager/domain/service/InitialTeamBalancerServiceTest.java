@@ -12,13 +12,13 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TeamBalancerServiceTest {
+class InitialTeamBalancerServiceTest {
 
-    private TeamBalancerService service;
+    private InitialTeamBalancerService service;
 
     @BeforeEach
     void setup() {
-        service = new TeamBalancerService();
+        service = new InitialTeamBalancerService();
     }
 
     // helper

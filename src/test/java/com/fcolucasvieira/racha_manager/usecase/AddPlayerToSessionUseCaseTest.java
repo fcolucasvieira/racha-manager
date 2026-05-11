@@ -3,7 +3,7 @@ package com.fcolucasvieira.racha_manager.usecase;
 import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
-import com.fcolucasvieira.racha_manager.domain.service.TeamBalancerService;
+import com.fcolucasvieira.racha_manager.domain.service.InitialTeamBalancerService;
 import com.fcolucasvieira.racha_manager.repository.PlayerRepository;
 import com.fcolucasvieira.racha_manager.repository.SessionRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +30,7 @@ class AddPlayerToSessionUseCaseTest {
     private PlayerRepository playerRepository;
 
     @Mock
-    private TeamBalancerService teamBalancerService;
+    private InitialTeamBalancerService initialTeamBalancerService;
 
     @InjectMocks
     private  AddPlayerToSessionUseCase useCase;
@@ -54,7 +54,7 @@ class AddPlayerToSessionUseCaseTest {
 
         when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
         when(playerRepository.findById(playerId)).thenReturn(Optional.of(player));
-        when(teamBalancerService.balance(session)).thenReturn(balancedTeams);
+        when(initialTeamBalancerService.balance(session)).thenReturn(balancedTeams);
 
         // act
         List<Team> result = useCase.execute(sessionId, playerId);
@@ -63,7 +63,7 @@ class AddPlayerToSessionUseCaseTest {
         assertEquals(balancedTeams, result);
 
         verify(session).addPlayer(player);
-        verify(teamBalancerService).balance(session);
+        verify(initialTeamBalancerService).balance(session);
         verify(session).updateTeams(balancedTeams);
         verify(sessionRepository).save(session);
     }
@@ -76,7 +76,7 @@ class AddPlayerToSessionUseCaseTest {
         // assert, verify & act
         assertThrows(IllegalArgumentException.class, () -> useCase.execute(sessionId, playerId));
 
-        verifyNoInteractions(playerRepository, teamBalancerService);
+        verifyNoInteractions(playerRepository, initialTeamBalancerService);
     }
 
     @Test
@@ -92,7 +92,7 @@ class AddPlayerToSessionUseCaseTest {
 
         verify(sessionRepository).findById(sessionId);
         verify(playerRepository).findById(playerId);
-        verifyNoInteractions(teamBalancerService);
+        verifyNoInteractions(initialTeamBalancerService);
     }
 
     }

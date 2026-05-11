@@ -3,7 +3,7 @@ package com.fcolucasvieira.racha_manager.usecase;
 import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
-import com.fcolucasvieira.racha_manager.domain.service.TeamBalancerService;
+import com.fcolucasvieira.racha_manager.domain.service.InitialTeamBalancerService;
 import com.fcolucasvieira.racha_manager.repository.SessionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -27,7 +26,7 @@ class RemovePlayerFromSessionUseCaseTest {
     private SessionRepository sessionRepository;
 
     @Mock
-    private TeamBalancerService teamBalancerService;
+    private InitialTeamBalancerService initialTeamBalancerService;
 
     @InjectMocks
     private RemovePlayerFromSessionUseCase useCase;
@@ -52,7 +51,7 @@ class RemovePlayerFromSessionUseCaseTest {
         List<Team> balancedTeams = List.of(new Team(1));
 
         when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
-        when(teamBalancerService.balance(session)).thenReturn(balancedTeams);
+        when(initialTeamBalancerService.balance(session)).thenReturn(balancedTeams);
 
         // act
         List<Team> result = useCase.execute(sessionId, playerId);
@@ -62,7 +61,7 @@ class RemovePlayerFromSessionUseCaseTest {
 
         verify(sessionRepository).findById(sessionId);
         verify(session).removePlayer(playerId);
-        verify(teamBalancerService).balance(session);
+        verify(initialTeamBalancerService).balance(session);
         verify(session).updateTeams(balancedTeams);
         verify(sessionRepository).save(session);
     }
@@ -75,7 +74,7 @@ class RemovePlayerFromSessionUseCaseTest {
         // act, assert & verify
         assertThrows(IllegalArgumentException.class, () -> useCase.execute(sessionId, playerId));
 
-        verifyNoMoreInteractions(teamBalancerService);
+        verifyNoMoreInteractions(initialTeamBalancerService);
     }
 
     @Test
@@ -91,6 +90,6 @@ class RemovePlayerFromSessionUseCaseTest {
         verify(sessionRepository).findById(sessionId);
         verify(session).removePlayer(playerId);
 
-        verifyNoInteractions(teamBalancerService);
+        verifyNoInteractions(initialTeamBalancerService);
     }
 }

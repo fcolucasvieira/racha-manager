@@ -20,7 +20,7 @@ public class Session {
         this.id = UUID.randomUUID();
         this.activePlayers = new ArrayList<>();
         this.teams = new ArrayList<>();
-        this.queue = new ArrayList<>();
+        this.queue = null;
         this.shuffled = false;
     }
 
@@ -82,7 +82,7 @@ public class Session {
             throw new IllegalStateException("Queue already started");
         }
 
-        if(teams.size() < 2){
+        if(teams == null || teams.size() < 2){
             throw new IllegalStateException("Not enough teams to start");
         }
 
@@ -101,28 +101,55 @@ public class Session {
             throw new IllegalStateException("No match in progress");
         }
 
-        Team winner = currentMatch.getTeamA().getNumber() == winnerTeamNumber
-                ? currentMatch.getTeamA()
-                : currentMatch.getTeamB();
+        if (queue == null) {
+            throw new IllegalStateException("Queue not initialized");
+        }
 
+        Team teamA = currentMatch.getTeamA();
+        Team teamB = currentMatch.getTeamB();
+
+        if (teamA.getNumber() != winnerTeamNumber &&
+                teamB.getNumber() != winnerTeamNumber) {
+            throw new IllegalArgumentException("Invalid winner team number");
+        }
+
+        Team winner = teamA.getNumber() == winnerTeamNumber ? teamA : teamB;
         Team loser = currentMatch.getLoser(winner);
 
         // loser vai pro final da fila
         queue.add(loser);
 
-        // se não tiver próximo, encerra
-        if (queue.isEmpty()) {
-            currentMatch = null;
-            return;
-        }
-
-        // armazena o primeiro time da fila (time atual a jogar)
         Team next = queue.removeFirst();
-
         currentMatch = new Match(winner, next);
     }
 
     public void markAsShuffled() {
         this.shuffled = true;
+    }
+
+    public void clearQueue() {
+        if (this.queue != null) {
+            this.queue.clear();
+        }
+        this.currentMatch = null;
+    }
+
+    public boolean canStartQueue() {
+        return currentMatch == null && teams != null && teams.size() >= 2;
+    }
+
+    public boolean hasStarted() {
+        return currentMatch != null;
+    }
+
+    public List<Team> getQueue() {
+        return queue == null ? List.of() : List.copyOf(queue);
+    }
+
+    public void addTeamToQueue(Team team) {
+        if (this.queue == null) {
+            throw new IllegalStateException("Queue not initialized");
+        }
+        this.queue.add(team);
     }
 }
