@@ -22,7 +22,7 @@ public class RemovePlayerFromSessionUseCase {
 
         session.removePlayer(playerId);
 
-        var teams = initialTeamBalancerService.balance(session);
+        var teams = initialTeamBalancerService.createInitialTeams(session);
 
         session.updateTeams(teams);
 

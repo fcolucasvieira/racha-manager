@@ -51,7 +51,7 @@ class RemovePlayerFromSessionUseCaseTest {
         List<Team> balancedTeams = List.of(new Team(1));
 
         when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
-        when(initialTeamBalancerService.balance(session)).thenReturn(balancedTeams);
+        when(initialTeamBalancerService.createInitialTeams(session)).thenReturn(balancedTeams);
 
         // act
         List<Team> result = useCase.execute(sessionId, playerId);
@@ -61,7 +61,7 @@ class RemovePlayerFromSessionUseCaseTest {
 
         verify(sessionRepository).findById(sessionId);
         verify(session).removePlayer(playerId);
-        verify(initialTeamBalancerService).balance(session);
+        verify(initialTeamBalancerService).createInitialTeams(session);
         verify(session).updateTeams(balancedTeams);
         verify(sessionRepository).save(session);
     }
