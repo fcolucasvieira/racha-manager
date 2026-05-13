@@ -123,6 +123,20 @@ public class Session {
         currentMatch = new Match(winner, next);
     }
 
+    public void removeTeam(Team team) {
+        if(team == null) {
+            throw new IllegalArgumentException("Team cannot be null");
+        }
+
+        if(teams != null) {
+            teams.remove(team);
+        }
+
+        if(queue != null){
+            queue.remove(team);
+        }
+    }
+
     public void markAsShuffled() {
         this.shuffled = true;
     }
@@ -152,4 +166,6 @@ public class Session {
         }
         this.queue.add(team);
     }
+
+
 }

@@ -36,9 +36,11 @@ public class AddPlayerToSessionUseCase {
 
             session.updateTeams(teams);
 
+            session.startQueue();
+
             sessionRepository.save(session);
 
-            return teams;
+            return session.getTeams();
         }
 
         if (session.hasStarted()) {
