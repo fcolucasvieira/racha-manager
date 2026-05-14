@@ -2,8 +2,8 @@ package com.fcolucasvieira.racha_manager.dto;
 
 import java.util.List;
 
-public record SessionTeamResponse(
+public record TeamDTO(
         int number,
-        List<String> playerNames
+        List<PlayerDTO> players
 ) {
 }

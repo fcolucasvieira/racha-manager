@@ -2,53 +2,58 @@ package com.fcolucasvieira.racha_manager.mapper;
 
 import com.fcolucasvieira.racha_manager.domain.model.Match;
 import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
-import com.fcolucasvieira.racha_manager.dto.MatchResponse;
-import com.fcolucasvieira.racha_manager.dto.SessionActivePlayerResponse;
-import com.fcolucasvieira.racha_manager.dto.SessionTeamResponse;
+import com.fcolucasvieira.racha_manager.dto.*;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class SessionMapper {
+    public SessionResponseDTO toResponse(Session session) {
 
-    public List<SessionTeamResponse> toTeamResponseList(List<Team> teams) {
-        return teams.stream()
-                .map(this::toTeamResponse)
-                .toList();
-    }
+        MatchDTO currentMatchDTO = null;
 
-    public SessionTeamResponse toTeamResponse(Team team) {
-        return new SessionTeamResponse(
-                team.getNumber(),
-                toPlayerNames(team.getPlayers())
+        // Se existir currentMatch
+        if(session.getCurrentMatch() != null) {
+            Match currentMatch = session.getCurrentMatch();
+
+            currentMatchDTO = new MatchDTO(
+                    toTeamDTO(currentMatch.getTeamA()),
+                    toTeamDTO(currentMatch.getTeamB())
+            );
+        }
+
+            return new SessionResponseDTO(
+                    session.getId(),
+                    session.hasStarted(),
+                    currentMatchDTO,
+                    session.getQueue()
+                            .stream()
+                            .map(this::toTeamDTO)
+                            .toList()
+            );
+        }
+
+    private MatchDTO toMatchDTO(Match match) {
+        return new MatchDTO(
+                toTeamDTO(match.getTeamA()),
+                toTeamDTO(match.getTeamB())
         );
     }
 
-    public List<SessionActivePlayerResponse> toActivePlayerResponseList(List<PlayerEntity> activePlayers) {
-        return activePlayers.stream()
-                .map(this::toActivePlayerResponse)
-                .toList();
+    public TeamDTO toTeamDTO(Team team) {
+        return new TeamDTO(
+                team.getNumber(),
+                team.getPlayers().stream()
+                        .map(this::toPlayerDTO)
+                        .toList()
+        );
     }
 
-    public SessionActivePlayerResponse toActivePlayerResponse(PlayerEntity player) {
-        return new SessionActivePlayerResponse(
+    private PlayerDTO toPlayerDTO(PlayerEntity player){
+        return new PlayerDTO(
                 player.getId(),
                 player.getName()
-        );
-    }
-
-    public List<String> toPlayerNames(List<PlayerEntity> players) {
-        return players.stream()
-                .map(PlayerEntity::getName)
-                .toList();
-    }
-
-    public MatchResponse toMatchResponse(Match match) {
-        return new MatchResponse(
-                toTeamResponse(match.getTeamA()),
-                toTeamResponse(match.getTeamB())
         );
     }
 }
