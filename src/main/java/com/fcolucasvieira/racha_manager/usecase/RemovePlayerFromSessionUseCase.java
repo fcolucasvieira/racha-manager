@@ -25,14 +25,16 @@ public class RemovePlayerFromSessionUseCase {
         // encontra o time do jogador
         Team team = findPlayerTeam(session, playerId);
 
-        // remove da sessão -> remove de activePlayers
+        // remove do activePlayers
         session.removePlayer(playerId);
 
         // remove do time
         team.removePlayerById(playerId);
 
-        // dissolve se vazio
+        // dissolve time se vazio
         if(team.getPlayers().isEmpty()) {
+            validateCurrentMatchTeamRemoval(session, team);
+
             session.removeTeam(team);
         }
 
@@ -53,5 +55,24 @@ public class RemovePlayerFromSessionUseCase {
                                 player.getId().equals(playerId)))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Player is not in a team"));
+    }
+
+    private void validateCurrentMatchTeamRemoval(Session session, Team team) {
+        // se a sessão não estiver iniciado, retorne
+        if(!session.hasStarted()){
+            return;
+        }
+
+        // instâncias para os times do currentMatch
+        Team teamA = session.getCurrentMatch().getTeamA();
+        Team teamB = session.getCurrentMatch().getTeamB();
+
+        // Booleano para identificar se team como argumento está no currentMatch
+        boolean isCurrentMatchTeam = team.equals(teamA) || team.equals(teamB);
+
+        // Não permitir dissolução de times que pertencem ao currentMatch
+        if(isCurrentMatchTeam) {
+            throw new IllegalStateException("Cannot remove all players from a current match team");
+        }
     }
 }
