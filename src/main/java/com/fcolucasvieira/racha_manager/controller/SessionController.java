@@ -6,6 +6,7 @@ import com.fcolucasvieira.racha_manager.dto.*;
 import com.fcolucasvieira.racha_manager.mapper.SessionMapper;
 import com.fcolucasvieira.racha_manager.repository.SessionRepository;
 import com.fcolucasvieira.racha_manager.usecase.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,10 +30,10 @@ public class SessionController {
 
 
     @PostMapping
-    public ResponseEntity<CreateSessionResponseDTO> createSession() {
+    public ResponseEntity<CreateSessionResponse> createSession() {
         UUID id = createSessionUseCase.execute();
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new CreateSessionResponseDTO(id));
+                .body(new CreateSessionResponse(id));
     }
 
     @PostMapping("/{sessionId}/players/{playerId}")
@@ -45,6 +46,14 @@ public class SessionController {
                         .map(sessionMapper::toTeamDTO)
                         .toList()
         );
+    }
+
+    @PostMapping("/{sessionId}/finish-match")
+    public ResponseEntity<Void> finishMatch(@PathVariable UUID sessionId,
+                                            @RequestBody @Valid FinishMatchRequest request) {
+        finishMatchUseCase.execute(sessionId, request.winnerTeamNumber());
+
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{sessionId}")

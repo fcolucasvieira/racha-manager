@@ -1,7 +1,7 @@
 package com.fcolucasvieira.racha_manager.controller;
 
-import com.fcolucasvieira.racha_manager.dto.CreatePlayerRequestDTO;
-import com.fcolucasvieira.racha_manager.dto.CreatePlayerResponseDTO;
+import com.fcolucasvieira.racha_manager.dto.CreatePlayerRequest;
+import com.fcolucasvieira.racha_manager.dto.CreatePlayerResponse;
 import com.fcolucasvieira.racha_manager.usecase.CreatePlayerUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +21,10 @@ public class PlayerController {
     private final CreatePlayerUseCase createUseCase;
 
     @PostMapping
-    public ResponseEntity<CreatePlayerResponseDTO> create(@RequestBody @Valid CreatePlayerRequestDTO request) {
+    public ResponseEntity<CreatePlayerResponse> create(@RequestBody @Valid CreatePlayerRequest request) {
         UUID id = createUseCase.execute(request.name());
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new CreatePlayerResponseDTO(id));
+                .body(new CreatePlayerResponse(id));
     }
 }
