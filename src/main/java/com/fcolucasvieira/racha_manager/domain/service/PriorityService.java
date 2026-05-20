@@ -2,12 +2,16 @@ package com.fcolucasvieira.racha_manager.domain.service;
 
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class PriorityService {
+
+    private static final Logger log = LoggerFactory.getLogger(PriorityService.class);
 
     public void apply(Session session) {
         // se não existe currentMatch, retornar
@@ -22,6 +26,14 @@ public class PriorityService {
         // uso de .getQueue() para uma cópia da queue na session
         List<Team> queue = session.getQueue();
 
+        log.info(
+                "[PRIORITY_REBALANCE_STARTED] sessionId={} currentMatch={}vs{} queueSize={}",
+                session.getId(),
+                teamA.getNumber(),
+                teamB.getNumber(),
+                queue.size()
+        );
+
         // completar teamA
         fill(teamA, queue);
         // completar teamB
@@ -29,6 +41,14 @@ public class PriorityService {
 
         // dissolver times vazios
         dissolveEmptyTeams(session);
+
+        log.info(
+                "[PRIORITY_REBALANCE_COMPLETED] sessionId={} currentMatch={}vs{} totalTeams={}",
+                session.getId(),
+                teamA.getNumber(),
+                teamB.getNumber(),
+                session.getTeams().size()
+        );
     }
 
     private void fill(Team target, List<Team> queue) {
@@ -37,7 +57,16 @@ public class PriorityService {
             // loop para adição de jogadores ao time alvo enquanto estiver incompleto
             while (target.isIncomplete() && !donor.getPlayers().isEmpty()) {
 
-                target.addPlayer(donor.removeFirstPlayer());
+                var transferredPlayer = donor.removeFirstPlayer();
+
+                target.addPlayer(transferredPlayer);
+
+                log.info(
+                        "[PLAYER_TRANSFERRED] donorTeam={} targetTeam={} playerId={}",
+                        donor.getNumber(),
+                        target.getNumber(),
+                        transferredPlayer.getId()
+                );
             }
 
             // se completo, retornar
@@ -54,6 +83,12 @@ public class PriorityService {
 
         for(Team team : teamsToRemove) {
             session.removeTeam(team);
+
+            log.info(
+                    "[EMPTY_TEAM_DISSOLVED] sessionId={} teamNumber={}",
+                    session.getId(),
+                    team.getNumber()
+            );
         }
     }
 }

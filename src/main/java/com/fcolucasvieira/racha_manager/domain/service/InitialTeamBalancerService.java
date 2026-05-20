@@ -3,8 +3,8 @@ package com.fcolucasvieira.racha_manager.domain.service;
 import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,11 +12,12 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
-@Slf4j
 public class InitialTeamBalancerService {
 
     private static final int TEAM_SIZE = 4;
     private static final int INITIAL_PLAYERS = 8;
+
+    private static final Logger log = LoggerFactory.getLogger(InitialTeamBalancerService.class);
 
     public List<Team> createInitialTeams(Session session) {
 
@@ -49,7 +50,12 @@ public class InitialTeamBalancerService {
         teams.add(team1);
         teams.add(team2);
 
-        log.info("Initial teams created successfully");
+        log.info(
+                "[INITIAL_BALANCE_COMPLETED] sessionId={} teams={} players={}",
+                session.getId(),
+                teams.size(),
+                session.getActivePlayers().size()
+        );
 
         return teams;
     }
