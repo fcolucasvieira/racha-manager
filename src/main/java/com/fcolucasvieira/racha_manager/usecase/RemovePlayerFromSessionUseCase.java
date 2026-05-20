@@ -6,6 +6,8 @@ import com.fcolucasvieira.racha_manager.domain.service.InitialTeamBalancerServic
 import com.fcolucasvieira.racha_manager.domain.service.PriorityService;
 import com.fcolucasvieira.racha_manager.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,8 @@ public class RemovePlayerFromSessionUseCase {
     private final SessionRepository sessionRepository;
     private final PriorityService priorityService;
 
+    private static final Logger log = LoggerFactory.getLogger(RemovePlayerFromSessionUseCase.class);
+
     public List<Team> execute(UUID sessionId, UUID playerId) {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
@@ -28,6 +32,13 @@ public class RemovePlayerFromSessionUseCase {
         // remove do activePlayers
         session.removePlayer(playerId);
 
+        log.info(
+                "[PLAYER_REMOVED] sessionId={} playerId={} activePlayers={}",
+                sessionId,
+                playerId,
+                session.getActivePlayers().size()
+        );
+
         // remove do time
         team.removePlayerById(playerId);
 
@@ -36,11 +47,22 @@ public class RemovePlayerFromSessionUseCase {
             validateCurrentMatchTeamRemoval(session, team);
 
             session.removeTeam(team);
+
+            log.info(
+                    "[TEAM_DISSOLVED] sessionId={} teamNumber={}",
+                    sessionId,
+                    team.getNumber()
+            );
         }
 
         // reorganiza currentMatch
         if(session.hasStarted()) {
             priorityService.apply(session);
+
+            log.info(
+                    "[PRIORITY_APPLIED] sessionId={}",
+                    sessionId
+            );
         }
 
         sessionRepository.save(session);
@@ -72,6 +94,12 @@ public class RemovePlayerFromSessionUseCase {
 
         // Não permitir dissolução de times que pertencem ao currentMatch
         if(isCurrentMatchTeam) {
+            log.warn(
+                    "[INVALID_TEAM_REMOVAL] sessionId={} teamNumber={} reason=current_match_team",
+                    session.getId(),
+                    team.getNumber()
+            );
+
             throw new IllegalStateException("Cannot remove all players from a current match team");
         }
     }

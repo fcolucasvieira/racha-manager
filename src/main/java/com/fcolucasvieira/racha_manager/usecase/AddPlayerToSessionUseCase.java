@@ -8,6 +8,8 @@ import com.fcolucasvieira.racha_manager.domain.service.InitialTeamBalancerServic
 import com.fcolucasvieira.racha_manager.repository.PlayerRepository;
 import com.fcolucasvieira.racha_manager.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +24,8 @@ public class AddPlayerToSessionUseCase {
     private final InitialTeamBalancerService initialTeamBalancerService;
     private final PriorityService priorityService;
 
+    private static final Logger log = LoggerFactory.getLogger(AddPlayerToSessionUseCase.class);
+
     public List<Team> execute(UUID sessionId, UUID playerId) {
         Session session = sessionRepository.findById(sessionId)
                         .orElseThrow(() -> new IllegalArgumentException("Session not found"));
@@ -31,12 +35,33 @@ public class AddPlayerToSessionUseCase {
 
         session.addPlayer(player);
 
+        log.info(
+                "[PLAYER_ADDED] sessionId={} playerId={} activePlayers={}",
+                sessionId,
+                playerId,
+                session.getActivePlayers().size()
+        );
+
         if(shouldCreateInitialTeams(session)){
             List<Team> teams = initialTeamBalancerService.createInitialTeams(session);
 
             session.updateTeams(teams);
 
+            log.info(
+                    "[INITIAL_TEAMS_CREATED] sessionId={} teamsCreated={}",
+                    sessionId,
+                    teams.size()
+            );
+
             session.startQueue();
+
+            log.info(
+                    "[QUEUE_STARTED] sessionId={} currentMatch={}vs{} queueSize={}",
+                    sessionId,
+                    session.getCurrentMatch().getTeamA().getNumber(),
+                    session.getCurrentMatch().getTeamB().getNumber(),
+                    session.getQueue().size()
+            );
 
             sessionRepository.save(session);
 
@@ -46,7 +71,19 @@ public class AddPlayerToSessionUseCase {
         if (session.hasStarted()) {
             addPlayerIncremental(session, player);
 
+            log.info(
+                    "[INCREMENTAL_PLAYER_ADDED] sessionId={} playerId={} totalTeams={}",
+                    sessionId,
+                    playerId,
+                    session.getTeams().size()
+            );
+
             priorityService.apply(session);
+
+            log.info(
+                    "[PRIORITY_APPLIED] sessionId={}",
+                    sessionId
+            );
         }
 
         sessionRepository.save(session);
