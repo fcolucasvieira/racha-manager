@@ -26,14 +26,6 @@ public class PriorityService {
         // uso de .getQueue() para uma cópia da queue na session
         List<Team> queue = session.getQueue();
 
-        log.info(
-                "[PRIORITY_REBALANCE_STARTED] sessionId={} currentMatch={}vs{} queueSize={}",
-                session.getId(),
-                teamA.getNumber(),
-                teamB.getNumber(),
-                queue.size()
-        );
-
         // completar teamA
         fill(teamA, queue);
         // completar teamB
@@ -41,14 +33,6 @@ public class PriorityService {
 
         // dissolver times vazios
         dissolveEmptyTeams(session);
-
-        log.info(
-                "[PRIORITY_REBALANCE_COMPLETED] sessionId={} currentMatch={}vs{} totalTeams={}",
-                session.getId(),
-                teamA.getNumber(),
-                teamB.getNumber(),
-                session.getTeams().size()
-        );
     }
 
     private void fill(Team target, List<Team> queue) {

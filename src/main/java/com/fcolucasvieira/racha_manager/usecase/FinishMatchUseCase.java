@@ -1,6 +1,7 @@
 package com.fcolucasvieira.racha_manager.usecase;
 
 import com.fcolucasvieira.racha_manager.domain.model.Session;
+import com.fcolucasvieira.racha_manager.domain.service.MatchFlowService;
 import com.fcolucasvieira.racha_manager.domain.service.PriorityService;
 import com.fcolucasvieira.racha_manager.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.UUID;
 public class FinishMatchUseCase {
     private final SessionRepository sessionRepository;
     private final PriorityService priorityService;
+    private final MatchFlowService matchFlowService;
 
     private static final Logger log = LoggerFactory.getLogger(FinishMatchUseCase.class);
 
@@ -23,12 +25,13 @@ public class FinishMatchUseCase {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
 
+        // guarda estado anterior para observabilidade de código
         var previousMatch = session.getCurrentMatch();
 
         int previousTeamA = previousMatch.getTeamA().getNumber();
         int previousTeamB = previousMatch.getTeamB().getNumber();
 
-        session.finishMatch(winnerTeamNumber);
+        matchFlowService.finishWithWinner(session, winnerTeamNumber);
 
         log.info(
                 "[MATCH_FINISHED] sessionId={} winnerTeamNumber={} finishedMatch={}vs{} nextMatch={}vs{}",
@@ -41,11 +44,6 @@ public class FinishMatchUseCase {
         );
 
         priorityService.apply(session);
-
-        log.info(
-                "[PRIORITY_APPLIED] sessionId={}",
-                sessionId
-        );
 
         sessionRepository.save(session);
     }

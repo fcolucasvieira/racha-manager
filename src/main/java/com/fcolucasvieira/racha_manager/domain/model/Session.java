@@ -63,17 +63,30 @@ public class Session {
         this.teams = teams;
     }
 
-    public void reorderPlayers(List<PlayerEntity> newOrder) {
-        if(newOrder == null) {
-            throw new IllegalArgumentException("Player list can't be null");
+    public void removeTeam(Team team) {
+        if(team == null) {
+            throw new IllegalArgumentException("Team cannot be null");
         }
 
-        if(newOrder.size() != this.activePlayers.size()) {
-            throw new IllegalArgumentException("Invalid reorder size");
+        if(teams != null) {
+            teams.remove(team);
         }
 
-        this.activePlayers.clear();
-        this.activePlayers.addAll(newOrder);
+        if(queue != null){
+            queue.remove(team);
+        }
+    }
+
+    public boolean hasStarted() {
+        return currentMatch != null;
+    }
+
+    public void updateCurrentMatch(Match match) {
+        if(match == null) {
+            throw new IllegalArgumentException("Match cannot be null");
+        }
+
+        this.currentMatch = match;
     }
 
     // regras de negócio (fila) em session
@@ -95,50 +108,36 @@ public class Session {
         this.currentMatch = new Match(t1, t2);
     }
 
-    // regras de negócio (fila) em session
-    public void finishMatch(int winnerTeamNumber) {
-        if (currentMatch == null) {
-            throw new IllegalStateException("No match in progress");
-        }
-
-        if (queue == null) {
-            throw new IllegalStateException("Queue not initialized");
-        }
-
-        Team teamA = currentMatch.getTeamA();
-        Team teamB = currentMatch.getTeamB();
-
-        if (teamA.getNumber() != winnerTeamNumber &&
-                teamB.getNumber() != winnerTeamNumber) {
-            throw new IllegalArgumentException("Invalid winner team number");
-        }
-
-        Team winner = teamA.getNumber() == winnerTeamNumber ? teamA : teamB;
-        Team loser = currentMatch.getLoser(winner);
-
-        // loser vai pro final da fila
-        queue.add(loser);
-
-        Team next = queue.removeFirst();
-        currentMatch = new Match(winner, next);
+    public List<Team> getQueue() {
+        return queue == null ? List.of() : List.copyOf(queue);
     }
 
-    public void removeTeam(Team team) {
+    public void addTeamToQueue(Team team) {
         if(team == null) {
             throw new IllegalArgumentException("Team cannot be null");
         }
 
-        if(teams != null) {
-            teams.remove(team);
+        if(this.queue == null) {
+            throw new IllegalStateException("Queue not initialized");
         }
 
-        if(queue != null){
-            queue.remove(team);
+        if(this.queue.contains(team)) {
+            throw new IllegalStateException("Team already in queue");
         }
+
+        this.queue.add(team);
     }
 
-    public void markAsShuffled() {
-        this.shuffled = true;
+    public Team removeFirstTeamFromQueue() {
+        if(queue == null || queue.isEmpty()) {
+            throw new IllegalStateException("Queue is empty");
+        }
+
+        return queue.removeFirst();
+    }
+
+    public boolean hasQueue() {
+        return queue != null;
     }
 
     public void clearQueue() {
@@ -152,20 +151,7 @@ public class Session {
         return currentMatch == null && teams != null && teams.size() >= 2;
     }
 
-    public boolean hasStarted() {
-        return currentMatch != null;
+    public void markAsShuffled() {
+        this.shuffled = true;
     }
-
-    public List<Team> getQueue() {
-        return queue == null ? List.of() : List.copyOf(queue);
-    }
-
-    public void addTeamToQueue(Team team) {
-        if (this.queue == null) {
-            throw new IllegalStateException("Queue not initialized");
-        }
-        this.queue.add(team);
-    }
-
-
 }
