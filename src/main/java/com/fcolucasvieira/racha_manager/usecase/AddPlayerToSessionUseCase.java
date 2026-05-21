@@ -47,12 +47,6 @@ public class AddPlayerToSessionUseCase {
 
             session.updateTeams(teams);
 
-            log.info(
-                    "[INITIAL_TEAMS_CREATED] sessionId={} teamsCreated={}",
-                    sessionId,
-                    teams.size()
-            );
-
             session.startQueue();
 
             log.info(
@@ -79,11 +73,6 @@ public class AddPlayerToSessionUseCase {
             );
 
             priorityService.apply(session);
-
-            log.info(
-                    "[PRIORITY_APPLIED] sessionId={}",
-                    sessionId
-            );
         }
 
         sessionRepository.save(session);
