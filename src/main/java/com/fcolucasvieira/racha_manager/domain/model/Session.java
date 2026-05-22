@@ -147,6 +147,10 @@ public class Session {
         this.currentMatch = null;
     }
 
+    public boolean hasAtLeastTeamsInQueue(int amount) {
+        return queue != null && queue.size() >= amount;
+    }
+
     public boolean canStartQueue() {
         return currentMatch == null && teams != null && teams.size() >= 2;
     }

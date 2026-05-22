@@ -48,6 +48,37 @@ public class MatchFlowService {
         );
     }
 
+    public void finishWithDraw(Session session) {
+        // valida se há currentMatch e queue na sessão
+        validateSessionState(session);
+
+        // se existir menos que 2 times na queue, lançar excessão
+        if(!session.hasAtLeastTeamsInQueue(2)) {
+            throw new IllegalStateException("Cannot finish draw without at least 2 teams in queue");
+        }
+
+        // seleta currentMatch através da session
+        Match currentMatch = session.getCurrentMatch();
+
+        // seleta times da sessão através da variável currentMatch
+        Team teamA = currentMatch.getTeamA();
+        Team teamB = currentMatch.getTeamB();
+
+        // joga os dois times para o final da fila (em ordem -> 1° A; 2º B)
+        session.addTeamToQueue(teamA);
+        session.addTeamToQueue(teamB);
+
+        // seleta os dois primeiros times da fila para o currentMatch
+        Team nextTeamA = session.removeFirstTeamFromQueue();
+        Team nextTeamB = session.removeFirstTeamFromQueue();
+
+        // atualiza currentMatch
+        session.updateCurrentMatch(
+                new Match(nextTeamA, nextTeamB)
+        );
+    }
+
+
     private void validateSessionState(Session session) {
         if(!session.hasStarted()) {
             throw new IllegalStateException("No match in progress");

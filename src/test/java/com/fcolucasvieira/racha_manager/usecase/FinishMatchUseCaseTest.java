@@ -1,5 +1,6 @@
 package com.fcolucasvieira.racha_manager.usecase;
 
+import com.fcolucasvieira.racha_manager.domain.enums.MatchResultType;
 import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
@@ -24,11 +25,15 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class FinishMatchUseCaseTest {
 
-    @Mock private SessionRepository sessionRepository;
-    @Mock private PriorityService priorityService;
-    @Mock private MatchFlowService matchFlowService;
+    @Mock
+    private SessionRepository sessionRepository;
+    @Mock
+    private PriorityService priorityService;
+    @Mock
+    private MatchFlowService matchFlowService;
 
-    @InjectMocks private FinishMatchUseCase useCase;
+    @InjectMocks
+    private FinishMatchUseCase useCase;
 
     UUID sessionId;
     UUID playerId;
@@ -45,7 +50,7 @@ class FinishMatchUseCaseTest {
         Team team = new Team(number);
 
         // adiciona a qtde. de players no time através do parâmetro countPlayers
-        for(int i = 1; i <= countPlayers; i++) {
+        for (int i = 1; i <= countPlayers; i++) {
             team.addPlayer(new PlayerEntity(UUID.randomUUID(), "P" + i));
         }
 
@@ -54,7 +59,7 @@ class FinishMatchUseCaseTest {
     }
 
     @Test
-    void shouldFinishMatchSuccessfully() {
+    void shouldFinishMatchWithWinnerSuccessfully() {
         // arrange
         Session session = new Session();
 
@@ -72,10 +77,38 @@ class FinishMatchUseCaseTest {
                 .thenReturn(Optional.of(session));
 
         // act
-        useCase.execute(sessionId, 1);
+        useCase.execute(sessionId, 1, MatchResultType.WINNER);
 
         // assert
         verify(matchFlowService).finishWithWinner(session, 1);
+        verify(priorityService).apply(session);
+        verify(sessionRepository).save(session);
+    }
+
+    @Test
+    void shouldFinishMatchWithDrawSuccessfully() {
+        // arrange
+        Session session = new Session();
+
+        Team t1 = createTeam(1, 4);
+        Team t2 = createTeam(2, 4);
+        Team t3 = createTeam(3, 4);
+        Team t4 = createTeam(4, 4);
+
+        List<Team> teams = new ArrayList<>(List.of(t1, t2, t3, t4));
+
+        session.updateTeams(teams);
+
+        session.startQueue();
+
+        when(sessionRepository.findById(sessionId))
+                .thenReturn(Optional.of(session));
+
+        // act
+        useCase.execute(sessionId, null, MatchResultType.DRAW);
+
+        // assert
+        verify(matchFlowService).finishWithDraw(session);
         verify(priorityService).apply(session);
         verify(sessionRepository).save(session);
     }
@@ -86,9 +119,47 @@ class FinishMatchUseCaseTest {
                 .thenReturn(Optional.empty());
 
         // act & assert
-        assertThrows(IllegalArgumentException.class, () -> useCase.execute(sessionId, 1));
+        assertThrows(IllegalArgumentException.class,
+                () -> useCase.execute(
+                        sessionId,
+                        1,
+                        MatchResultType.WINNER)
+        );
 
         verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
+        verify(priorityService, never()).apply(any());
+        verify(sessionRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenWinnerTypeHasNullWinner() {
+        // act & assert
+        assertThrows(IllegalArgumentException.class,
+                () -> useCase.execute(
+                        sessionId,
+                        null,
+                        MatchResultType.WINNER)
+        );
+
+        verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
+        verify(priorityService, never()).apply(any());
+        verify(sessionRepository, never()).save(any());
+    }
+
+
+    @Test
+    void shouldThrowExceptionWhenDrawHasWinnerNumber() {
+        // act & assert
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> useCase.execute(
+                        sessionId,
+                        1,
+                        MatchResultType.DRAW
+                )
+        );
+
+        verify(matchFlowService, never()).finishWithDraw(any());
         verify(priorityService, never()).apply(any());
         verify(sessionRepository, never()).save(any());
     }

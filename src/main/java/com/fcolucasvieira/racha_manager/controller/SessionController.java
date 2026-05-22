@@ -51,7 +51,11 @@ public class SessionController {
     @PostMapping("/{sessionId}/finish-match")
     public ResponseEntity<Void> finishMatch(@PathVariable UUID sessionId,
                                             @RequestBody @Valid FinishMatchRequest request) {
-        finishMatchUseCase.execute(sessionId, request.winnerTeamNumber());
+        finishMatchUseCase.execute(
+                sessionId,
+                request.winnerTeamNumber(),
+                request.resultType()
+        );
 
         return ResponseEntity.noContent().build();
     }
