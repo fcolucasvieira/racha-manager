@@ -11,8 +11,8 @@ public class Team {
     private static final int TEAM_SIZE = 4;
 
     private final int number;
-
     private final List<PlayerEntity> players;
+    private boolean played;
 
     public Team(Integer number) {
         if(number <= 0) {
@@ -21,6 +21,7 @@ public class Team {
 
         this.number = number;
         this.players = new ArrayList<>();
+        this.played = false;
     }
 
     public void addPlayer(PlayerEntity player) {
@@ -34,7 +35,8 @@ public class Team {
             throw new IllegalStateException("Team has no players");
         }
 
-        return players.remove(0);    }
+        return players.remove(0);
+    }
 
     public void removePlayerById(UUID playerId) {
         if (playerId == null) {
@@ -67,6 +69,10 @@ public class Team {
 
     public boolean isIncomplete() {
         return players.size() < TEAM_SIZE;
+    }
+
+    public void markAsPlayed() {
+        this.played = true;
     }
 
     public int missingPlayers() {

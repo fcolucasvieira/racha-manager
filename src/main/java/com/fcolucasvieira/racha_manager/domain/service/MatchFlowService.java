@@ -11,6 +11,7 @@ public class MatchFlowService {
         // valida se há currentMatch e queue na sessão
         validateSessionState(session);
 
+        // instância currentMatch e seus times
         Match currentMatch = session.getCurrentMatch();
 
         Team teamA = currentMatch.getTeamA();
@@ -26,6 +27,10 @@ public class MatchFlowService {
 
         // seleta o perdedor
         Team loser = currentMatch.getLoser(winner);
+
+        // marca times que já jogaram
+        winner.markAsPlayed();
+        loser.markAsPlayed();
 
         // Caso a queue esteja vazia, o próximo jogo é o mesmo que o anterior (vencedor vs perdedor)
         if(session.getQueue().isEmpty()) {
@@ -68,6 +73,10 @@ public class MatchFlowService {
         session.addTeamToQueue(teamA);
         session.addTeamToQueue(teamB);
 
+        // marca os times que já jogaram
+        teamA.markAsPlayed();
+        teamB.markAsPlayed();
+
         // seleta os dois primeiros times da fila para o currentMatch
         Team nextTeamA = session.removeFirstTeamFromQueue();
         Team nextTeamB = session.removeFirstTeamFromQueue();
@@ -77,7 +86,6 @@ public class MatchFlowService {
                 new Match(nextTeamA, nextTeamB)
         );
     }
-
 
     private void validateSessionState(Session session) {
         if(!session.hasStarted()) {

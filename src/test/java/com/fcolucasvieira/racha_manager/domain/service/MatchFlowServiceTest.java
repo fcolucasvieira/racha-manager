@@ -135,4 +135,43 @@ class MatchFlowServiceTest {
         // act & assert
         assertThrows(IllegalArgumentException.class, () -> service.finishWithWinner(session, 99));
     }
+
+    @Test
+    void shouldPrioritizeRookieTeamAfterMatchFinishes() {
+        // arrange
+        Session session = new Session();
+
+        Team t1 = createTeam(1, 4);
+        Team t2 = createTeam(2, 4);
+
+        // t3 ainda não jogou
+        Team t3 = createTeam(3, 4);
+
+        session.updateTeams(
+                new ArrayList<>(List.of(t1, t2, t3))
+        );
+
+        session.startQueue();
+
+        Team rookie = createTeam(4, 4);
+
+        // novo time novato entra na fila
+        session.addTeamToQueue(rookie);
+
+        // act
+        service.finishWithWinner(session, 1);
+
+        // assert
+        assertEquals(1, session.getCurrentMatch().getTeamA().getNumber());
+
+        // t3 deve continuar na frente do rookie,
+        // porque chegou antes como novato
+        assertEquals(3, session.getCurrentMatch().getTeamB().getNumber());
+
+        // fila restante
+        assertEquals(2, session.getQueue().size());
+
+        assertEquals(4, session.getQueue().get(0).getNumber());
+        assertEquals(2, session.getQueue().get(1).getNumber());
+    }
 }

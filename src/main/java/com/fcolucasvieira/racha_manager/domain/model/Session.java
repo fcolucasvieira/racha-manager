@@ -1,6 +1,8 @@
 package com.fcolucasvieira.racha_manager.domain.model;
 
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,8 @@ public class Session {
     private List<Team> queue;
     private Match currentMatch;
     private boolean shuffled;
+
+    private static final Logger log =  LoggerFactory.getLogger(Session.class);
 
     public Session() {
         this.id = UUID.randomUUID();
@@ -125,7 +129,55 @@ public class Session {
             throw new IllegalStateException("Team already in queue");
         }
 
+        // se o time ainda não jogou, adicioná-lo atrás do último novato da fila
+        if(!team.isPlayed()) {
+
+            // gera uma lista com times novatos através da queue
+            List<Team> rookieTeams = queue.stream()
+                    .filter(t -> !t.isPlayed())
+                    .toList();
+
+            // se a lista estiver vazia, não há times novatos. logo, o time novato é adicionado ao início da queue
+            if(rookieTeams.isEmpty()) {
+                this.queue.addFirst(team);
+
+                log.info(
+                        "[QUEUE_PRIORITY] team={} rookie=true insertedPosition={} queue={}",
+                        team.getNumber(),
+                        0,
+                        queue.stream().map(Team::getNumber).toList()
+                );
+
+                return;
+            }
+
+            // seleta o último time da queue como novato
+            Team lastRookie = rookieTeams.getLast();
+
+            // seleta índice do último time novato na queue
+            int rookieIndex = queue.indexOf(lastRookie);
+
+            this.queue.add(rookieIndex + 1, team);
+
+            log.info(
+                    "[QUEUE_PRIORITY] team={} rookie=true insertedPosition={} queue={}",
+                    team.getNumber(),
+                    rookieIndex + 1,
+                    queue.stream().map(Team::getNumber).toList()
+            );
+
+            return;
+        }
+
+        // caso contrário, adicioná-lo ao final da fila
         this.queue.add(team);
+
+        log.info(
+                "[QUEUE_APPEND] team={} rookie=false insertedPosition={} queue={}",
+                team.getNumber(),
+                queue.size() - 1,
+                queue.stream().map(Team::getNumber).toList()
+        );
     }
 
     public Team removeFirstTeamFromQueue() {
@@ -152,7 +204,7 @@ public class Session {
     }
 
     public boolean canStartQueue() {
-        return currentMatch == null && teams != null && teams.size() >= 2;
+        return !hasStarted() && teams != null && teams.size() >= 2;
     }
 
     public void markAsShuffled() {

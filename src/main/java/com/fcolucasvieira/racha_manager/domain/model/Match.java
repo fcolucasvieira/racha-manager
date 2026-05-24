@@ -1,6 +1,5 @@
 package com.fcolucasvieira.racha_manager.domain.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
