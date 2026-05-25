@@ -45,12 +45,14 @@ public class PriorityService {
 
                 target.addPlayer(transferredPlayer);
 
+                /*
                 log.info(
                         "[PLAYER_TRANSFERRED] donorTeam={} targetTeam={} playerId={}",
                         donor.getNumber(),
                         target.getNumber(),
                         transferredPlayer.getId()
                 );
+                 */
             }
 
             // se completo, retornar
@@ -68,11 +70,14 @@ public class PriorityService {
         for(Team team : teamsToRemove) {
             session.removeTeam(team);
 
+            /*
             log.info(
                     "[EMPTY_TEAM_DISSOLVED] sessionId={} teamNumber={}",
                     session.getId(),
                     team.getNumber()
             );
+
+             */
         }
     }
 }

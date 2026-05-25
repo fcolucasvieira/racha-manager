@@ -141,12 +141,14 @@ public class Session {
             if(rookieTeams.isEmpty()) {
                 this.queue.addFirst(team);
 
+                /*
                 log.info(
                         "[QUEUE_PRIORITY] team={} rookie=true insertedPosition={} queue={}",
                         team.getNumber(),
                         0,
                         queue.stream().map(Team::getNumber).toList()
                 );
+                 */
 
                 return;
             }
@@ -159,12 +161,14 @@ public class Session {
 
             this.queue.add(rookieIndex + 1, team);
 
+            /*
             log.info(
                     "[QUEUE_PRIORITY] team={} rookie=true insertedPosition={} queue={}",
                     team.getNumber(),
                     rookieIndex + 1,
                     queue.stream().map(Team::getNumber).toList()
             );
+             */
 
             return;
         }
@@ -172,12 +176,14 @@ public class Session {
         // caso contrário, adicioná-lo ao final da fila
         this.queue.add(team);
 
+        /*
         log.info(
                 "[QUEUE_APPEND] team={} rookie=false insertedPosition={} queue={}",
                 team.getNumber(),
                 queue.size() - 1,
                 queue.stream().map(Team::getNumber).toList()
         );
+         */
     }
 
     public Team removeFirstTeamFromQueue() {

@@ -50,12 +50,13 @@ public class InitialTeamBalancerService {
         teams.add(team1);
         teams.add(team2);
 
-        log.info(
+        /* log.info(
                 "[INITIAL_BALANCE_COMPLETED] sessionId={} teams={} players={}",
                 session.getId(),
                 teams.size(),
                 session.getActivePlayers().size()
         );
+         */
 
         return teams;
     }
