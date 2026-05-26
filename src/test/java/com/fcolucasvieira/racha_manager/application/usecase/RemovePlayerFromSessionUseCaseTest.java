@@ -1,8 +1,8 @@
 package com.fcolucasvieira.racha_manager.application.usecase;
 
 import com.fcolucasvieira.racha_manager.domain.model.*;
-import com.fcolucasvieira.racha_manager.domain.service.PriorityService;
 import com.fcolucasvieira.racha_manager.domain.port.SessionRepositoryPort;
+import com.fcolucasvieira.racha_manager.domain.service.PriorityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,10 +21,13 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class RemovePlayerFromSessionUseCaseTest {
 
-    @Mock private SessionRepositoryPort sessionRepositoryPort;
-    @Mock private PriorityService priorityService;
+    @Mock
+    private SessionRepositoryPort sessionRepositoryPort;
+    @Mock
+    private PriorityService priorityService;
 
-    @InjectMocks private RemovePlayerFromSessionUseCase useCase;
+    @InjectMocks
+    private RemovePlayerFromSessionUseCase useCase;
 
     private UUID sessionId;
     private UUID playerId;
@@ -35,172 +38,217 @@ class RemovePlayerFromSessionUseCaseTest {
         playerId = UUID.randomUUID();
     }
 
-    // Helper
+    // helper
+    private PlayerEntity createPlayer(String name) {
+        return new PlayerEntity(UUID.randomUUID(), name);
+    }
+
+    // helper
     private Team createTeam(int number, int playersCount) {
         Team team = new Team(number);
 
-        for(int i = 1; i <= playersCount; i++) {
-            team.addPlayer(
-                    new PlayerEntity(
-                    number == 1 && i == 1
-                            ? playerId
-                            : UUID.randomUUID(),
-                    "P" + i
-                    )
-            );
+        for (int i = 1; i <= playersCount; i++) {
+            team.addPlayer(createPlayer("P" + i));
         }
 
         return team;
     }
 
     @Test
-    void shouldRemovePlayerFromSession() {
-        // arrange
+    void shouldThrowExceptionWhenSessionNotFound() {
+        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.empty());
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> useCase.execute(sessionId, playerId)
+        );
+
+        verify(sessionRepositoryPort, never()).save(any());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenPlayerIsNotInAnyTeam() {
         Session session = new Session();
 
         Team t1 = createTeam(1, 2);
 
-        session.updateTeams(
-                new ArrayList<>(List.of(t1))
-        );
+        session.updateTeams(new ArrayList<>(List.of(t1)));
 
-        // adiciona jogadores a sessão
         t1.getPlayers().forEach(session::addPlayer);
 
         when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
 
-        // act
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> useCase.execute(sessionId, playerId)
+        );
+
+        verify(sessionRepositoryPort, never()).save(any());
+    }
+
+    @Test
+    void shouldRemovePlayerFromSession() {
+        Session session = new Session();
+
+        PlayerEntity removablePlayer =
+                new PlayerEntity(playerId, "P1");
+
+        Team t1 = new Team(1);
+
+        t1.addPlayer(removablePlayer);
+        t1.addPlayer(createPlayer("P2"));
+
+        session.updateTeams(new ArrayList<>(List.of(t1)));
+
+        t1.getPlayers().forEach(session::addPlayer);
+
+        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
+
         useCase.execute(sessionId, playerId);
 
-        // assert
         assertEquals(1, session.getActivePlayers().size());
         assertEquals(1, t1.getPlayers().size());
 
-        verify(sessionRepositoryPort)
-                .save(session);
+        verify(sessionRepositoryPort).save(session);
     }
 
     @Test
     void shouldDissolveEmptyTeam() {
-        // arrange
         Session session = new Session();
 
-        // t1 com um jogador (playerId, P1)
-        Team t1 = createTeam(1, 1);
+        PlayerEntity removablePlayer = new PlayerEntity(playerId, "P1");
 
-        // atualiza times da sessão
-        session.updateTeams(
-                new ArrayList<>(List.of(t1))
-        );
+        Team t1 = new Team(1);
 
-        // aos jogadores de t1, incrementa na sessão (activePlayers)
-        t1.getPlayers().forEach(session::addPlayer);
+        t1.addPlayer(removablePlayer);
+
+        session.updateTeams(new ArrayList<>(List.of(t1)));
+
+        session.addPlayer(removablePlayer);
 
         when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
 
-        //act
         useCase.execute(sessionId, playerId);
 
         assertTrue(session.getTeams().isEmpty());
+
+        verify(sessionRepositoryPort).save(session);
     }
 
     @Test
-    void shouldApplyPriorityServiceWhenSessionHasStarted() {
-        // arrange
+    void shouldApplyPriorityServiceWhenRemovingPlayerFromCurrentMatchTeam() {
         Session session = new Session();
 
-        Team t1 = createTeam(1, 4);
+        PlayerEntity removablePlayer = new PlayerEntity(playerId, "P1");
+
+        Team t1 = new Team(1);
         Team t2 = createTeam(2, 4);
-        Team t3 = createTeam(3, 2);
+        Team t3 = createTeam(3, 4);
 
-        // Incrementa times na sessão
-        session.updateTeams(
-                new ArrayList<>(List.of(t1, t2, t3))
-        );
+        t1.addPlayer(removablePlayer);
+        t1.addPlayer(createPlayer("P2"));
+        t1.addPlayer(createPlayer("P3"));
+        t1.addPlayer(createPlayer("P4"));
 
-        // adiciona players na sessão (activePlayers)
+        session.updateTeams(new ArrayList<>(List.of(t1, t2, t3)));
+
         session.getTeams().forEach(
                 team -> team.getPlayers().forEach(session::addPlayer)
         );
 
-        // inicia queue para que o time com jogador removido, seja incrementado os 4 jogadores
         session.startQueue();
 
-        when(sessionRepositoryPort.findById(sessionId))
-                .thenReturn(Optional.of(session));
+        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
 
-        UUID removablePlayerId = t3.getPlayers().get(0).getId();
+        useCase.execute(sessionId, playerId);
 
-        // act
-        useCase.execute(sessionId, removablePlayerId);
+        verify(priorityService).apply(session);
 
-        // assert
-        assertTrue(t1.isFull());
+        verify(sessionRepositoryPort).save(session);
+    }
 
-        assertEquals(1, session.getQueue().size());
-        assertEquals(1, t3.getPlayers().size());
+    @Test
+    void shouldNotApplyPriorityServiceWhenRemovingPlayerOutsideCurrentMatch() {
+        Session session = new Session();
 
-        verify(priorityService)
-                .apply(session);
+        PlayerEntity removablePlayer = new PlayerEntity(playerId, "P1");
 
-        verify(sessionRepositoryPort)
-                .save(session);
+        Team t1 = createTeam(1, 4);
+        Team t2 = createTeam(2, 4);
+
+        Team t3 = new Team(3);
+
+        t3.addPlayer(removablePlayer);
+        t3.addPlayer(createPlayer("P2"));
+
+        session.updateTeams(new ArrayList<>(List.of(t1, t2, t3)));
+
+        session.getTeams().forEach(
+                team -> team.getPlayers().forEach(session::addPlayer)
+        );
+
+        session.startQueue();
+
+        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
+
+        useCase.execute(sessionId, playerId);
+
+        verify(priorityService, never()).apply(any());
+
+        verify(sessionRepositoryPort).save(session);
     }
 
     @Test
     void shouldNotApplyPriorityServiceWhenSessionHasNotStarted() {
-        // arrange
         Session session = new Session();
 
-        Team t1 = createTeam(1, 2);
+        PlayerEntity removablePlayer = new PlayerEntity(playerId, "P1");
 
-        session.updateTeams(
-                new ArrayList<>(List.of(t1))
-        );
+        Team t1 = new Team(1);
+
+        t1.addPlayer(removablePlayer);
+        t1.addPlayer(createPlayer("P2"));
+
+        session.updateTeams(new ArrayList<>(List.of(t1)));
 
         t1.getPlayers().forEach(session::addPlayer);
 
         when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
 
-        // act
         useCase.execute(sessionId, playerId);
 
-        // assert
-        verify(priorityService, never())
-                .apply(any());
+        verify(priorityService, never()).apply(any());
     }
 
     @Test
     void shouldThrowExceptionWhenRemovingLastPlayerFromCurrentMatchTeam() {
-        // arrange
         Session session = new Session();
 
-        // t1 em currentMatch e com jogador a ser removido -> deve lançar excessão
-        Team t1 = createTeam(1, 1);
+        PlayerEntity removablePlayer = new PlayerEntity(playerId, "P1");
+
+        Team t1 = new Team(1);
         Team t2 = createTeam(2, 4);
         Team t3 = createTeam(3, 4);
 
+        t1.addPlayer(removablePlayer);
 
-        session.updateTeams(
-                new ArrayList<>(List.of(t1, t2, t3))
-        );
+        session.updateTeams(new ArrayList<>(List.of(t1, t2, t3)));
 
         session.getTeams().forEach(
                 team -> team.getPlayers().forEach(session::addPlayer)
         );
 
-        // inicia queue para que currentMatch (t1 vs t2) esteja ocorrendo
         session.startQueue();
 
         when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
 
-        // act + assert
-        assertThrows(IllegalStateException.class, () -> useCase.execute(sessionId, playerId));
+        assertThrows(
+                IllegalStateException.class,
+                () -> useCase.execute(sessionId, playerId)
+        );
 
-        verify(priorityService, never())
-                .apply(any());
+        verify(priorityService, never()).apply(any());
 
-        verify(sessionRepositoryPort, never())
-                .save(session);
+        verify(sessionRepositoryPort, never()).save(any());
     }
 }

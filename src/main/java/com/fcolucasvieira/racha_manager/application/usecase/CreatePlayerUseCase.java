@@ -20,13 +20,11 @@ public class CreatePlayerUseCase {
     public UUID execute(String name) {
         PlayerEntity player = new PlayerEntity(name);
 
-        /*
         log.info(
                 "[PLAYER_CREATED] playerId={} playerName={}",
                 player.getId(),
                 player.getName()
         );
-         */
 
         repository.save(player);
 

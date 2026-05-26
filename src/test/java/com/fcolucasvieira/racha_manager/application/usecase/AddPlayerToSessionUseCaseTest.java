@@ -23,12 +23,17 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AddPlayerToSessionUseCaseTest {
 
-    @Mock private SessionRepositoryPort sessionRepositoryPort;
-    @Mock private PlayerRepositoryPort playerRepositoryPort;
-    @Mock private InitialTeamBalancerService initialTeamBalancerService;
-    @Mock private PriorityService priorityService;
+    @Mock
+    private SessionRepositoryPort sessionRepositoryPort;
+    @Mock
+    private PlayerRepositoryPort playerRepositoryPort;
+    @Mock
+    private InitialTeamBalancerService initialTeamBalancerService;
+    @Mock
+    private PriorityService priorityService;
 
-    @InjectMocks private AddPlayerToSessionUseCase useCase;
+    @InjectMocks
+    private AddPlayerToSessionUseCase useCase;
 
     private UUID sessionId;
     private UUID playerId;
@@ -41,10 +46,7 @@ class AddPlayerToSessionUseCaseTest {
 
     // helper
     private PlayerEntity createPlayer(String name) {
-        return new PlayerEntity(
-                UUID.randomUUID(),
-                name
-        );
+        return new PlayerEntity(UUID.randomUUID(), name);
     }
 
     // helper
@@ -52,9 +54,7 @@ class AddPlayerToSessionUseCaseTest {
         Team team = new Team(number);
 
         for (int i = 1; i <= playersCount; i++) {
-            team.addPlayer(
-                    createPlayer("P" + i)
-            );
+            team.addPlayer(createPlayer("P" + i));
         }
 
         return team;
@@ -62,238 +62,208 @@ class AddPlayerToSessionUseCaseTest {
 
     @Test
     void shouldThrowExceptionWhenSessionNotFound() {
-        // arrange
-        when(sessionRepositoryPort.findById(sessionId))
-                .thenReturn(Optional.empty());
+        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.empty());
 
-        // act & assert
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> useCase.execute(sessionId, playerId)
-        );
+        assertThrows(IllegalArgumentException.class, () -> useCase.execute(sessionId, playerId));
 
         verify(playerRepositoryPort, never()).findById(any());
     }
 
     @Test
     void shouldThrowExceptionWhenPlayerNotFound() {
-        // arrange
         Session session = new Session();
 
-        when(sessionRepositoryPort.findById(sessionId))
-                .thenReturn(Optional.of(session));
+        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
+        when(playerRepositoryPort.findById(playerId)).thenReturn(Optional.empty());
 
-        when(playerRepositoryPort.findById(playerId))
-                .thenReturn(Optional.empty());
-
-        // act & assert
-        assertThrows(
-                IllegalArgumentException.class,
-                () -> useCase.execute(sessionId, playerId)
-        );
+        assertThrows(IllegalArgumentException.class, () -> useCase.execute(sessionId, playerId));
 
         verify(sessionRepositoryPort, never()).save(any());
     }
 
     @Test
     void shouldCreateInitialTeamsWhenSessionReachEightPlayers() {
-        // arrange
         Session session = new Session();
 
         for (int i = 1; i <= 7; i++) {
-            session.addPlayer(
-                    createPlayer("P" + i)
-            );
+            session.addPlayer(createPlayer("P" + i));
         }
 
-        PlayerEntity p8 =
-                new PlayerEntity(playerId, "P8");
+        PlayerEntity p8 = new PlayerEntity(playerId, "P8");
 
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 4);
 
-        List<Team> generatedTeams =
-                List.of(t1, t2);
+        List<Team> generatedTeams = List.of(t1, t2);
 
-        when(sessionRepositoryPort.findById(sessionId))
-                .thenReturn(Optional.of(session));
+        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
+        when(playerRepositoryPort.findById(playerId)).thenReturn(Optional.of(p8));
+        when(initialTeamBalancerService.createInitialTeams(session)).thenReturn(generatedTeams);
 
-        when(playerRepositoryPort.findById(playerId))
-                .thenReturn(Optional.of(p8));
+        List<Team> result = useCase.execute(sessionId, playerId);
 
-        when(initialTeamBalancerService.createInitialTeams(session))
-                .thenReturn(generatedTeams);
-
-        // act
-        List<Team> result =
-                useCase.execute(sessionId, playerId);
-
-        // assert
         assertEquals(2, result.size());
-
         assertTrue(session.hasStarted());
-
         assertNotNull(session.getCurrentMatch());
 
-        verify(initialTeamBalancerService)
-                .createInitialTeams(session);
-
-        verify(sessionRepositoryPort)
-                .save(session);
-
-        verify(priorityService, never())
-                .apply(any());
+        verify(initialTeamBalancerService).createInitialTeams(session);
+        verify(sessionRepositoryPort).save(session);
     }
 
     @Test
     void shouldNotCreateInitialTeamsBeforeEightPlayers() {
-        // arrange
         Session session = new Session();
 
         for (int i = 1; i <= 6; i++) {
-            session.addPlayer(
-                    createPlayer("P" + i)
-            );
+            session.addPlayer(createPlayer("P" + i));
         }
 
-        PlayerEntity p7 =
-                new PlayerEntity(playerId, "P7");
+        PlayerEntity p7 = new PlayerEntity(playerId, "P7");
 
-        when(sessionRepositoryPort.findById(sessionId))
-                .thenReturn(Optional.of(session));
+        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
+        when(playerRepositoryPort.findById(playerId)).thenReturn(Optional.of(p7));
 
-        when(playerRepositoryPort.findById(playerId))
-                .thenReturn(Optional.of(p7));
+        List<Team> result = useCase.execute(sessionId, playerId);
 
-        // act
-        List<Team> result =
-                useCase.execute(sessionId, playerId);
-
-        // assert
         assertTrue(result.isEmpty());
 
-        verify(initialTeamBalancerService, never())
-                .createInitialTeams(any());
-
-        verify(priorityService, never())
-                .apply(any());
-
-        verify(sessionRepositoryPort)
-                .save(session);
-    }
-
-    @Test
-    void shouldApplyPriorityServiceWhenSessionHasStarted() {
-        // arrange
-        Session session = new Session();
-
-        Team t1 = createTeam(1, 4);
-        Team t2 = createTeam(2, 4);
-
-        session.updateTeams(
-                new ArrayList<>(List.of(t1, t2))
-        );
-
-        session.startQueue();
-
-        PlayerEntity p9 =
-                new PlayerEntity(playerId, "P9");
-
-        when(sessionRepositoryPort.findById(sessionId))
-                .thenReturn(Optional.of(session));
-
-        when(playerRepositoryPort.findById(playerId))
-                .thenReturn(Optional.of(p9));
-
-        // act
-        useCase.execute(sessionId, playerId);
-
-        // assert
-        verify(priorityService)
-                .apply(session);
-
-        verify(sessionRepositoryPort)
-                .save(session);
+        verify(initialTeamBalancerService, never()).createInitialTeams(any());
+        verify(sessionRepositoryPort).save(session);
     }
 
     @Test
     void shouldCreateNewTeamWhenLastTeamIsFull() {
-        // arrange
         Session session = new Session();
 
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 4);
 
-        session.updateTeams(
-                new ArrayList<>(List.of(t1, t2))
-        );
+        session.updateTeams(new ArrayList<>(List.of(t1, t2)));
 
         session.startQueue();
 
-        PlayerEntity newPlayer =
-                new PlayerEntity(playerId, "P9");
+        PlayerEntity newPlayer = new PlayerEntity(playerId, "P9");
 
-        when(sessionRepositoryPort.findById(sessionId))
-                .thenReturn(Optional.of(session));
+        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
+        when(playerRepositoryPort.findById(playerId)).thenReturn(Optional.of(newPlayer));
 
-        when(playerRepositoryPort.findById(playerId))
-                .thenReturn(Optional.of(newPlayer));
-
-        // act
         useCase.execute(sessionId, playerId);
 
-        // assert
+        Team createdTeam = session.getTeams().get(2);
+
         assertEquals(3, session.getTeams().size());
-
-        Team createdTeam =
-                session.getTeams().get(2);
-
         assertEquals(3, createdTeam.getNumber());
-
         assertEquals(1, createdTeam.getPlayers().size());
-
-        assertEquals(
-                "P9",
-                createdTeam.getPlayers().get(0).getName()
-        );
-
-        verify(priorityService).apply(session);
+        assertEquals("P9", createdTeam.getPlayers().get(0).getName());
     }
 
     @Test
     void shouldAddPlayerToIncompleteLastTeam() {
-        // arrange
         Session session = new Session();
 
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 3);
 
-        session.updateTeams(
-                new ArrayList<>(List.of(t1, t2))
-        );
+        session.updateTeams(new ArrayList<>(List.of(t1, t2)));
 
         session.startQueue();
 
-        PlayerEntity newPlayer =
-                new PlayerEntity(playerId, "P8");
+        PlayerEntity newPlayer = new PlayerEntity(playerId, "P8");
 
-        when(sessionRepositoryPort.findById(sessionId))
-                .thenReturn(Optional.of(session));
+        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
+        when(playerRepositoryPort.findById(playerId)).thenReturn(Optional.of(newPlayer));
 
-        when(playerRepositoryPort.findById(playerId))
-                .thenReturn(Optional.of(newPlayer));
-
-        // act
         useCase.execute(sessionId, playerId);
 
-        // assert
         assertEquals(2, session.getTeams().size());
+        assertEquals(4, session.getTeams().get(1).getPlayers().size());
+    }
 
-        assertEquals(
-                4,
-                session.getTeams().get(1).getPlayers().size()
-        );
+    @Test
+    void shouldAddNewCreatedTeamToQueueWhenSessionAlreadyStarted() {
+        Session session = new Session();
 
-        verify(priorityService).apply(session);
+        Team t1 = createTeam(1, 4);
+        Team t2 = createTeam(2, 4);
+
+        session.updateTeams(new ArrayList<>(List.of(t1, t2)));
+
+        session.startQueue();
+
+        PlayerEntity newPlayer = new PlayerEntity(playerId, "P9");
+
+        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
+        when(playerRepositoryPort.findById(playerId)).thenReturn(Optional.of(newPlayer));
+
+        useCase.execute(sessionId, playerId);
+
+        Team queuedTeam = session.getQueue().getFirst();
+
+        assertEquals(1, session.getQueue().size());
+        assertEquals(3, queuedTeam.getNumber());
+
+        assertFalse(queuedTeam.isPlayed());
+    }
+
+    @Test
+    void shouldAddNewCreatedRookieTeamBehindExistingRookieTeams() {
+        Session session = new Session();
+
+        Team t1 = createTeam(1, 4);
+        Team t2 = createTeam(2, 4);
+
+        session.updateTeams(new ArrayList<>(List.of(t1, t2)));
+
+        session.startQueue();
+
+        PlayerEntity p9 = new PlayerEntity(UUID.randomUUID(), "P9");
+
+        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
+
+        when(playerRepositoryPort.findById(playerId)).thenReturn(Optional.of(p9));
+
+        useCase.execute(sessionId, playerId);
+
+        UUID secondPlayerId = UUID.randomUUID();
+
+        PlayerEntity p10 = new PlayerEntity(secondPlayerId, "P10");
+
+        Team incompleteTeam = session.getTeams().getLast();
+
+        incompleteTeam.addPlayer(createPlayer("Extra1"));
+        incompleteTeam.addPlayer(createPlayer("Extra2"));
+        incompleteTeam.addPlayer(createPlayer("Extra3"));
+
+        when(playerRepositoryPort.findById(secondPlayerId)).thenReturn(Optional.of(p10));
+
+        useCase.execute(sessionId, secondPlayerId);
+
+        assertEquals(2, session.getQueue().size());
+        assertEquals(3, session.getQueue().get(0).getNumber());
+        assertEquals(4, session.getQueue().get(1).getNumber());
+    }
+
+    @Test
+    void shouldNotCreateInitialTeamsWhenSessionAlreadyShuffled() {
+        Session session = new Session();
+
+        for (int i = 1; i <= 7; i++) {
+            session.addPlayer(createPlayer("P" + i));
+        }
+
+        session.markAsShuffled();
+
+        PlayerEntity p8 = new PlayerEntity(playerId, "P8");
+
+        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
+
+        when(playerRepositoryPort.findById(playerId)).thenReturn(Optional.of(p8));
+
+        List<Team> result = useCase.execute(sessionId, playerId);
+
+        assertTrue(result.isEmpty());
+        assertFalse(session.hasStarted());
+
+        verify(initialTeamBalancerService, never()).createInitialTeams(any());
     }
 }

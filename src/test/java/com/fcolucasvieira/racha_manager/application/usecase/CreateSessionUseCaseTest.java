@@ -19,16 +19,13 @@ class CreateSessionUseCaseTest {
 
     @Mock
     private SessionRepositoryPort repository;
-
     @InjectMocks
     private CreateSessionUseCase useCase;
 
     @Test
     void shouldCreateSessionSuccessfully() {
-        // act
         UUID result = useCase.execute();
 
-        // assert & verify
         assertNotNull(result);
         verify(repository).save(any(Session.class));
     }

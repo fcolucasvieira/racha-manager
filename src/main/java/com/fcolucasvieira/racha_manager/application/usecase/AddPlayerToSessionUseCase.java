@@ -22,7 +22,6 @@ public class AddPlayerToSessionUseCase {
     private final SessionRepositoryPort sessionRepositoryPort;
     private final PlayerRepositoryPort playerRepositoryPort;
     private final InitialTeamBalancerService initialTeamBalancerService;
-    private final PriorityService priorityService;
 
     private static final Logger log = LoggerFactory.getLogger(AddPlayerToSessionUseCase.class);
 
@@ -35,14 +34,12 @@ public class AddPlayerToSessionUseCase {
 
         session.addPlayer(player);
 
-        /*
         log.info(
                 "[PLAYER_ADDED] sessionId={} playerId={} activePlayers={}",
                 sessionId,
                 playerId,
                 session.getActivePlayers().size()
         );
-         */
 
         if(shouldCreateInitialTeams(session)){
             List<Team> teams = initialTeamBalancerService.createInitialTeams(session);
@@ -51,7 +48,6 @@ public class AddPlayerToSessionUseCase {
 
             session.startQueue();
 
-            /*
             log.info(
                     "[QUEUE_STARTED] sessionId={} currentMatch={}vs{} queueSize={}",
                     sessionId,
@@ -59,7 +55,6 @@ public class AddPlayerToSessionUseCase {
                     session.getCurrentMatch().getTeamB().getNumber(),
                     session.getQueue().size()
             );
-             */
 
             sessionRepositoryPort.save(session);
 
@@ -69,16 +64,12 @@ public class AddPlayerToSessionUseCase {
         if (session.hasStarted()) {
             addPlayerIncremental(session, player);
 
-            /*
             log.info(
                     "[INCREMENTAL_PLAYER_ADDED] sessionId={} playerId={} totalTeams={}",
                     sessionId,
                     playerId,
                     session.getTeams().size()
             );
-             */
-
-            priorityService.apply(session);
         }
 
         sessionRepositoryPort.save(session);

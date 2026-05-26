@@ -59,6 +59,25 @@ public class Session {
         }
     }
 
+    public Team findPlayerTeam(UUID playerId) {
+        return teams.stream()
+                .filter(team -> team.getPlayers().stream()
+                        .anyMatch(player ->
+                                player.getId().equals(playerId)))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Player is not in a team"));
+    }
+
+    public void validateTeamRemoval(Team team) {
+        if (!hasStarted()) {
+            return;
+        }
+
+        if (isCurrentMatchTeam(team)) {
+            throw new IllegalStateException("Cannot remove all players from a current match team");
+        }
+    }
+
     public void updateTeams(List<Team> teams) {
         if(teams == null){
             throw new IllegalArgumentException("Teams cannot be null");
@@ -83,6 +102,14 @@ public class Session {
 
     public boolean hasStarted() {
         return currentMatch != null;
+    }
+
+    public boolean isCurrentMatchTeam(Team team) {
+        if(!hasStarted()) {
+            return false;
+        }
+
+        return currentMatch.getTeamA().equals(team) || currentMatch.getTeamB().equals(team);
     }
 
     public void updateCurrentMatch(Match match) {

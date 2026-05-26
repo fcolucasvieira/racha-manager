@@ -20,12 +20,10 @@ public class CreateSessionUseCase {
     public UUID execute() {
         Session session = new Session();
 
-        /*
         log.info(
                 "[SESSION_CREATED] sessionId={}",
                 session.getId()
         );
-         */
 
         repository.save(session);
 

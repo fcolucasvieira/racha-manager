@@ -19,13 +19,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CreatePlayerUseCaseTest {
 
-    @Mock private PlayerRepositoryPort repository;
-
-    @InjectMocks private CreatePlayerUseCase useCase;
+    @Mock
+    private PlayerRepositoryPort repository;
+    @InjectMocks
+    private CreatePlayerUseCase useCase;
 
     @Test
     void shouldCreatePlayerSuccessfully() {
-        // arrange
         String name = "Lucas";
 
         when(repository.save(any(PlayerEntity.class)))
@@ -35,10 +35,8 @@ class CreatePlayerUseCaseTest {
                     return player;
                 });
 
-        // act
         UUID result = useCase.execute(name);
 
-        // assert & verify
         assertNotNull(result);
 
         verify(repository).save(argThat(player ->

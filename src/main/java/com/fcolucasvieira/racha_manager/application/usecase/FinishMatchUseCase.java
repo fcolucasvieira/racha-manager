@@ -28,6 +28,10 @@ public class FinishMatchUseCase {
         Session session = sessionRepositoryPort.findById(sessionId)
                 .orElseThrow(() -> new IllegalArgumentException("Session not found"));
 
+        if (!session.hasStarted()) {
+            throw new IllegalStateException("Session has not started");
+        }
+
         validateResultConsistency(winnerTeamNumber, resultType);
 
         // guarda estado anterior (observabilidade de código)
@@ -40,7 +44,6 @@ public class FinishMatchUseCase {
 
             matchFlowService.finishWithDraw(session);
 
-            /*
             log.info(
                     "[MATCH_DRAW_FINISHED] sessionId={} finishedMatch={}vs{} nextMatch={}vs{}",
                     sessionId,
@@ -49,13 +52,10 @@ public class FinishMatchUseCase {
                     session.getCurrentMatch().getTeamA().getNumber(),
                     session.getCurrentMatch().getTeamB().getNumber()
             );
-             */
-        }
-        else {
+        } else {
 
             matchFlowService.finishWithWinner(session, winnerTeamNumber);
 
-            /*
             log.info(
                     "[MATCH_FINISHED] sessionId={} winnerTeamNumber={} finishedMatch={}vs{} nextMatch={}vs{}",
                     sessionId,
@@ -65,7 +65,6 @@ public class FinishMatchUseCase {
                     session.getCurrentMatch().getTeamA().getNumber(),
                     session.getCurrentMatch().getTeamB().getNumber()
             );
-             */
         }
 
         priorityService.apply(session);
