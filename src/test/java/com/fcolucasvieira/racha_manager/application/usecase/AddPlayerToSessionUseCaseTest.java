@@ -1,5 +1,6 @@
 package com.fcolucasvieira.racha_manager.application.usecase;
 
+import com.fcolucasvieira.racha_manager.domain.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.domain.model.*;
 import com.fcolucasvieira.racha_manager.domain.port.*;
 import com.fcolucasvieira.racha_manager.domain.service.InitialTeamBalancerService;
@@ -29,8 +30,6 @@ class AddPlayerToSessionUseCaseTest {
     private PlayerRepositoryPort playerRepositoryPort;
     @Mock
     private InitialTeamBalancerService initialTeamBalancerService;
-    @Mock
-    private PriorityService priorityService;
 
     @InjectMocks
     private AddPlayerToSessionUseCase useCase;
@@ -64,7 +63,7 @@ class AddPlayerToSessionUseCaseTest {
     void shouldThrowExceptionWhenSessionNotFound() {
         when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> useCase.execute(sessionId, playerId));
+        assertThrows(NotFoundException.class, () -> useCase.execute(sessionId, playerId));
 
         verify(playerRepositoryPort, never()).findById(any());
     }
@@ -76,7 +75,7 @@ class AddPlayerToSessionUseCaseTest {
         when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
         when(playerRepositoryPort.findById(playerId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> useCase.execute(sessionId, playerId));
+        assertThrows(NotFoundException.class, () -> useCase.execute(sessionId, playerId));
 
         verify(sessionRepositoryPort, never()).save(any());
     }

@@ -1,5 +1,7 @@
 package com.fcolucasvieira.racha_manager.domain.service;
 
+import com.fcolucasvieira.racha_manager.domain.exception.ConflictException;
+import com.fcolucasvieira.racha_manager.domain.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
@@ -62,19 +64,19 @@ public class InitialTeamBalancerService {
 
     private void validateInitialBalance(Session session) {
         if (session == null) {
-            throw new IllegalArgumentException("Session cannot be null");
+            throw new ValidationException("Session cannot be null");
         }
 
         if (session.isShuffled()) {
-            throw new IllegalStateException("Initial shuffle already performed");
+            throw new ConflictException("Initial shuffle already performed");
         }
 
         if (session.getActivePlayers().size() != INITIAL_PLAYERS) {
-            throw new IllegalStateException("Not enough players for initial balance");
+            throw new ConflictException("Initial balance requires exactly 8 players");
         }
 
         if (session.getTeams() != null && !session.getTeams().isEmpty()) {
-            throw new IllegalStateException("Session already contains teams");
+            throw new ConflictException("Session already contains teams");
         }
     }
 }

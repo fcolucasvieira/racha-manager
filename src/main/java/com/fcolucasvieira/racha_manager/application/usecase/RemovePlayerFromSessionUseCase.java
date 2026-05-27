@@ -1,5 +1,6 @@
 package com.fcolucasvieira.racha_manager.application.usecase;
 
+import com.fcolucasvieira.racha_manager.domain.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
 import com.fcolucasvieira.racha_manager.domain.service.PriorityService;
@@ -23,7 +24,7 @@ public class RemovePlayerFromSessionUseCase {
 
     public List<Team> execute(UUID sessionId, UUID playerId) {
         Session session = sessionRepositoryPort.findById(sessionId)
-                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+                .orElseThrow(() -> new NotFoundException("Session not found: " + sessionId));
 
         // encontra o time do jogador
         Team team = session.findPlayerTeam(playerId);

@@ -1,8 +1,8 @@
-package com.fcolucasvieira.racha_manager.infraestructure.persistence.adapter;
+package com.fcolucasvieira.racha_manager.infrastructure.persistence.adapter;
 
 import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
 import com.fcolucasvieira.racha_manager.domain.port.PlayerRepositoryPort;
-import com.fcolucasvieira.racha_manager.infraestructure.persistence.jpa.SpringDataPlayerRepository;
+import com.fcolucasvieira.racha_manager.infrastructure.persistence.jpa.SpringDataPlayerRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;

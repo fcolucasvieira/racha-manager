@@ -1,5 +1,7 @@
 package com.fcolucasvieira.racha_manager.domain.model;
 
+import com.fcolucasvieira.racha_manager.domain.exception.ConflictException;
+import com.fcolucasvieira.racha_manager.domain.exception.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +48,7 @@ class SessionTest {
 
         // act & assert
         assertThrows(
-                IllegalArgumentException.class,
+                ConflictException.class,
                 () -> session.addPlayer(player)
         );
     }
@@ -58,7 +60,7 @@ class SessionTest {
 
         // act & assert
         assertThrows(
-                IllegalArgumentException.class,
+                NotFoundException.class,
                 () -> session.removePlayer(playerId)
         );
     }
@@ -98,7 +100,7 @@ class SessionTest {
         );
 
         // act & assert
-        assertThrows(IllegalStateException.class, () -> session.startQueue());
+        assertThrows(ConflictException.class, () -> session.startQueue());
     }
 
     @Test
@@ -168,7 +170,7 @@ class SessionTest {
         session.startQueue();
 
         // act & assert
-        assertThrows(IllegalStateException.class, () -> session.addTeamToQueue(t3));
+        assertThrows(ConflictException.class, () -> session.addTeamToQueue(t3));
     }
 
     @Test

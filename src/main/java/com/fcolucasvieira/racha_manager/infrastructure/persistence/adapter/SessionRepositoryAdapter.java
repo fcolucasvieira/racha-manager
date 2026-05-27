@@ -1,4 +1,4 @@
-package com.fcolucasvieira.racha_manager.infraestructure.persistence.adapter;
+package com.fcolucasvieira.racha_manager.infrastructure.persistence.adapter;
 
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.port.SessionRepositoryPort;

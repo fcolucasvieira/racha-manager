@@ -1,5 +1,7 @@
 package com.fcolucasvieira.racha_manager.domain.service;
 
+import com.fcolucasvieira.racha_manager.domain.exception.ConflictException;
+import com.fcolucasvieira.racha_manager.domain.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
@@ -46,7 +48,7 @@ class InitialTeamBalancerServiceTest {
     void shouldThrowExceptionWhenSessionIsNull() {
 
         assertThrows(
-                IllegalArgumentException.class,
+                ValidationException.class,
                 () -> service.createInitialTeams(null)
         );
     }
@@ -76,7 +78,7 @@ class InitialTeamBalancerServiceTest {
             );
         }
 
-        assertThrows(IllegalStateException.class,
+        assertThrows(ConflictException.class,
                 () -> service.createInitialTeams(session));
     }
 
@@ -86,7 +88,7 @@ class InitialTeamBalancerServiceTest {
 
         session.markAsShuffled();
 
-        assertThrows(IllegalStateException.class,
+        assertThrows(ConflictException.class,
                     () -> service.createInitialTeams(session));
     }
 
@@ -106,7 +108,7 @@ class InitialTeamBalancerServiceTest {
         ));
 
         assertThrows(
-                IllegalStateException.class,
+                ConflictException.class,
                 () -> service.createInitialTeams(session)
         );
     }

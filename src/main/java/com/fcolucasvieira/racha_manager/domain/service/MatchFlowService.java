@@ -1,5 +1,7 @@
 package com.fcolucasvieira.racha_manager.domain.service;
 
+import com.fcolucasvieira.racha_manager.domain.exception.ConflictException;
+import com.fcolucasvieira.racha_manager.domain.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.domain.model.Match;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
@@ -59,7 +61,7 @@ public class MatchFlowService {
 
         // se existir menos que 2 times na queue, lançar excessão
         if(!session.hasAtLeastTeamsInQueue(2)) {
-            throw new IllegalStateException("Cannot finish draw without at least 2 teams in queue");
+            throw new ConflictException("Cannot finish draw without at least 2 teams in queue");
         }
 
         // seleta currentMatch através da session
@@ -89,11 +91,11 @@ public class MatchFlowService {
 
     private void validateSessionState(Session session) {
         if(!session.hasStarted()) {
-            throw new IllegalStateException("No match in progress");
+            throw new ConflictException("No match in progress");
         }
 
         if(!session.hasQueue()) {
-            throw new IllegalStateException("Queue not initialized");
+            throw new ConflictException("Queue not initialized");
         }
     }
 
@@ -106,7 +108,7 @@ public class MatchFlowService {
                 teamB.getNumber() != winnerTeamNumber;
 
         if(invalidNumber) {
-            throw new IllegalArgumentException("Invalid winner team number");
+            throw new ValidationException("Invalid winner team number");
         }
     }
 }

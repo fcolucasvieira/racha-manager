@@ -1,8 +1,9 @@
 package com.fcolucasvieira.racha_manager.domain.model;
 
+import com.fcolucasvieira.racha_manager.domain.exception.ConflictException;
+import com.fcolucasvieira.racha_manager.domain.exception.NotFoundException;
+import com.fcolucasvieira.racha_manager.domain.exception.ValidationException;
 import lombok.Getter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +18,6 @@ public class Session {
     private List<Team> queue;
     private Match currentMatch;
     private boolean shuffled;
-
-    private static final Logger log =  LoggerFactory.getLogger(Session.class);
 
     public Session() {
         this.id = UUID.randomUUID();
@@ -37,27 +36,27 @@ public class Session {
 
     private void validatePlayerForAddition(PlayerEntity player) {
         if(player == null || player.getId() == null) {
-            throw new IllegalArgumentException("Player cannot be null");
+            throw new ValidationException("Player cannot be null");
         }
 
         boolean alreadyExists = activePlayers.stream()
                 .anyMatch(p-> p.getId().equals(player.getId()));
 
         if (alreadyExists) {
-            throw new IllegalArgumentException("Player already in session");
+            throw new ConflictException("Player already in session");
         }
     }
 
     public void removePlayer(UUID playerId) {
         if (playerId == null) {
-            throw new IllegalArgumentException("Player ID cannot be null");
+            throw new ValidationException("Player ID cannot be null");
         }
 
         boolean removed = activePlayers
                 .removeIf(p -> p.getId().equals(playerId));
 
         if(!removed){
-            throw new IllegalArgumentException("Player not found in session");
+            throw new NotFoundException("Player not found in session");
         }
     }
 
@@ -68,14 +67,14 @@ public class Session {
                         .anyMatch(player ->
                                 player.getId().equals(playerId)))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Player is not in a team"));
+                .orElseThrow(() -> new NotFoundException("Player is not in a team"));
     }
 
     // Team
 
     public void updateTeams(List<Team> teams) {
         if(teams == null){
-            throw new IllegalArgumentException("Teams cannot be null");
+            throw new ValidationException("Teams cannot be null");
         }
 
         this.teams = teams;
@@ -83,7 +82,7 @@ public class Session {
 
     public void removeTeam(Team team) {
         if(team == null) {
-            throw new IllegalArgumentException("Team cannot be null");
+            throw new ValidationException("Team cannot be null");
         }
 
         if(teams != null) {
@@ -102,7 +101,7 @@ public class Session {
         }
 
         if (isCurrentMatchTeam(team)) {
-            throw new IllegalStateException("Cannot remove all players from a current match team");
+            throw new ConflictException("Cannot remove all players from a current match team");
         }
     }
 
@@ -122,7 +121,7 @@ public class Session {
 
     public void updateCurrentMatch(Match match) {
         if(match == null) {
-            throw new IllegalArgumentException("Match cannot be null");
+            throw new ValidationException("Match cannot be null");
         }
 
         this.currentMatch = match;
@@ -132,11 +131,11 @@ public class Session {
 
     public void startQueue() {
         if (currentMatch != null) {
-            throw new IllegalStateException("Queue already started");
+            throw new ConflictException("Queue already started");
         }
 
-        if(teams == null || teams.size() < 2){
-            throw new IllegalStateException("Not enough teams to start");
+        if(teams.size() < 2){
+            throw new ConflictException("Not enough teams to start");
         }
 
         this.queue = new ArrayList<>(teams);
@@ -154,15 +153,15 @@ public class Session {
 
     public void addTeamToQueue(Team team) {
         if(team == null) {
-            throw new IllegalArgumentException("Team cannot be null");
+            throw new ValidationException("Team cannot be null");
         }
 
         if(this.queue == null) {
-            throw new IllegalStateException("Queue not initialized");
+            throw new ConflictException("Queue not initialized");
         }
 
         if(this.queue.contains(team)) {
-            throw new IllegalStateException("Team already in queue");
+            throw new ConflictException("Team already in queue");
         }
 
         // se o time ainda não jogou, adicioná-lo atrás do último novato da fila
@@ -197,7 +196,7 @@ public class Session {
 
     public Team removeFirstTeamFromQueue() {
         if(queue == null || queue.isEmpty()) {
-            throw new IllegalStateException("Queue is empty");
+            throw new ConflictException("Queue is empty");
         }
 
         return queue.removeFirst();

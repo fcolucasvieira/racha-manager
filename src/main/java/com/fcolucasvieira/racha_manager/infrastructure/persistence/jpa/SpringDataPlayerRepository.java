@@ -1,4 +1,4 @@
-package com.fcolucasvieira.racha_manager.infraestructure.persistence.jpa;
+package com.fcolucasvieira.racha_manager.infrastructure.persistence.jpa;
 
 import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

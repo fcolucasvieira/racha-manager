@@ -1,5 +1,7 @@
 package com.fcolucasvieira.racha_manager.application.usecase;
 
+import com.fcolucasvieira.racha_manager.domain.exception.ConflictException;
+import com.fcolucasvieira.racha_manager.domain.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.domain.model.*;
 import com.fcolucasvieira.racha_manager.domain.port.SessionRepositoryPort;
 import com.fcolucasvieira.racha_manager.domain.service.PriorityService;
@@ -59,7 +61,7 @@ class RemovePlayerFromSessionUseCaseTest {
         when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.empty());
 
         assertThrows(
-                IllegalArgumentException.class,
+                NotFoundException.class,
                 () -> useCase.execute(sessionId, playerId)
         );
 
@@ -79,7 +81,7 @@ class RemovePlayerFromSessionUseCaseTest {
         when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
 
         assertThrows(
-                IllegalArgumentException.class,
+                ConflictException.class,
                 () -> useCase.execute(sessionId, playerId)
         );
 
@@ -243,7 +245,7 @@ class RemovePlayerFromSessionUseCaseTest {
         when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
 
         assertThrows(
-                IllegalStateException.class,
+                ConflictException.class,
                 () -> useCase.execute(sessionId, playerId)
         );
 

@@ -1,5 +1,6 @@
 package com.fcolucasvieira.racha_manager.application.usecase;
 
+import com.fcolucasvieira.racha_manager.domain.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
@@ -27,10 +28,10 @@ public class AddPlayerToSessionUseCase {
 
     public List<Team> execute(UUID sessionId, UUID playerId) {
         Session session = sessionRepositoryPort.findById(sessionId)
-                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+                .orElseThrow(() -> new NotFoundException("Session not found: " + sessionId));
 
         PlayerEntity player = playerRepositoryPort.findById(playerId)
-                .orElseThrow(() -> new IllegalArgumentException("Player not found"));
+                .orElseThrow(() -> new NotFoundException("Player not found: " + playerId));
 
         session.addPlayer(player);
 

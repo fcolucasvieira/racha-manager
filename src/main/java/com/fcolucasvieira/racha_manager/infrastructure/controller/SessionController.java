@@ -1,4 +1,4 @@
-package com.fcolucasvieira.racha_manager.infraestructure.controller;
+package com.fcolucasvieira.racha_manager.infrastructure.controller;
 
 import com.fcolucasvieira.racha_manager.application.dto.CreateSessionResponse;
 import com.fcolucasvieira.racha_manager.application.dto.FinishMatchRequest;

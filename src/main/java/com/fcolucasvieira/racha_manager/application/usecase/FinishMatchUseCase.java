@@ -1,6 +1,9 @@
 package com.fcolucasvieira.racha_manager.application.usecase;
 
 import com.fcolucasvieira.racha_manager.domain.enums.MatchResultType;
+import com.fcolucasvieira.racha_manager.domain.exception.ConflictException;
+import com.fcolucasvieira.racha_manager.domain.exception.NotFoundException;
+import com.fcolucasvieira.racha_manager.domain.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.service.MatchFlowService;
 import com.fcolucasvieira.racha_manager.domain.service.PriorityService;
@@ -26,10 +29,10 @@ public class FinishMatchUseCase {
                         MatchResultType resultType) {
 
         Session session = sessionRepositoryPort.findById(sessionId)
-                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+                .orElseThrow(() -> new NotFoundException("Session not found: "  + sessionId));
 
         if (!session.hasStarted()) {
-            throw new IllegalStateException("Session has not started");
+            throw new ConflictException("Session has not started");
         }
 
         validateResultConsistency(winnerTeamNumber, resultType);
@@ -74,11 +77,11 @@ public class FinishMatchUseCase {
 
     private void validateResultConsistency(Integer winnerTeamNumber, MatchResultType resultType) {
         if(resultType == MatchResultType.WINNER && winnerTeamNumber == null) {
-            throw new IllegalArgumentException("Winner team number is required");
+            throw new ValidationException("Winner team number is required");
         }
 
         if(resultType == MatchResultType.DRAW && winnerTeamNumber != null) {
-            throw new IllegalArgumentException("Winner team number must be null on draw");
+            throw new ValidationException("Winner team number must be null on draw");
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.fcolucasvieira.racha_manager.domain.service;
 
+import com.fcolucasvieira.racha_manager.domain.exception.ConflictException;
+import com.fcolucasvieira.racha_manager.domain.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.domain.model.Match;
 import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
@@ -99,7 +101,7 @@ class MatchFlowServiceTest {
         Session session = new Session();
 
         // act & assert
-        assertThrows(IllegalStateException.class, () -> service.finishWithWinner(session, 1));
+        assertThrows(ConflictException.class, () -> service.finishWithWinner(session, 1));
     }
 
     @Test
@@ -117,7 +119,7 @@ class MatchFlowServiceTest {
         );
 
         // act & assert
-        assertThrows(IllegalStateException.class, () -> service.finishWithWinner(session, 1));
+        assertThrows(ConflictException.class, () -> service.finishWithWinner(session, 1));
     }
 
     @Test
@@ -136,7 +138,7 @@ class MatchFlowServiceTest {
         session.startQueue();
 
         // act & assert
-        assertThrows(IllegalArgumentException.class, () -> service.finishWithWinner(session, 99));
+        assertThrows(ValidationException.class, () -> service.finishWithWinner(session, 99));
     }
 
     @Test
@@ -234,7 +236,7 @@ class MatchFlowServiceTest {
 
         // act & assert
         assertThrows(
-                IllegalStateException.class,
+                ConflictException.class,
                 () -> service.finishWithDraw(session)
         );
     }

@@ -1,6 +1,9 @@
 package com.fcolucasvieira.racha_manager.application.usecase;
 
 import com.fcolucasvieira.racha_manager.domain.enums.MatchResultType;
+import com.fcolucasvieira.racha_manager.domain.exception.ConflictException;
+import com.fcolucasvieira.racha_manager.domain.exception.NotFoundException;
+import com.fcolucasvieira.racha_manager.domain.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.domain.model.*;
 import com.fcolucasvieira.racha_manager.domain.service.MatchFlowService;
 import com.fcolucasvieira.racha_manager.domain.service.PriorityService;
@@ -112,7 +115,7 @@ class FinishMatchUseCaseTest {
         when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.empty());
 
         assertThrows(
-                IllegalArgumentException.class,
+                NotFoundException.class,
                 () -> useCase.execute(
                         sessionId,
                         1,
@@ -133,7 +136,7 @@ class FinishMatchUseCaseTest {
 
         // act & assert
         assertThrows(
-                IllegalStateException.class,
+                ConflictException.class,
                 () -> useCase.execute(
                         sessionId,
                         1,
@@ -160,7 +163,7 @@ class FinishMatchUseCaseTest {
         when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
 
         assertThrows(
-                IllegalArgumentException.class,
+                ValidationException.class,
                 () -> useCase.execute(
                         sessionId,
                         null,
@@ -187,7 +190,7 @@ class FinishMatchUseCaseTest {
         when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
 
         assertThrows(
-                IllegalArgumentException.class,
+                ValidationException.class,
                 () -> useCase.execute(
                         sessionId,
                         1,
