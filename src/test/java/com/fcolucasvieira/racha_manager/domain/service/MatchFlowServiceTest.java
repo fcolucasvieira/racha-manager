@@ -63,6 +63,9 @@ class MatchFlowServiceTest {
 
         assertEquals(1, session.getQueue().size());
         assertEquals(2, session.getQueue().get(0).getNumber());
+
+        assertTrue(t1.isPlayed());
+        assertTrue(t2.isPlayed());
     }
 
     @Test
@@ -173,5 +176,66 @@ class MatchFlowServiceTest {
 
         assertEquals(4, session.getQueue().get(0).getNumber());
         assertEquals(2, session.getQueue().get(1).getNumber());
+    }
+
+    @Test
+    void shouldFinishMatchWithDrawSuccessfully() {
+        // arrange
+        Session session = new Session();
+
+        Team t1 = createTeam(1, 4);
+        Team t2 = createTeam(2, 4);
+        Team t3 = createTeam(3, 4);
+        Team t4 = createTeam(4, 4);
+
+        session.updateTeams(
+                new ArrayList<>(List.of(t1, t2, t3, t4))
+        );
+
+        // currentMatch -> t1 vs t2
+        // queue -> [t3, t4]
+        session.startQueue();
+
+        // act
+        service.finishWithDraw(session);
+
+        // assert
+
+        // próximos times entram no currentMatch
+        assertEquals(3, session.getCurrentMatch().getTeamA().getNumber());
+        assertEquals(4, session.getCurrentMatch().getTeamB().getNumber());
+
+        // times do empate voltam ao final da fila
+        assertEquals(2, session.getQueue().size());
+
+        assertEquals(1, session.getQueue().get(0).getNumber());
+        assertEquals(2, session.getQueue().get(1).getNumber());
+
+        assertTrue(t1.isPlayed());
+        assertTrue(t2.isPlayed());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDrawHasLessThanTwoTeamsInQueue() {
+        // arrange
+        Session session = new Session();
+
+        Team t1 = createTeam(1, 4);
+        Team t2 = createTeam(2, 4);
+        Team t3 = createTeam(3, 4);
+
+        session.updateTeams(
+                new ArrayList<>(List.of(t1, t2, t3))
+        );
+
+        // currentMatch -> t1 vs t2
+        // queue -> [t3]
+        session.startQueue();
+
+        // act & assert
+        assertThrows(
+                IllegalStateException.class,
+                () -> service.finishWithDraw(session)
+        );
     }
 }

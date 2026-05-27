@@ -27,10 +27,10 @@ public class AddPlayerToSessionUseCase {
 
     public List<Team> execute(UUID sessionId, UUID playerId) {
         Session session = sessionRepositoryPort.findById(sessionId)
-                        .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
 
         PlayerEntity player = playerRepositoryPort.findById(playerId)
-                        .orElseThrow(() -> new IllegalArgumentException("Player not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Player not found"));
 
         session.addPlayer(player);
 
@@ -41,7 +41,7 @@ public class AddPlayerToSessionUseCase {
                 session.getActivePlayers().size()
         );
 
-        if(shouldCreateInitialTeams(session)){
+        if (shouldCreateInitialTeams(session)) {
             List<Team> teams = initialTeamBalancerService.createInitialTeams(session);
 
             session.updateTeams(teams);

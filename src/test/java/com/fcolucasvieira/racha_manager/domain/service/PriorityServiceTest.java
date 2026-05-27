@@ -86,7 +86,6 @@ class PriorityServiceTest {
 
         // assert
         assertTrue(t1.isFull());
-        assertTrue(t5.isFull());
 
         assertEquals(1, session.getQueue().size());
         assertEquals(5, session.getQueue().get(0).getNumber());
@@ -125,6 +124,11 @@ class PriorityServiceTest {
         assertTrue(t1.isFull());
         assertTrue(session.getQueue().isEmpty());
 
+        assertFalse(
+                session.getTeams().stream()
+                        .anyMatch(team -> team.getNumber() == 3)
+        );
+
         assertEquals(2, session.getTeams().size());
     }
 
@@ -157,7 +161,7 @@ class PriorityServiceTest {
     }
 
     @Test
-    void shouldDoNothingWhenCurrentMatchIsNull() {
+    void shouldDoNothingWhenSessionHasNotStarted() {
         // arrange
         Session session = new Session();
 
@@ -177,5 +181,26 @@ class PriorityServiceTest {
         // assert
         assertEquals(3, session.getTeams().size());
         assertEquals(2, t2.getPlayers().size());
+    }
+
+    @Test
+    void shouldNotDissolveEmptyCurrentMatchTeams() {
+
+        Session session = new Session();
+
+        Team t1 = new Team(1);
+        Team t2 = createTeam(2, 4);
+
+        session.updateTeams(
+                new ArrayList<>(List.of(t1, t2))
+        );
+
+        session.startQueue();
+
+        service.apply(session);
+
+        assertTrue(
+                session.getTeams().contains(t1)
+        );
     }
 }

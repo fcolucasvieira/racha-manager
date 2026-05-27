@@ -32,7 +32,7 @@ public class MatchFlowService {
         winner.markAsPlayed();
         loser.markAsPlayed();
 
-        // Caso a queue esteja vazia, o próximo jogo é o mesmo que o anterior (vencedor vs perdedor)
+            // Caso a queue esteja vazia, o próximo jogo é o mesmo que o anterior (vencedor vs perdedor)
         if(session.getQueue().isEmpty()) {
             session.updateCurrentMatch(
                     new Match(winner, loser)

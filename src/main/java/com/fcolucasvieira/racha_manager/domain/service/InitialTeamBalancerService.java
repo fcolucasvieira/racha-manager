@@ -50,13 +50,12 @@ public class InitialTeamBalancerService {
         teams.add(team1);
         teams.add(team2);
 
-        /* log.info(
+        log.info(
                 "[INITIAL_BALANCE_COMPLETED] sessionId={} teams={} players={}",
                 session.getId(),
                 teams.size(),
                 session.getActivePlayers().size()
         );
-         */
 
         return teams;
     }
@@ -70,7 +69,7 @@ public class InitialTeamBalancerService {
             throw new IllegalStateException("Initial shuffle already performed");
         }
 
-        if (session.getActivePlayers().size() < INITIAL_PLAYERS) {
+        if (session.getActivePlayers().size() != INITIAL_PLAYERS) {
             throw new IllegalStateException("Not enough players for initial balance");
         }
 

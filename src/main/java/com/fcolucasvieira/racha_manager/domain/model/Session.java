@@ -28,22 +28,11 @@ public class Session {
         this.shuffled = false;
     }
 
+    // Player
+
     public void addPlayer(PlayerEntity player) {
         validatePlayerForAddition(player);
         activePlayers.add(player);
-    }
-
-    public void removePlayer(UUID playerId) {
-        if (playerId == null) {
-            throw new IllegalArgumentException("Player ID cannot be null");
-        }
-
-        boolean removed = activePlayers
-                .removeIf(p -> p.getId().equals(playerId));
-
-        if(!removed){
-            throw new IllegalArgumentException("Player not found in session");
-        }
     }
 
     private void validatePlayerForAddition(PlayerEntity player) {
@@ -59,6 +48,20 @@ public class Session {
         }
     }
 
+    public void removePlayer(UUID playerId) {
+        if (playerId == null) {
+            throw new IllegalArgumentException("Player ID cannot be null");
+        }
+
+        boolean removed = activePlayers
+                .removeIf(p -> p.getId().equals(playerId));
+
+        if(!removed){
+            throw new IllegalArgumentException("Player not found in session");
+        }
+    }
+
+    // Busca time em que o jogador está
     public Team findPlayerTeam(UUID playerId) {
         return teams.stream()
                 .filter(team -> team.getPlayers().stream()
@@ -68,15 +71,7 @@ public class Session {
                 .orElseThrow(() -> new IllegalArgumentException("Player is not in a team"));
     }
 
-    public void validateTeamRemoval(Team team) {
-        if (!hasStarted()) {
-            return;
-        }
-
-        if (isCurrentMatchTeam(team)) {
-            throw new IllegalStateException("Cannot remove all players from a current match team");
-        }
-    }
+    // Team
 
     public void updateTeams(List<Team> teams) {
         if(teams == null){
@@ -100,6 +95,19 @@ public class Session {
         }
     }
 
+    // talvez vínculo ao removeTeam, eles fazem papéis próximos
+    public void validateTeamRemoval(Team team) {
+        if (!hasStarted()) {
+            return;
+        }
+
+        if (isCurrentMatchTeam(team)) {
+            throw new IllegalStateException("Cannot remove all players from a current match team");
+        }
+    }
+
+    // CurrentMatch
+
     public boolean hasStarted() {
         return currentMatch != null;
     }
@@ -120,7 +128,8 @@ public class Session {
         this.currentMatch = match;
     }
 
-    // regras de negócio (fila) em session
+    // Queue
+
     public void startQueue() {
         if (currentMatch != null) {
             throw new IllegalStateException("Queue already started");
@@ -168,15 +177,6 @@ public class Session {
             if(rookieTeams.isEmpty()) {
                 this.queue.addFirst(team);
 
-                /*
-                log.info(
-                        "[QUEUE_PRIORITY] team={} rookie=true insertedPosition={} queue={}",
-                        team.getNumber(),
-                        0,
-                        queue.stream().map(Team::getNumber).toList()
-                );
-                 */
-
                 return;
             }
 
@@ -188,29 +188,11 @@ public class Session {
 
             this.queue.add(rookieIndex + 1, team);
 
-            /*
-            log.info(
-                    "[QUEUE_PRIORITY] team={} rookie=true insertedPosition={} queue={}",
-                    team.getNumber(),
-                    rookieIndex + 1,
-                    queue.stream().map(Team::getNumber).toList()
-            );
-             */
-
             return;
         }
 
         // caso contrário, adicioná-lo ao final da fila
         this.queue.add(team);
-
-        /*
-        log.info(
-                "[QUEUE_APPEND] team={} rookie=false insertedPosition={} queue={}",
-                team.getNumber(),
-                queue.size() - 1,
-                queue.stream().map(Team::getNumber).toList()
-        );
-         */
     }
 
     public Team removeFirstTeamFromQueue() {
@@ -239,6 +221,8 @@ public class Session {
     public boolean canStartQueue() {
         return !hasStarted() && teams != null && teams.size() >= 2;
     }
+
+    // Shuffled
 
     public void markAsShuffled() {
         this.shuffled = true;

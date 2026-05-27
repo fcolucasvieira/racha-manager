@@ -15,7 +15,7 @@ public class PriorityService {
 
     public void apply(Session session) {
         // se não existe currentMatch, retornar
-        if (session.getCurrentMatch() == null){
+        if (!session.hasStarted()){
             return;
         }
 
@@ -45,14 +45,12 @@ public class PriorityService {
 
                 target.addPlayer(transferredPlayer);
 
-                /*
                 log.info(
                         "[PLAYER_TRANSFERRED] donorTeam={} targetTeam={} playerId={}",
                         donor.getNumber(),
                         target.getNumber(),
                         transferredPlayer.getId()
                 );
-                 */
             }
 
             // se completo, retornar
@@ -64,20 +62,20 @@ public class PriorityService {
 
     private void dissolveEmptyTeams(Session session) {
         List<Team> teamsToRemove = session.getTeams().stream()
-                .filter(team -> team.getPlayers().isEmpty())
+                .filter(team ->
+                        team.getPlayers().isEmpty() &&
+                        !session.isCurrentMatchTeam(team)
+                )
                 .toList();
 
         for(Team team : teamsToRemove) {
             session.removeTeam(team);
 
-            /*
             log.info(
                     "[EMPTY_TEAM_DISSOLVED] sessionId={} teamNumber={}",
                     session.getId(),
                     team.getNumber()
             );
-
-             */
         }
     }
 }

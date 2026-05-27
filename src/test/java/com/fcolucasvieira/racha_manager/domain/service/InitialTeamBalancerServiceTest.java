@@ -21,9 +21,6 @@ class InitialTeamBalancerServiceTest {
 
     @Test
     void shouldCreateTwoTeamsWithFourPlayersEach() {
-        // ARRANGE
-
-        // Sessão existente e ainda não balanceada
         Session session = new Session();
 
         // 8 players adicionados a sessão
@@ -32,10 +29,8 @@ class InitialTeamBalancerServiceTest {
                     new PlayerEntity(UUID.randomUUID(), "P" + i));
         }
 
-        // ACT
         List<Team> teams = service.createInitialTeams(session);
 
-        // ASSERT
         assertEquals(2, teams.size());
         assertEquals(4, teams.get(0).getPlayers().size());
         assertEquals(4, teams.get(1).getPlayers().size());
@@ -45,6 +40,15 @@ class InitialTeamBalancerServiceTest {
                 .sum();
 
         assertEquals(8, totalPlayers);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSessionIsNull() {
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> service.createInitialTeams(null)
+        );
     }
 
     @Test
@@ -66,7 +70,7 @@ class InitialTeamBalancerServiceTest {
     void shouldThrowExceptionWhenLessThanEightPlayers(){
         Session session = new Session();
 
-        for(int i = 0; i < 7; i++) {
+        for(int i = 1; i <= 7; i++) {
             session.addPlayer(
                     new PlayerEntity(UUID.randomUUID(), "P" + i)
             );
