@@ -1,5 +1,8 @@
 package com.fcolucasvieira.racha_manager.domain.model;
 
+import com.fcolucasvieira.racha_manager.domain.exception.ConflictException;
+import com.fcolucasvieira.racha_manager.domain.exception.NotFoundException;
+import com.fcolucasvieira.racha_manager.domain.exception.ValidationException;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -16,7 +19,7 @@ public class Team {
 
     public Team(Integer number) {
         if(number <= 0) {
-            throw new IllegalArgumentException("Team number must be valid");
+            throw new ValidationException("Team number must be valid");
         }
 
         this.number = number;
@@ -32,7 +35,7 @@ public class Team {
 
     public PlayerEntity removeFirstPlayer() {
         if (players.isEmpty()) {
-            throw new IllegalStateException("Team has no players");
+            throw new ConflictException("Team has no players");
         }
 
         return players.remove(0);
@@ -40,26 +43,26 @@ public class Team {
 
     public void removePlayerById(UUID playerId) {
         if (playerId == null) {
-            throw new IllegalArgumentException("Player ID cannot be null");
+            throw new ValidationException("Player ID cannot be null");
         }
 
         boolean removed = players.removeIf(p -> p.getId().equals(playerId));
 
         if (!removed) {
-            throw new IllegalArgumentException("Player not found in team");
+            throw new NotFoundException("Player not found in team");
         }
     }
 
     public void validatePlayerForAddition(PlayerEntity player) {
         if(player == null || player.getId() == null) {
-            throw new IllegalArgumentException("Player cannot be null");
+            throw new ValidationException("Player cannot be null");
         }
 
         boolean alreadyExists = players.stream()
                 .anyMatch(p -> p.getId().equals(player.getId()));
 
         if (alreadyExists) {
-            throw new IllegalArgumentException("Player already in team");
+            throw new ConflictException("Player already in team");
         }
     }
 

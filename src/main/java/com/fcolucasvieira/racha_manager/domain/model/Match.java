@@ -1,5 +1,7 @@
 package com.fcolucasvieira.racha_manager.domain.model;
 
+import com.fcolucasvieira.racha_manager.domain.exception.ConflictException;
+import com.fcolucasvieira.racha_manager.domain.exception.ValidationException;
 import lombok.Getter;
 
 @Getter
@@ -9,11 +11,11 @@ public class Match {
 
     public Match(Team teamA, Team teamB) {
         if(teamA == null || teamB == null) {
-            throw new IllegalArgumentException("Teams cannot be null");
+            throw new ValidationException("Teams cannot be null");
         }
 
         if(teamA.equals(teamB)) {
-            throw new IllegalArgumentException("A match must have two different teams");
+            throw new ConflictException("A match must have two different teams");
         }
 
         this.teamA = teamA;
@@ -24,7 +26,7 @@ public class Match {
         if (winner.equals(teamA)) return teamB;
         if (winner.equals(teamB)) return teamA;
 
-        throw new IllegalArgumentException("Winner is not part of this match");
+        throw new ValidationException("Winner is not part of this match");
     }
 
     public boolean contains(Team team) {

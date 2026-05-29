@@ -1,5 +1,6 @@
 package com.fcolucasvieira.racha_manager.domain.model;
 
+import com.fcolucasvieira.racha_manager.domain.exception.ValidationException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,7 +22,7 @@ public class PlayerEntity {
 
     public PlayerEntity(String name) {
         if(name == null){
-            throw new IllegalArgumentException("Name cannot be null");
+            throw new ValidationException("Name cannot be null");
         }
 
         this.name = name;
