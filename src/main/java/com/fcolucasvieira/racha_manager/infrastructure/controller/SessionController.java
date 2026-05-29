@@ -8,10 +8,12 @@ import com.fcolucasvieira.racha_manager.application.usecase.AddPlayerToSessionUs
 import com.fcolucasvieira.racha_manager.application.usecase.CreateSessionUseCase;
 import com.fcolucasvieira.racha_manager.application.usecase.FinishMatchUseCase;
 import com.fcolucasvieira.racha_manager.application.usecase.RemovePlayerFromSessionUseCase;
+import com.fcolucasvieira.racha_manager.domain.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
 import com.fcolucasvieira.racha_manager.application.mapper.SessionMapper;
 import com.fcolucasvieira.racha_manager.domain.port.SessionRepositoryPort;
+import com.fcolucasvieira.racha_manager.infrastructure.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -36,26 +38,33 @@ public class SessionController {
 
 
     @PostMapping
-    public ResponseEntity<CreateSessionResponse> createSession() {
+    public ResponseEntity<ApiResponse<CreateSessionResponse>> createSession() {
         UUID id = createSessionUseCase.execute();
+
+        CreateSessionResponse response = new CreateSessionResponse(id);
+
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new CreateSessionResponse(id));
+                .body(
+                        ApiResponse.success(response, "Session created successfully")
+                );
     }
 
     @PostMapping("/{sessionId}/players/{playerId}")
-    public ResponseEntity<List<TeamDTO>> addPlayer(@PathVariable UUID sessionId,
+    public ResponseEntity<ApiResponse<List<TeamDTO>>> addPlayer(@PathVariable UUID sessionId,
                                                    @PathVariable UUID playerId) {
         List<Team> teams = addPlayerToSessionUseCase.execute(sessionId, playerId);
 
+        List<TeamDTO> response = teams.stream()
+                .map(sessionMapper::toTeamDTO)
+                .toList();
+
         return ResponseEntity.ok(
-                teams.stream()
-                        .map(sessionMapper::toTeamDTO)
-                        .toList()
+                ApiResponse.success(response, "Player added successfully")
         );
     }
 
     @PostMapping("/{sessionId}/finish-match")
-    public ResponseEntity<Void> finishMatch(@PathVariable UUID sessionId,
+    public ResponseEntity<ApiResponse<Void>> finishMatch(@PathVariable UUID sessionId,
                                             @RequestBody @Valid FinishMatchRequest request) {
         finishMatchUseCase.execute(
                 sessionId,
@@ -63,26 +72,34 @@ public class SessionController {
                 request.resultType()
         );
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                ApiResponse.success(null, "Match finished successfully")
+        );
     }
 
     @GetMapping("/{sessionId}")
-    public ResponseEntity<SessionResponseDTO> getSession(@PathVariable UUID sessionId) {
+    public ResponseEntity<ApiResponse<SessionResponseDTO>> getSession(@PathVariable UUID sessionId) {
         Session session = sessionRepositoryPort.findById(sessionId)
-                .orElseThrow(() -> new IllegalArgumentException("Session not found"));
+                .orElseThrow(() -> new NotFoundException("Session not found: " + sessionId));
 
-        return ResponseEntity.ok(sessionMapper.toResponse(session));
+        SessionResponseDTO response = sessionMapper.toResponse(session);
+
+        return ResponseEntity.ok(
+                ApiResponse.success(response, "Session retrieved successfully")
+        );
     }
 
     @DeleteMapping("/{sessionId}/players/{playerId}")
-    public ResponseEntity<List<TeamDTO>> removePlayer(@PathVariable UUID sessionId,
+    public ResponseEntity<ApiResponse<List<TeamDTO>>> removePlayer(@PathVariable UUID sessionId,
                                                       @PathVariable UUID playerId) {
         List<Team> teams = removePlayerFromSessionUseCase.execute(sessionId, playerId);
 
+        List<TeamDTO> response = teams.stream()
+                .map(sessionMapper::toTeamDTO)
+                .toList();
+
         return ResponseEntity.ok(
-                teams.stream()
-                        .map(sessionMapper::toTeamDTO)
-                        .toList()
+                ApiResponse.success(response, "Player removed successfully")
         );
     }
 }

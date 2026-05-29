@@ -3,6 +3,7 @@ package com.fcolucasvieira.racha_manager.infrastructure.controller;
 import com.fcolucasvieira.racha_manager.application.dto.CreatePlayerRequest;
 import com.fcolucasvieira.racha_manager.application.dto.CreatePlayerResponse;
 import com.fcolucasvieira.racha_manager.application.usecase.CreatePlayerUseCase;
+import com.fcolucasvieira.racha_manager.infrastructure.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,14 @@ public class PlayerController {
     private final CreatePlayerUseCase createUseCase;
 
     @PostMapping
-    public ResponseEntity<CreatePlayerResponse> create(@RequestBody @Valid CreatePlayerRequest request) {
+    public ResponseEntity<ApiResponse<CreatePlayerResponse>> create(@RequestBody @Valid CreatePlayerRequest request) {
         UUID id = createUseCase.execute(request.name());
 
+        CreatePlayerResponse response = new CreatePlayerResponse(id);
+
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new CreatePlayerResponse(id));
+                .body(
+                        ApiResponse.success(response, "Player created successfully")
+                );
     }
 }
