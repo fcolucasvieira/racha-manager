@@ -7,5 +7,5 @@ public record SessionResponseDTO(
         UUID id,
         boolean started,
         MatchDTO currentMatch,
-        List<TeamDTO> queues
+        List<TeamDTO> queue
 ) {}

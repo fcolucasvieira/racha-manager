@@ -14,17 +14,13 @@ import org.springframework.stereotype.Component;
 public class SessionMapper {
     public SessionResponseDTO toResponse(Session session) {
 
-        MatchDTO currentMatchDTO = null;
+        // Seleta currentMatch em uma variável
+        Match currentMatch = session.getCurrentMatch();
 
-        // Se existir currentMatch
-        if(session.getCurrentMatch() != null) {
-            Match currentMatch = session.getCurrentMatch();
-
-            currentMatchDTO = new MatchDTO(
-                    toTeamDTO(currentMatch.getTeamA()),
-                    toTeamDTO(currentMatch.getTeamB())
-            );
-        }
+        MatchDTO currentMatchDTO =
+                (currentMatch != null)
+                        ? toMatchDTO(currentMatch)
+                        : null;
 
             return new SessionResponseDTO(
                     session.getId(),

@@ -4,10 +4,7 @@ import com.fcolucasvieira.racha_manager.application.dto.CreateSessionResponse;
 import com.fcolucasvieira.racha_manager.application.dto.FinishMatchRequest;
 import com.fcolucasvieira.racha_manager.application.dto.SessionResponseDTO;
 import com.fcolucasvieira.racha_manager.application.dto.TeamDTO;
-import com.fcolucasvieira.racha_manager.application.usecase.AddPlayerToSessionUseCase;
-import com.fcolucasvieira.racha_manager.application.usecase.CreateSessionUseCase;
-import com.fcolucasvieira.racha_manager.application.usecase.FinishMatchUseCase;
-import com.fcolucasvieira.racha_manager.application.usecase.RemovePlayerFromSessionUseCase;
+import com.fcolucasvieira.racha_manager.application.usecase.*;
 import com.fcolucasvieira.racha_manager.domain.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
@@ -31,8 +28,7 @@ public class SessionController {
     private final AddPlayerToSessionUseCase addPlayerToSessionUseCase;
     private final RemovePlayerFromSessionUseCase removePlayerFromSessionUseCase;
     private final FinishMatchUseCase finishMatchUseCase;
-
-    private final SessionRepositoryPort sessionRepositoryPort;
+    private final GetSessionUseCase getSessionUseCase;
 
     private final SessionMapper sessionMapper;
 
@@ -79,8 +75,7 @@ public class SessionController {
 
     @GetMapping("/{sessionId}")
     public ResponseEntity<ApiResponse<SessionResponseDTO>> getSession(@PathVariable UUID sessionId) {
-        Session session = sessionRepositoryPort.findById(sessionId)
-                .orElseThrow(() -> new NotFoundException("Session not found: " + sessionId));
+        Session session = getSessionUseCase.execute(sessionId);
 
         SessionResponseDTO response = sessionMapper.toResponse(session);
 

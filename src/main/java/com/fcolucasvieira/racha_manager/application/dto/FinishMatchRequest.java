@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 public record FinishMatchRequest(
         Integer winnerTeamNumber,
 
-        @NotNull
+        @NotNull(message = "Result type is required")
         MatchResultType resultType
 ) {
 }
