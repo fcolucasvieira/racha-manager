@@ -5,12 +5,12 @@ import com.fcolucasvieira.racha_manager.application.dto.FinishMatchRequest;
 import com.fcolucasvieira.racha_manager.application.dto.SessionResponseDTO;
 import com.fcolucasvieira.racha_manager.application.dto.TeamDTO;
 import com.fcolucasvieira.racha_manager.application.usecase.*;
-import com.fcolucasvieira.racha_manager.domain.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
 import com.fcolucasvieira.racha_manager.application.mapper.SessionMapper;
-import com.fcolucasvieira.racha_manager.domain.port.SessionRepositoryPort;
 import com.fcolucasvieira.racha_manager.infrastructure.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,6 +20,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(
+        name = "Sessions",
+        description = "Operations related to racha sessions and matches"
+)
 @RestController
 @RequestMapping("/sessions")
 @RequiredArgsConstructor
@@ -32,7 +36,10 @@ public class SessionController {
 
     private final SessionMapper sessionMapper;
 
-
+    @Operation(
+            summary = "Create a new session",
+            description = "Creates a new racha session and returns its identifier."
+    )
     @PostMapping
     public ResponseEntity<ApiResponse<CreateSessionResponse>> createSession() {
         UUID id = createSessionUseCase.execute();
@@ -45,6 +52,17 @@ public class SessionController {
                 );
     }
 
+    @Operation(
+            summary = "Add player to session",
+            description = """
+            Adds an existing player to a session.
+
+            When the eighth player joins, the system automatically:
+            - Creates the first two teams
+            - Balances players randomly
+            - Starts the match queue
+            """
+    )
     @PostMapping("/{sessionId}/players/{playerId}")
     public ResponseEntity<ApiResponse<List<TeamDTO>>> addPlayer(@PathVariable UUID sessionId,
                                                    @PathVariable UUID playerId) {
@@ -59,6 +77,18 @@ public class SessionController {
         );
     }
 
+    @Operation(
+            summary = "Finish current match",
+            description = """
+            Finishes the current match.
+
+            Supported results:
+            - WINNER: a winning team must be provided
+            - DRAW: winnerTeamNumber must be null
+
+            The queue and priorities are automatically updated.
+            """
+    )
     @PostMapping("/{sessionId}/finish-match")
     public ResponseEntity<ApiResponse<Void>> finishMatch(@PathVariable UUID sessionId,
                                             @RequestBody @Valid FinishMatchRequest request) {
@@ -73,6 +103,16 @@ public class SessionController {
         );
     }
 
+    @Operation(
+            summary = "Get session details",
+            description = """
+            Retrieves the current state of a session, including:
+
+            - Current match
+            - Teams in queue
+            - Session status
+            """
+    )
     @GetMapping("/{sessionId}")
     public ResponseEntity<ApiResponse<SessionResponseDTO>> getSession(@PathVariable UUID sessionId) {
         Session session = getSessionUseCase.execute(sessionId);
@@ -84,6 +124,15 @@ public class SessionController {
         );
     }
 
+    @Operation(
+            summary = "Remove player from session",
+            description = """
+            Removes a player from a session.
+
+            Empty teams may be dissolved automatically and
+            priorities can be recalculated when necessary.
+            """
+    )
     @DeleteMapping("/{sessionId}/players/{playerId}")
     public ResponseEntity<ApiResponse<List<TeamDTO>>> removePlayer(@PathVariable UUID sessionId,
                                                       @PathVariable UUID playerId) {
