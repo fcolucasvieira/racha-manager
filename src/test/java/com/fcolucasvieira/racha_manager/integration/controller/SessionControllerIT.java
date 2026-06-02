@@ -67,6 +67,17 @@ public class SessionControllerIT {
         return playerId;
     }
 
+    // helper (preenchimento de sessão com 8 jogadores)
+    private void fillSessionWithEightPlayers(String sessionId) throws Exception {
+        for(int i = 0; i < 8; i++) {
+            String playerId = createPlayerAndReturnId("P" + i);
+
+            mockMvc.perform(
+                    post("/sessions/" + sessionId + "/players/" + playerId)
+            );
+        }
+    }
+
     @Test
     void shouldCreateSessionSuccessfully() throws Exception {
         mockMvc.perform(
@@ -252,6 +263,26 @@ public class SessionControllerIT {
     }
 
     @Test
+    void shouldReturnNotFoundWhenRemovingPlayerNotInSession() throws Exception {
+        // cria sessão
+        String sessionId = createSessionAndReturnId();
+
+        // cria e adiciona 8 jogadores a sessão existente (formação de times e início das partidas)
+        fillSessionWithEightPlayers(sessionId);
+
+        // ID aleatório para teste do endpoint
+        String randomPlayerId = createPlayerAndReturnId("Lucas");
+
+        mockMvc.perform(
+                delete("/sessions/" + sessionId + "/players/" + randomPlayerId)
+        )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Player is not in a team"))
+                .andExpect(jsonPath("$.timestamp").exists());
+    }
+
+    @Test
     void shouldReturnNotFoundWhenFinishingMatchInNonExistingSession() throws Exception {
         // ID aleatório para realização de teste do endpoint
         String randomSessionId = UUID.randomUUID().toString();
@@ -299,13 +330,7 @@ public class SessionControllerIT {
         String sessionId = createSessionAndReturnId();
 
         // cria e adiciona 8 jogadores a sessão existente (formação de times e início de partidas)
-        for(int i = 0; i < 8; i++) {
-            String playerId = createPlayerAndReturnId("P" + i);
-
-            mockMvc.perform(
-                    post("/sessions/" + sessionId + "/players/" + playerId)
-            );
-        }
+        fillSessionWithEightPlayers(sessionId);
 
         mockMvc.perform(
                 post("/sessions/" + sessionId + "/finish-match")
@@ -328,13 +353,7 @@ public class SessionControllerIT {
         String sessionId = createSessionAndReturnId();
 
         // cria e adiciona 8 jogadores a sessão existente (formação de times e início de partidas)
-        for(int i = 0; i < 8; i++) {
-            String playerId = createPlayerAndReturnId("P" + i);
-
-            mockMvc.perform(
-                    post("/sessions/" + sessionId + "/players/" + playerId)
-            );
-        }
+        fillSessionWithEightPlayers(sessionId);
 
         mockMvc.perform(
                         post("/sessions/" + sessionId + "/finish-match")
@@ -352,18 +371,12 @@ public class SessionControllerIT {
     }
 
     @Test
-    void shouldFinishMatchSuccessfully() throws Exception {
+    void shouldFinishMatchWinnerSuccessfully() throws Exception {
         // cria sessão
         String sessionId = createSessionAndReturnId();
 
         // cria e adiciona 8 jogadores a sessão existentes (formação de times e início dos jogos)
-        for(int i = 0; i < 8; i++) {
-            String playerId = createPlayerAndReturnId("P" + i);
-
-            mockMvc.perform(
-                    post("/sessions/" + sessionId + "/players/" + playerId)
-            );
-        }
+        fillSessionWithEightPlayers(sessionId);
 
         mockMvc.perform(
                         post("/sessions/" + sessionId + "/finish-match")
@@ -371,6 +384,30 @@ public class SessionControllerIT {
                                 .content(
                                         objectMapper.writeValueAsString(
                                                 new FinishMatchRequest(1, MatchResultType.WINNER)
+                                        )
+                                )
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Match finished successfully"))
+                .andExpect(jsonPath("$.data").doesNotExist())
+                .andExpect(jsonPath("$.timestamp").exists());
+    }
+
+    @Test
+    void shouldFinishMatchWithDrawSuccessfully() throws Exception {
+        // cria sessão
+        String sessionId = createSessionAndReturnId();
+
+        // cria e adiciona 8 jogadores a sessão existentes (formação de times e início dos jogos)
+        fillSessionWithEightPlayers(sessionId);
+
+        mockMvc.perform(
+                        post("/sessions/" + sessionId + "/finish-match")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        objectMapper.writeValueAsString(
+                                                new FinishMatchRequest(null, MatchResultType.DRAW)
                                         )
                                 )
                 )
