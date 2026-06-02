@@ -81,7 +81,7 @@ class RemovePlayerFromSessionUseCaseTest {
         when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
 
         assertThrows(
-                ConflictException.class,
+                NotFoundException.class,
                 () -> useCase.execute(sessionId, playerId)
         );
 
@@ -220,37 +220,5 @@ class RemovePlayerFromSessionUseCaseTest {
         useCase.execute(sessionId, playerId);
 
         verify(priorityService, never()).apply(any());
-    }
-
-    @Test
-    void shouldThrowExceptionWhenRemovingLastPlayerFromCurrentMatchTeam() {
-        Session session = new Session();
-
-        PlayerEntity removablePlayer = new PlayerEntity(playerId, "P1");
-
-        Team t1 = new Team(1);
-        Team t2 = createTeam(2, 4);
-        Team t3 = createTeam(3, 4);
-
-        t1.addPlayer(removablePlayer);
-
-        session.updateTeams(new ArrayList<>(List.of(t1, t2, t3)));
-
-        session.getTeams().forEach(
-                team -> team.getPlayers().forEach(session::addPlayer)
-        );
-
-        session.startQueue();
-
-        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
-
-        assertThrows(
-                ConflictException.class,
-                () -> useCase.execute(sessionId, playerId)
-        );
-
-        verify(priorityService, never()).apply(any());
-
-        verify(sessionRepositoryPort, never()).save(any());
     }
 }

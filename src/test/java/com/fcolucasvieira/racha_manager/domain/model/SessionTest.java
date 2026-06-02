@@ -2,6 +2,7 @@ package com.fcolucasvieira.racha_manager.domain.model;
 
 import com.fcolucasvieira.racha_manager.domain.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.domain.exception.NotFoundException;
+import com.fcolucasvieira.racha_manager.domain.exception.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -54,6 +55,27 @@ class SessionTest {
     }
 
     @Test
+    void shouldNotAddPlayerNull() {
+        // arrange
+        PlayerEntity player = null;
+
+        assertThrows(
+                ValidationException.class,
+                () -> session.addPlayer(player)
+        );
+    }
+
+    @Test
+    void shouldNotAddPlayerWithIdNull() {
+        PlayerEntity player = new PlayerEntity(null, "Player");
+
+        assertThrows(
+                ValidationException.class,
+                () -> session.addPlayer(player)
+        );
+    }
+
+    @Test
     void shouldNotRemovePlayerWhenPlayerNotExists() {
         // arrange
         UUID playerId = UUID.randomUUID();
@@ -62,6 +84,64 @@ class SessionTest {
         assertThrows(
                 NotFoundException.class,
                 () -> session.removePlayer(playerId)
+        );
+    }
+
+    @Test
+    void shouldNotRemovePlayerWithIdNull() {
+        UUID playerId = null;
+
+        assertThrows(
+                ValidationException.class,
+                () -> session.removePlayer(playerId)
+        );
+    }
+
+    @Test
+    void shouldfindPlayerTeamSuccessfully() {
+        UUID playerId = UUID.randomUUID();
+
+        PlayerEntity player = new PlayerEntity(playerId, "Player");
+
+        Team team = new Team(1);
+
+        team.addPlayer(player);
+
+        session.updateTeams(
+                new ArrayList<>(List.of(team))
+        );
+
+        Team result = session.findPlayerTeam(playerId);
+
+        assertEquals(result, team);
+        assertTrue(team.getPlayers().contains(player));
+    }
+
+    @Test
+    void shouldNotUpdateTeamsWhenTeamsListBeNull() {
+        List<Team> teams = null;
+
+        assertThrows(
+                ValidationException.class,
+                () -> session.updateTeams(teams)
+        );
+    }
+
+    @Test
+    void shouldNotRemoveTeamWhenTeamBeNull() {
+        assertThrows(
+                ValidationException.class,
+                () -> session.removeTeam(null)
+        );
+    }
+
+    @Test
+    void shouldNotUpdateCurrentMatchWhenMatchBeNull() {
+        Match match = null;
+
+        assertThrows(
+                ValidationException.class,
+                () -> session.updateCurrentMatch(match)
         );
     }
 
@@ -101,6 +181,23 @@ class SessionTest {
 
         // act & assert
         assertThrows(ConflictException.class, () -> session.startQueue());
+    }
+
+    @Test
+    void shouldNotStartQueueWhenQueueAlreadyStarted() {
+        Team t1 = createTeam(1, 4);
+        Team t2 = createTeam(2, 4);
+
+        session.updateTeams(
+                new ArrayList<>(List.of(t1, t2))
+        );
+
+        session.startQueue();
+
+        assertThrows(
+                ConflictException.class,
+                () -> session.startQueue()
+        );
     }
 
     @Test
@@ -174,6 +271,41 @@ class SessionTest {
     }
 
     @Test
+    void shouldNotAddTeamToQueueWhenTeamBeNull() {
+        Team t1 = createTeam(1, 4);
+        Team t2 = createTeam(2, 4);
+
+        session.updateTeams(
+                new ArrayList<>(List.of(t1, t2))
+        );
+
+        session.startQueue();
+
+        assertThrows(
+                ValidationException.class,
+                () -> session.addTeamToQueue(null)
+        );
+    }
+
+    @Test
+    void shouldNotAddTeamToQueueWhenQueueNotInitialized() {
+        Team team = createTeam(1, 4);
+
+        assertThrows(
+                ConflictException.class,
+                () -> session.addTeamToQueue(team)
+        );
+    }
+
+    @Test
+    void shouldNotRemoveFirstTeamFromQueueWhenQueueIsEmpty() {
+        assertThrows(
+                ConflictException.class,
+                () -> session.removeFirstTeamFromQueue()
+        );
+    }
+
+    @Test
     void shouldRemoveFirstTeamFromQueue() {
         // arrange
         Team t1 = createTeam(1, 4);
@@ -215,5 +347,14 @@ class SessionTest {
         assertNull(session.getCurrentMatch());
 
         assertTrue(session.getQueue().isEmpty());
+    }
+
+    @Test
+    void shouldMarkSessionAsShuffled() {
+        assertFalse(session.isShuffled());
+
+        session.markAsShuffled();
+
+        assertTrue(session.isShuffled());
     }
 }

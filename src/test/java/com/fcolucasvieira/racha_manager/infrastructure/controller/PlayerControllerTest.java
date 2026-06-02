@@ -1,4 +1,4 @@
-package com.fcolucasvieira.racha_manager.integration.controller;
+package com.fcolucasvieira.racha_manager.infrastructure.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fcolucasvieira.racha_manager.application.dto.CreatePlayerRequest;
@@ -16,7 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class PlayerControllerIT {
+public class PlayerControllerTest {
     // Simula chamadas HTTP sem precisar subir servidor Tomcat
     @Autowired
     private MockMvc mockMvc;

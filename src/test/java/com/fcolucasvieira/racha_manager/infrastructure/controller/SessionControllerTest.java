@@ -1,4 +1,4 @@
-package com.fcolucasvieira.racha_manager.integration.controller;
+package com.fcolucasvieira.racha_manager.infrastructure.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fcolucasvieira.racha_manager.application.dto.CreatePlayerRequest;
@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class SessionControllerIT {
+public class SessionControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -399,7 +399,10 @@ public class SessionControllerIT {
         // cria sessão
         String sessionId = createSessionAndReturnId();
 
-        // cria e adiciona 8 jogadores a sessão existentes (formação de times e início dos jogos)
+        // cria e adiciona 8 jogadores a sessão existente (formação de times e início dos jogos)
+        fillSessionWithEightPlayers(sessionId);
+
+        // cria e adiciona mais 8 jogadores a sessão existente (para executar o empate, são necessários 2 times na queue)
         fillSessionWithEightPlayers(sessionId);
 
         mockMvc.perform(

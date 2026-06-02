@@ -94,7 +94,6 @@ public class Session {
         }
     }
 
-    // talvez vínculo ao removeTeam, eles fazem papéis próximos
     public void validateTeamRemoval(Team team) {
         if (!hasStarted()) {
             return;
