@@ -3,6 +3,8 @@ package com.fcolucasvieira.racha_manager.integration.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fcolucasvieira.racha_manager.application.dto.CreatePlayerRequest;
+import com.fcolucasvieira.racha_manager.application.dto.FinishMatchRequest;
+import com.fcolucasvieira.racha_manager.domain.enums.MatchResultType;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -321,6 +322,57 @@ public class SessionControllerIT {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value("Session not found: " + randomSessionId))
+                .andExpect(jsonPath("$.timestamp").exists());
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenFinishingMatchInNonExistingSession() throws Exception {
+        // ID aleatório para realização de teste do endpoint
+        String randomSessionId = UUID.randomUUID().toString();
+
+        mockMvc.perform(
+                post("/sessions/" + randomSessionId + "/finish-match")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                objectMapper.writeValueAsString(
+                                        new FinishMatchRequest(1, MatchResultType.WINNER)
+                                )
+                                )
+        )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Session not found: " + randomSessionId))
+                .andExpect(jsonPath("$.timestamp").exists());
+    }
+
+    @Test
+    void shouldReturnConflictWhenSessionHasNotStarted() throws Exception {
+        // cria sessão
+        MvcResult sessionResult = mockMvc.perform(
+                post("/sessions")
+        ).andReturn();
+
+        String sessionBody = sessionResult.getResponse().getContentAsString();
+
+        String sessionId = objectMapper.readTree(sessionBody)
+                .path("data")
+                .path("id")
+                .asText();
+
+        // obs: sessão existente, mas não iniciada (ideal para o nosso teste)
+
+        mockMvc.perform(
+                post("/sessions/" + sessionId + "/finish-match")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                objectMapper.writeValueAsString(
+                                        new FinishMatchRequest(1, MatchResultType.WINNER)
+                                )
+                        )
+        )
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Session has not started"))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
 }
