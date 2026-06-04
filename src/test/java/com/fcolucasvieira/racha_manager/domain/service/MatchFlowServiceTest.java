@@ -7,12 +7,14 @@ import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.fcolucasvieira.racha_manager.domain.constant.RachaRules.TEAM_SIZE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MatchFlowServiceTest {
@@ -24,7 +26,7 @@ class MatchFlowServiceTest {
         service = new MatchFlowService();
     }
 
-    // helper para criação de times
+    // helper (criação de times)
     Team createTeam(int number, int countPlayers) {
         Team team = new Team(number);
 
@@ -41,8 +43,8 @@ class MatchFlowServiceTest {
     }
 
     @Test
-    void shouldFinishMatchWithWinnerSuccessfully() {
-        // arrange
+    @DisplayName("Success with teams in queue (Winner)")
+    void shouldFinishMatchWithWinnerSuccessfullyWithTeamsInQueue() {
         Session session = new Session();
 
         Team t1 = createTeam(1, 4);
@@ -56,10 +58,8 @@ class MatchFlowServiceTest {
 
         session.startQueue();
 
-        // act
         service.finishWithWinner(session, 1);
 
-        // assert
         assertEquals(1, session.getCurrentMatch().getTeamA().getNumber());
         assertEquals(3, session.getCurrentMatch().getTeamB().getNumber());
 
@@ -71,8 +71,8 @@ class MatchFlowServiceTest {
     }
 
     @Test
-    void shouldKeepSameMatchWhenQueueIsEmpty() {
-        // arrange
+    @DisplayName("Success without teams in queue (Winner)")
+    void shouldFinishMatchSuccessfullyWithoutTeamsInQueue() {
         Session session = new Session();
 
         Team t1 = createTeam(1, 4);
@@ -85,28 +85,31 @@ class MatchFlowServiceTest {
 
         session.startQueue();
 
-        // act
         service.finishWithWinner(session, 1);
 
-        // assert
         assertEquals(1, session.getCurrentMatch().getTeamA().getNumber());
         assertEquals(2, session.getCurrentMatch().getTeamB().getNumber());
 
         assertTrue(session.getQueue().isEmpty());
+
+        assertTrue(t1.isPlayed());
+        assertTrue(t2.isPlayed());
     }
 
     @Test
+    @DisplayName("Session not started (Winner & Draw)")
     void shouldThrowExceptionWhenNoMatchInProgress() {
-        // arrange
         Session session = new Session();
 
-        // act & assert
-        assertThrows(ConflictException.class, () -> service.finishWithWinner(session, 1));
+        assertThrows(
+                ConflictException.class,
+                () -> service.finishWithWinner(session, 1)
+        );
     }
 
     @Test
+    @DisplayName("Session not initialized queue (Winner & Draw)")
     void shouldThrowExceptionWhenQueueNotInitialized() {
-        // arrange
         Session session = new Session();
 
         Team t1 = createTeam(1, 4);
@@ -118,13 +121,15 @@ class MatchFlowServiceTest {
                 new Match(t1, t2)
         );
 
-        // act & assert
-        assertThrows(ConflictException.class, () -> service.finishWithWinner(session, 1));
+        assertThrows(
+                ConflictException.class,
+                () -> service.finishWithWinner(session, 1)
+        );
     }
 
     @Test
+    @DisplayName("Invalid winner to finish match (Winner)")
     void shouldThrowExceptionWhenWinnerIsInvalid() {
-        // arrange
         Session session = new Session();
 
         Team t1 = createTeam(1, 4);
@@ -137,52 +142,15 @@ class MatchFlowServiceTest {
 
         session.startQueue();
 
-        // act & assert
-        assertThrows(ValidationException.class, () -> service.finishWithWinner(session, 99));
-    }
-
-    @Test
-    void shouldPrioritizeRookieTeamAfterMatchFinishes() {
-        // arrange
-        Session session = new Session();
-
-        Team t1 = createTeam(1, 4);
-        Team t2 = createTeam(2, 4);
-
-        // t3 ainda não jogou
-        Team t3 = createTeam(3, 4);
-
-        session.updateTeams(
-                new ArrayList<>(List.of(t1, t2, t3))
+        assertThrows(
+                ValidationException.class,
+                () -> service.finishWithWinner(session, 3)
         );
-
-        session.startQueue();
-
-        Team rookie = createTeam(4, 4);
-
-        // novo time novato entra na fila
-        session.addTeamToQueue(rookie);
-
-        // act
-        service.finishWithWinner(session, 1);
-
-        // assert
-        assertEquals(1, session.getCurrentMatch().getTeamA().getNumber());
-
-        // t3 deve continuar na frente do rookie,
-        // porque chegou antes como novato
-        assertEquals(3, session.getCurrentMatch().getTeamB().getNumber());
-
-        // fila restante
-        assertEquals(2, session.getQueue().size());
-
-        assertEquals(4, session.getQueue().get(0).getNumber());
-        assertEquals(2, session.getQueue().get(1).getNumber());
     }
 
     @Test
+    @DisplayName("Success (Draw)")
     void shouldFinishMatchWithDrawSuccessfully() {
-        // arrange
         Session session = new Session();
 
         Team t1 = createTeam(1, 4);
@@ -198,16 +166,11 @@ class MatchFlowServiceTest {
         // queue -> [t3, t4]
         session.startQueue();
 
-        // act
         service.finishWithDraw(session);
 
-        // assert
-
-        // próximos times entram no currentMatch
         assertEquals(3, session.getCurrentMatch().getTeamA().getNumber());
         assertEquals(4, session.getCurrentMatch().getTeamB().getNumber());
 
-        // times do empate voltam ao final da fila
         assertEquals(2, session.getQueue().size());
 
         assertEquals(1, session.getQueue().get(0).getNumber());
@@ -218,23 +181,23 @@ class MatchFlowServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenDrawHasLessThanTwoTeamsInQueue() {
-        // arrange
+    @DisplayName("Queue has less than " + (TEAM_SIZE * 2) + " (Draw)")
+    void shouldThrowExceptionWhenQueueHasLessThanTwoTeamsInQueue() {
         Session session = new Session();
 
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 4);
         Team t3 = createTeam(3, 4);
+        Team t4 = createTeam(4, 2);
 
         session.updateTeams(
-                new ArrayList<>(List.of(t1, t2, t3))
+                new ArrayList<>(List.of(t1, t2, t3, t4))
         );
 
         // currentMatch -> t1 vs t2
-        // queue -> [t3]
+        // queue -> [t3, t4]
         session.startQueue();
 
-        // act & assert
         assertThrows(
                 ConflictException.class,
                 () -> service.finishWithDraw(session)

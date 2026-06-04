@@ -95,8 +95,14 @@ public class AddPlayerToSessionUseCase {
         // Se não existe time ou último está cheio
         if (lastTeam == null || lastTeam.isFull()) {
 
+            // Define número do novo time
+            int nextTeamNumber = teams.stream()
+                    .mapToInt(Team::getNumber)
+                    .max()
+                    .orElse(0) + 1;
+
             // Cria novo time
-            Team newTeam = new Team(teams.size() + 1);
+            Team newTeam = new Team(nextTeamNumber);
 
             // Adiciona o jogador ao time
             newTeam.addPlayer(player);

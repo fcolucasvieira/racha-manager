@@ -15,7 +15,13 @@ public class PriorityService {
 
     public void apply(Session session) {
         // se não existe currentMatch, retornar
+        // retornar seria o ideal? Não seria ideal lançar uma excessão?
         if (!session.hasStarted()){
+            log.debug(
+                    "[PRIORITY_SKIPPED] sessionId={} reason=no_current_match",
+                    session.getId()
+            );
+
             return;
         }
 
