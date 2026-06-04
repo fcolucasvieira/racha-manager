@@ -13,11 +13,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.fcolucasvieira.racha_manager.domain.constant.RachaRules.*;
 @Service
 public class InitialTeamBalancerService {
-
-    private static final int TEAM_SIZE = 4;
-    private static final int INITIAL_PLAYERS = 8;
 
     private static final Logger log = LoggerFactory.getLogger(InitialTeamBalancerService.class);
 
@@ -72,7 +70,7 @@ public class InitialTeamBalancerService {
         }
 
         if (session.getActivePlayers().size() != INITIAL_PLAYERS) {
-            throw new ConflictException("Initial balance requires exactly 8 players");
+            throw new ConflictException("Initial balance requires exactly " + INITIAL_PLAYERS + " players");
         }
 
         if (session.getTeams() != null && !session.getTeams().isEmpty()) {

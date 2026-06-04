@@ -59,9 +59,9 @@ public class MatchFlowService {
         // valida se há currentMatch e queue na sessão
         validateSessionState(session);
 
-        // se existir menos que 2 times na queue, lançar excessão
-        if(!session.hasAtLeastTeamsInQueue(2)) {
-            throw new ConflictException("Cannot finish draw without at least 2 teams in queue");
+        // se existir menos que a qtde. de jogadores suficientes para 2 times na queue, lançar excessão
+        if(!session.hasEnoughPlayersForDraw()) {
+            throw new ConflictException("Cannot finish draw without enough players waiting");
         }
 
         // seleta currentMatch através da session

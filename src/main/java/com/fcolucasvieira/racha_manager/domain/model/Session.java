@@ -1,5 +1,6 @@
 package com.fcolucasvieira.racha_manager.domain.model;
 
+import com.fcolucasvieira.racha_manager.domain.constant.RachaRules;
 import com.fcolucasvieira.racha_manager.domain.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.domain.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.domain.exception.ValidationException;
@@ -212,8 +213,18 @@ public class Session {
         this.currentMatch = null;
     }
 
-    public boolean hasAtLeastTeamsInQueue(int amount) {
-        return queue != null && queue.size() >= amount;
+    public boolean hasEnoughPlayersForDraw() {
+        return getWaitingPlayersCount() >= (RachaRules.TEAM_SIZE * 2);
+    }
+
+    public int getWaitingPlayersCount() {
+        if(queue == null){
+            return 0;
+        }
+
+        return queue.stream().
+                mapToInt(team -> team.getPlayers().size())
+                .sum();
     }
 
     public boolean canStartQueue() {

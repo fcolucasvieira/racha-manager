@@ -6,11 +6,13 @@ import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.UUID;
 
+import static com.fcolucasvieira.racha_manager.domain.constant.RachaRules.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InitialTeamBalancerServiceTest {
@@ -22,31 +24,38 @@ class InitialTeamBalancerServiceTest {
     }
 
     @Test
-    void shouldCreateTwoTeamsWithFourPlayersEach() {
+    @DisplayName("Success")
+    void shouldCreateTwoTeamsFull() {
         Session session = new Session();
 
-        // 8 players adicionados a sessão
-        for(int i = 1; i <= 8; i++){
+        // players suficientes adicionados a sessão
+        for(int i = 1; i <= INITIAL_PLAYERS; i++){
             session.addPlayer(
                     new PlayerEntity(UUID.randomUUID(), "P" + i));
         }
 
         List<Team> teams = service.createInitialTeams(session);
 
-        assertEquals(2, teams.size());
-        assertEquals(4, teams.get(0).getPlayers().size());
-        assertEquals(4, teams.get(1).getPlayers().size());
+        assertEquals(INITIAL_TEAMS, teams.size());
+
+        assertEquals(1, teams.get(0).getNumber());
+        assertEquals(2, teams.get(1).getNumber());
+
+        assertEquals(TEAM_SIZE, teams.get(0).getPlayers().size());
+        assertEquals(TEAM_SIZE, teams.get(1).getPlayers().size());
 
         int totalPlayers = teams.stream()
                 .mapToInt(team -> team.getPlayers().size())
                 .sum();
 
-        assertEquals(8, totalPlayers);
+        assertEquals(INITIAL_PLAYERS, totalPlayers);
+
+        assertTrue(session.isShuffled());
     }
 
     @Test
+    @DisplayName("Session null")
     void shouldThrowExceptionWhenSessionIsNull() {
-
         assertThrows(
                 ValidationException.class,
                 () -> service.createInitialTeams(null)
@@ -54,25 +63,22 @@ class InitialTeamBalancerServiceTest {
     }
 
     @Test
-    void shouldMarkSessionAsShuffled() {
+    @DisplayName("Session already is shuffled")
+    void shouldThrowExceptionWhenSessionAlreadyShuffled(){
         Session session = new Session();
 
-        for (int i = 1; i <= 8; i++) {
-            session.addPlayer(
-                    new PlayerEntity(UUID.randomUUID(), "P" + i)
-            );
-        }
+        session.markAsShuffled();
 
-        service.createInitialTeams(session);
-
-        assertTrue(session.isShuffled());
+        assertThrows(ConflictException.class,
+                () -> service.createInitialTeams(session));
     }
 
     @Test
-    void shouldThrowExceptionWhenLessThanEightPlayers(){
+    @DisplayName("Session less than quantity initial players")
+    void shouldThrowExceptionWhenSessionHasLessThanInitialPlayers(){
         Session session = new Session();
 
-        for(int i = 1; i <= 7; i++) {
+        for(int i = 1; i <= INITIAL_PLAYERS - 1; i++) {
             session.addPlayer(
                     new PlayerEntity(UUID.randomUUID(), "P" + i)
             );
@@ -83,20 +89,26 @@ class InitialTeamBalancerServiceTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenSessionAlreadyShuffled(){
+    @DisplayName("Session more than quantity initial players")
+    void shouldThrowExceptionWhenSessionHasMoreThanInitialPlayers(){
         Session session = new Session();
 
-        session.markAsShuffled();
+        for(int i = 1; i <= INITIAL_PLAYERS + 1; i++) {
+            session.addPlayer(
+                    new PlayerEntity(UUID.randomUUID(), "P" + i)
+            );
+        }
 
         assertThrows(ConflictException.class,
-                    () -> service.createInitialTeams(session));
+                () -> service.createInitialTeams(session));
     }
 
     @Test
-    void shouldNotAllowBalanceWhenSessionAlreadyHasTeams() {
+    @DisplayName("Session already contains teams")
+    void shouldThrowExceptionWhenTeamsAlreadyExist() {
         Session session = new Session();
 
-        for (int i = 1; i <= 8; i++) {
+        for (int i = 1; i <= INITIAL_PLAYERS; i++) {
             session.addPlayer(
                     new PlayerEntity(UUID.randomUUID(), "P" + i)
             );
