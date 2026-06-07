@@ -5,10 +5,17 @@ import com.fcolucasvieira.racha_manager.domain.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.domain.model.Match;
 import com.fcolucasvieira.racha_manager.domain.model.Session;
 import com.fcolucasvieira.racha_manager.domain.model.Team;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
+@RequiredArgsConstructor
 public class MatchFlowService {
+
+    private final TeamFillService teamFillService;
+
     public void finishWithWinner(Session session, int winnerTeamNumber) {
         // valida se há currentMatch e queue na sessão
         validateSessionState(session);
@@ -71,22 +78,33 @@ public class MatchFlowService {
         Team teamA = currentMatch.getTeamA();
         Team teamB = currentMatch.getTeamB();
 
-        // joga os dois times para o final da fila (em ordem -> 1° A; 2º B)
-        session.addTeamToQueue(teamA);
-        session.addTeamToQueue(teamB);
-
         // marca os times que já jogaram
         teamA.markAsPlayed();
         teamB.markAsPlayed();
 
-        // seleta os dois primeiros times da fila para o currentMatch
+        // joga os dois times para o final da fila (em ordem -> 1° A; 2º B)
+        session.addTeamToQueue(teamA);
+        session.addTeamToQueue(teamB);
+
+        // seleta o primeiro time da fila para o currentMatch
         Team nextTeamA = session.removeFirstTeamFromQueue();
+
+        // ajusta o primeiro time do novo currentMatch
+        teamFillService.fill(nextTeamA, session.getQueue());
+
+        // seleta o segundo time da fila para o currentMatch
         Team nextTeamB = session.removeFirstTeamFromQueue();
+
+        // ajusta o segundo time do novo currentMatch
+        teamFillService.fill(nextTeamB, session.getQueue());
 
         // atualiza currentMatch
         session.updateCurrentMatch(
                 new Match(nextTeamA, nextTeamB)
         );
+
+        // dissolve times incompletos da sessão
+        teamFillService.dissolveEmptyTeams(session);
     }
 
     private void validateSessionState(Session session) {

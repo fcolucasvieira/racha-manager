@@ -68,9 +68,9 @@ public class FinishMatchUseCase {
                     session.getCurrentMatch().getTeamA().getNumber(),
                     session.getCurrentMatch().getTeamB().getNumber()
             );
-        }
 
-        priorityService.apply(session);
+            priorityService.apply(session);
+        }
 
         sessionRepositoryPort.save(session);
     }

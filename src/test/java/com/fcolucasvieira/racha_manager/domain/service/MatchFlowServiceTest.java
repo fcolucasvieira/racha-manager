@@ -23,11 +23,11 @@ class MatchFlowServiceTest {
 
     @BeforeEach
     void setup() {
-        service = new MatchFlowService();
+        service = new MatchFlowService(new TeamFillService());
     }
 
     // helper (criação de times)
-    Team createTeam(int number, int countPlayers) {
+    private Team createTeam(int number, int countPlayers) {
         Team team = new Team(number);
 
         for (int i = 1; i <= countPlayers; i++) {
@@ -72,7 +72,7 @@ class MatchFlowServiceTest {
 
     @Test
     @DisplayName("Success without teams in queue (Winner)")
-    void shouldFinishMatchSuccessfullyWithoutTeamsInQueue() {
+    void shouldFinishMatchWithWinnerSuccessfullyWithoutTeamsInQueue() {
         Session session = new Session();
 
         Team t1 = createTeam(1, 4);
@@ -181,8 +181,8 @@ class MatchFlowServiceTest {
     }
 
     @Test
-    @DisplayName("Queue has less than " + (TEAM_SIZE * 2) + " (Draw)")
-    void shouldThrowExceptionWhenQueueHasLessThanTwoTeamsInQueue() {
+    @DisplayName("Queue has less than " + (TEAM_SIZE * 2) + " players available (Draw)")
+    void shouldThrowExceptionWhenQueueHasInsufficientPlayersForDraw() {
         Session session = new Session();
 
         Team t1 = createTeam(1, 4);

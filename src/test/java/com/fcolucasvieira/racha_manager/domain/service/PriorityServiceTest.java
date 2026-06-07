@@ -19,7 +19,7 @@ class PriorityServiceTest {
 
     @BeforeEach
     void setup() {
-        service = new PriorityService();
+        service = new PriorityService(new TeamFillService());
     }
 
     // helper (criação de times)
@@ -60,6 +60,8 @@ class PriorityServiceTest {
 
         assertEquals(4, t1.getPlayers().size());
         assertEquals(1, t3.getPlayers().size());
+
+        assertEquals(4, t2.getPlayers().size());
     }
 
     @Test
@@ -94,6 +96,9 @@ class PriorityServiceTest {
         assertEquals(3, session.getQueue().get(0).getPlayers().size());
 
         assertEquals(3, session.getTeams().size());
+
+        assertEquals(4, t1.getPlayers().size());
+        assertEquals(4, t2.getPlayers().size());
     }
 
     @Test
@@ -119,9 +124,7 @@ class PriorityServiceTest {
 
         assertTrue(t1.isFull());
 
-        assertTrue(session.getQueue().isEmpty());
-
-        assertEquals(2, session.getTeams().size());
+        assertFalse(session.getTeams().contains(t3));
     }
 
     @Test
@@ -162,5 +165,9 @@ class PriorityServiceTest {
         assertDoesNotThrow(
                 () -> service.apply(session)
         );
+
+        assertNull(session.getCurrentMatch());
+        assertTrue(session.getQueue().isEmpty());
+        assertTrue(session.getTeams().isEmpty());
     }
 }
