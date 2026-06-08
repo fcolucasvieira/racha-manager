@@ -9,6 +9,7 @@ import com.fcolucasvieira.racha_manager.domain.service.MatchFlowService;
 import com.fcolucasvieira.racha_manager.domain.service.PriorityService;
 import com.fcolucasvieira.racha_manager.domain.port.SessionRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,9 +26,8 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class FinishMatchUseCaseTest {
-
     @Mock
-    private SessionRepositoryPort sessionRepositoryPort;
+    private SessionRepositoryPort repository;
     @Mock
     private PriorityService priorityService;
     @Mock
@@ -60,18 +60,20 @@ class FinishMatchUseCaseTest {
     }
 
     @Test
+    @DisplayName("Success (Winner)")
     void shouldFinishMatchWithWinnerSuccessfully() {
         Session session = new Session();
 
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 4);
-        Team t3 = createTeam(3, 4);
+        Team t3 = createTeam(3, 1);
 
         session.updateTeams(new ArrayList<>(List.of(t1, t2, t3)));
 
         session.startQueue();
 
-        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
+        when(repository.findById(sessionId))
+                .thenReturn(Optional.of(session));
 
         useCase.execute(
                 sessionId,
@@ -81,10 +83,11 @@ class FinishMatchUseCaseTest {
 
         verify(matchFlowService).finishWithWinner(session, 1);
         verify(priorityService).apply(session);
-        verify(sessionRepositoryPort).save(session);
+        verify(repository).save(session);
     }
 
     @Test
+    @DisplayName("Success (Draw)")
     void shouldFinishMatchWithDrawSuccessfully() {
         Session session = new Session();
 
@@ -97,7 +100,8 @@ class FinishMatchUseCaseTest {
 
         session.startQueue();
 
-        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
+        when(repository.findById(sessionId))
+                .thenReturn(Optional.of(session));
 
         useCase.execute(
                 sessionId,
@@ -106,13 +110,16 @@ class FinishMatchUseCaseTest {
         );
 
         verify(matchFlowService).finishWithDraw(session);
-        verify(priorityService).apply(session);
-        verify(sessionRepositoryPort).save(session);
+        verify(priorityService, never()).apply(any());
+        verify(repository).save(session);
+
     }
 
     @Test
+    @DisplayName("Session not found")
     void shouldThrowExceptionWhenSessionNotFound() {
-        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.empty());
+        when(repository.findById(sessionId))
+                .thenReturn(Optional.empty());
 
         assertThrows(
                 NotFoundException.class,
@@ -124,17 +131,19 @@ class FinishMatchUseCaseTest {
         );
 
         verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
+        verify(matchFlowService, never()).finishWithDraw(any());
         verify(priorityService, never()).apply(any());
-        verify(sessionRepositoryPort, never()).save(any());
+        verify(repository, never()).save(any());
     }
 
     @Test
+    @DisplayName("Session not started")
     void shouldThrowExceptionWhenSessionHasNotStarted() {
         Session session = new Session();
 
-        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
+        when(repository.findById(sessionId))
+                .thenReturn(Optional.of(session));
 
-        // act & assert
         assertThrows(
                 ConflictException.class,
                 () -> useCase.execute(
@@ -145,11 +154,13 @@ class FinishMatchUseCaseTest {
         );
 
         verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
+        verify(matchFlowService, never()).finishWithDraw(any());
         verify(priorityService, never()).apply(any());
-        verify(sessionRepositoryPort, never()).save(any());
+        verify(repository, never()).save(any());
     }
 
     @Test
+    @DisplayName("Winner number team is null")
     void shouldThrowExceptionWhenWinnerTypeHasNullWinner() {
         Session session = new Session();
 
@@ -160,7 +171,8 @@ class FinishMatchUseCaseTest {
 
         session.startQueue();
 
-        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
+        when(repository.findById(sessionId))
+                .thenReturn(Optional.of(session));
 
         assertThrows(
                 ValidationException.class,
@@ -172,11 +184,13 @@ class FinishMatchUseCaseTest {
         );
 
         verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
+        verify(matchFlowService, never()).finishWithDraw(any());
         verify(priorityService, never()).apply(any());
-        verify(sessionRepositoryPort, never()).save(any());
+        verify(repository, never()).save(any());
     }
 
     @Test
+    @DisplayName("Draw contains winner number team")
     void shouldThrowExceptionWhenDrawHasWinnerNumber() {
         Session session = new Session();
 
@@ -187,7 +201,8 @@ class FinishMatchUseCaseTest {
 
         session.startQueue();
 
-        when(sessionRepositoryPort.findById(sessionId)).thenReturn(Optional.of(session));
+        when(repository.findById(sessionId))
+                .thenReturn(Optional.of(session));
 
         assertThrows(
                 ValidationException.class,
@@ -198,8 +213,9 @@ class FinishMatchUseCaseTest {
                 )
         );
 
+        verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
         verify(matchFlowService, never()).finishWithDraw(any());
         verify(priorityService, never()).apply(any());
-        verify(sessionRepositoryPort, never()).save(any());
+        verify(repository, never()).save(any());
     }
 }

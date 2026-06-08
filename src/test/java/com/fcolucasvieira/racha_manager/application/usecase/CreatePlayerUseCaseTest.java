@@ -18,9 +18,9 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CreatePlayerUseCaseTest {
-
     @Mock
     private PlayerRepositoryPort repository;
+
     @InjectMocks
     private CreatePlayerUseCase useCase;
 

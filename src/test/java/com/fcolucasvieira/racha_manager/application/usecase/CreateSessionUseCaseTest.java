@@ -15,9 +15,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CreateSessionUseCaseTest {
-
     @Mock
     private SessionRepositoryPort repository;
+
     @InjectMocks
     private CreateSessionUseCase useCase;
 
