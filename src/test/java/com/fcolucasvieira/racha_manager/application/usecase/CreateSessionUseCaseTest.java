@@ -1,7 +1,8 @@
 package com.fcolucasvieira.racha_manager.application.usecase;
 
-import com.fcolucasvieira.racha_manager.domain.model.Session;
-import com.fcolucasvieira.racha_manager.domain.port.SessionRepositoryPort;
+import com.fcolucasvieira.racha_manager.session.model.Session;
+import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
+import com.fcolucasvieira.racha_manager.session.usecase.CreateSessionUseCase;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,7 +17,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CreateSessionUseCaseTest {
     @Mock
-    private SessionRepositoryPort repository;
+    private SessionRepository repository;
 
     @InjectMocks
     private CreateSessionUseCase useCase;

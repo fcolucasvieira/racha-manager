@@ -1,11 +1,13 @@
 package com.fcolucasvieira.racha_manager.domain.service;
 
-import com.fcolucasvieira.racha_manager.domain.exception.ConflictException;
-import com.fcolucasvieira.racha_manager.domain.exception.ValidationException;
-import com.fcolucasvieira.racha_manager.domain.model.Match;
-import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
-import com.fcolucasvieira.racha_manager.domain.model.Session;
-import com.fcolucasvieira.racha_manager.domain.model.Team;
+import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
+import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
+import com.fcolucasvieira.racha_manager.session.model.Match;
+import com.fcolucasvieira.racha_manager.session.service.MatchFlowService;
+import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.session.model.Session;
+import com.fcolucasvieira.racha_manager.session.model.Team;
+import com.fcolucasvieira.racha_manager.session.service.TeamFillService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.fcolucasvieira.racha_manager.domain.constant.RachaRules.TEAM_SIZE;
+import static com.fcolucasvieira.racha_manager.session.constant.SessionRules.TEAM_SIZE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MatchFlowServiceTest {

@@ -1,8 +1,10 @@
 package com.fcolucasvieira.racha_manager.domain.service;
 
-import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
-import com.fcolucasvieira.racha_manager.domain.model.Session;
-import com.fcolucasvieira.racha_manager.domain.model.Team;
+import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.session.model.Session;
+import com.fcolucasvieira.racha_manager.session.service.PriorityService;
+import com.fcolucasvieira.racha_manager.session.model.Team;
+import com.fcolucasvieira.racha_manager.session.service.TeamFillService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

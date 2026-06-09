@@ -1,9 +1,9 @@
 package com.fcolucasvieira.racha_manager.infrastructure.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fcolucasvieira.racha_manager.application.dto.CreatePlayerRequest;
-import com.fcolucasvieira.racha_manager.application.dto.FinishMatchRequest;
-import com.fcolucasvieira.racha_manager.domain.enums.MatchResultType;
+import com.fcolucasvieira.racha_manager.player.dto.request.CreatePlayerRequest;
+import com.fcolucasvieira.racha_manager.session.dto.request.FinishMatchRequest;
+import com.fcolucasvieira.racha_manager.session.enums.MatchResultType;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

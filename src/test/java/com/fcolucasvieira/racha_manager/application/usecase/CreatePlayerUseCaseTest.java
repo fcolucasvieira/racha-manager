@@ -1,7 +1,8 @@
 package com.fcolucasvieira.racha_manager.application.usecase;
 
-import com.fcolucasvieira.racha_manager.domain.model.PlayerEntity;
-import com.fcolucasvieira.racha_manager.domain.port.PlayerRepositoryPort;
+import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.player.repository.PlayerRepository;
+import com.fcolucasvieira.racha_manager.player.usecase.CreatePlayerUseCase;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,7 +20,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CreatePlayerUseCaseTest {
     @Mock
-    private PlayerRepositoryPort repository;
+    private PlayerRepository repository;
 
     @InjectMocks
     private CreatePlayerUseCase useCase;

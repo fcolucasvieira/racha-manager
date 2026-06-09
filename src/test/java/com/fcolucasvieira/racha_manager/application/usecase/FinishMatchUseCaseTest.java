@@ -1,13 +1,16 @@
 package com.fcolucasvieira.racha_manager.application.usecase;
 
-import com.fcolucasvieira.racha_manager.domain.enums.MatchResultType;
-import com.fcolucasvieira.racha_manager.domain.exception.ConflictException;
-import com.fcolucasvieira.racha_manager.domain.exception.NotFoundException;
-import com.fcolucasvieira.racha_manager.domain.exception.ValidationException;
-import com.fcolucasvieira.racha_manager.domain.model.*;
-import com.fcolucasvieira.racha_manager.domain.service.MatchFlowService;
-import com.fcolucasvieira.racha_manager.domain.service.PriorityService;
-import com.fcolucasvieira.racha_manager.domain.port.SessionRepositoryPort;
+import com.fcolucasvieira.racha_manager.session.enums.MatchResultType;
+import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
+import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
+import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
+import com.fcolucasvieira.racha_manager.session.service.MatchFlowService;
+import com.fcolucasvieira.racha_manager.session.service.PriorityService;
+import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
+import com.fcolucasvieira.racha_manager.session.model.Session;
+import com.fcolucasvieira.racha_manager.session.usecase.FinishMatchUseCase;
+import com.fcolucasvieira.racha_manager.session.model.Team;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +30,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class FinishMatchUseCaseTest {
     @Mock
-    private SessionRepositoryPort repository;
+    private SessionRepository repository;
     @Mock
     private PriorityService priorityService;
     @Mock
