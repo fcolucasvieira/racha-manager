@@ -5,7 +5,7 @@ import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.session.service.MatchFlowService;
-import com.fcolucasvieira.racha_manager.session.service.PriorityService;
+import com.fcolucasvieira.racha_manager.session.service.CurrentMatchRebalanceService;
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
 import com.fcolucasvieira.racha_manager.session.model.Session;
@@ -32,7 +32,7 @@ class FinishMatchUseCaseTest {
     @Mock
     private SessionRepository repository;
     @Mock
-    private PriorityService priorityService;
+    private CurrentMatchRebalanceService currentMatchRebalanceService;
     @Mock
     private MatchFlowService matchFlowService;
 
@@ -85,7 +85,7 @@ class FinishMatchUseCaseTest {
         );
 
         verify(matchFlowService).finishWithWinner(session, 1);
-        verify(priorityService).apply(session);
+        verify(currentMatchRebalanceService).apply(session);
         verify(repository).save(session);
     }
 
@@ -113,7 +113,7 @@ class FinishMatchUseCaseTest {
         );
 
         verify(matchFlowService).finishWithDraw(session);
-        verify(priorityService, never()).apply(any());
+        verify(currentMatchRebalanceService, never()).apply(any());
         verify(repository).save(session);
 
     }
@@ -135,7 +135,7 @@ class FinishMatchUseCaseTest {
 
         verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
         verify(matchFlowService, never()).finishWithDraw(any());
-        verify(priorityService, never()).apply(any());
+        verify(currentMatchRebalanceService, never()).apply(any());
         verify(repository, never()).save(any());
     }
 
@@ -158,7 +158,7 @@ class FinishMatchUseCaseTest {
 
         verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
         verify(matchFlowService, never()).finishWithDraw(any());
-        verify(priorityService, never()).apply(any());
+        verify(currentMatchRebalanceService, never()).apply(any());
         verify(repository, never()).save(any());
     }
 
@@ -188,7 +188,7 @@ class FinishMatchUseCaseTest {
 
         verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
         verify(matchFlowService, never()).finishWithDraw(any());
-        verify(priorityService, never()).apply(any());
+        verify(currentMatchRebalanceService, never()).apply(any());
         verify(repository, never()).save(any());
     }
 
@@ -218,7 +218,7 @@ class FinishMatchUseCaseTest {
 
         verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
         verify(matchFlowService, never()).finishWithDraw(any());
-        verify(priorityService, never()).apply(any());
+        verify(currentMatchRebalanceService, never()).apply(any());
         verify(repository, never()).save(any());
     }
 }

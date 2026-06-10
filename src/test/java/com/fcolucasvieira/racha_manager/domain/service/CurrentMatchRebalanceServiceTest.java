@@ -2,7 +2,7 @@ package com.fcolucasvieira.racha_manager.domain.service;
 
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
-import com.fcolucasvieira.racha_manager.session.service.PriorityService;
+import com.fcolucasvieira.racha_manager.session.service.CurrentMatchRebalanceService;
 import com.fcolucasvieira.racha_manager.session.model.Team;
 import com.fcolucasvieira.racha_manager.session.service.TeamFillService;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,13 +15,13 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PriorityServiceTest {
+class CurrentMatchRebalanceServiceTest {
 
-    private PriorityService service;
+    private CurrentMatchRebalanceService service;
 
     @BeforeEach
     void setup() {
-        service = new PriorityService(new TeamFillService());
+        service = new CurrentMatchRebalanceService(new TeamFillService());
     }
 
     // helper (criação de times)

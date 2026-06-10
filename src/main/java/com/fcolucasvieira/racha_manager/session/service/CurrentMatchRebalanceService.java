@@ -1,5 +1,6 @@
 package com.fcolucasvieira.racha_manager.session.service;
 
+import com.fcolucasvieira.racha_manager.session.model.Match;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
 import lombok.RequiredArgsConstructor;
@@ -11,15 +12,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PriorityService {
+public class CurrentMatchRebalanceService {
 
     private final TeamFillService teamFillService;
 
-    private static final Logger log = LoggerFactory.getLogger(PriorityService.class);
+    private static final Logger log = LoggerFactory.getLogger(CurrentMatchRebalanceService.class);
 
     public void apply(Session session) {
         // se não existe currentMatch, retornar
-        // retornar seria o ideal? Não seria ideal lançar uma excessão?
         if (!session.hasStarted()){
             log.debug(
                     "[PRIORITY_SKIPPED] sessionId={} reason=no_current_match",
@@ -29,9 +29,11 @@ public class PriorityService {
             return;
         }
 
+        Match currentMatch = session.getCurrentMatch();
+
         // instâncias de times do currentMatch (teamA, teamB)
-        Team teamA = session.getCurrentMatch().getTeamA();
-        Team teamB = session.getCurrentMatch().getTeamB();
+        Team teamA = currentMatch.getTeamA();
+        Team teamB = currentMatch.getTeamB();
 
         // uso de .getQueue() para uma cópia da queue na session
         List<Team> queue = session.getQueue();

@@ -3,7 +3,7 @@ package com.fcolucasvieira.racha_manager.session.usecase;
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
-import com.fcolucasvieira.racha_manager.session.service.PriorityService;
+import com.fcolucasvieira.racha_manager.session.service.CurrentMatchRebalanceService;
 import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ import java.util.UUID;
 public class RemovePlayerFromSessionUseCase {
 
     private final SessionRepository sessionRepository;
-    private final PriorityService priorityService;
+    private final CurrentMatchRebalanceService currentMatchRebalanceService;
 
     private static final Logger log = LoggerFactory.getLogger(RemovePlayerFromSessionUseCase.class);
 
@@ -55,7 +55,7 @@ public class RemovePlayerFromSessionUseCase {
 
         // reorganiza prioridades do currentMatch
         if(session.isCurrentMatchTeam(team)) {
-            priorityService.apply(session);
+            currentMatchRebalanceService.apply(session);
 
             log.info(
                     "[PRIORITY_APPLIED] sessionId={}",

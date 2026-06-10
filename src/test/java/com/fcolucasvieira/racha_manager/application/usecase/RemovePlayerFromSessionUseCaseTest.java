@@ -3,7 +3,7 @@ package com.fcolucasvieira.racha_manager.application.usecase;
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
-import com.fcolucasvieira.racha_manager.session.service.PriorityService;
+import com.fcolucasvieira.racha_manager.session.service.CurrentMatchRebalanceService;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.usecase.RemovePlayerFromSessionUseCase;
 import com.fcolucasvieira.racha_manager.session.model.Team;
@@ -28,7 +28,7 @@ class RemovePlayerFromSessionUseCaseTest {
     @Mock
     private SessionRepository repository;
     @Mock
-    private PriorityService priorityService;
+    private CurrentMatchRebalanceService currentMatchRebalanceService;
 
     @InjectMocks
     private RemovePlayerFromSessionUseCase useCase;
@@ -208,7 +208,7 @@ class RemovePlayerFromSessionUseCaseTest {
 
         useCase.execute(sessionId, playerId);
 
-        verify(priorityService).apply(session);
+        verify(currentMatchRebalanceService).apply(session);
         verify(repository).save(session);
     }
 
@@ -241,7 +241,7 @@ class RemovePlayerFromSessionUseCaseTest {
 
         useCase.execute(sessionId, playerId);
 
-        verify(priorityService, never()).apply(any());
+        verify(currentMatchRebalanceService, never()).apply(any());
 
         verify(repository).save(session);
     }
@@ -267,7 +267,7 @@ class RemovePlayerFromSessionUseCaseTest {
 
         useCase.execute(sessionId, playerId);
 
-        verify(priorityService, never()).apply(any());
+        verify(currentMatchRebalanceService, never()).apply(any());
         verify(repository).save(session);
     }
 }

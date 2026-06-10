@@ -6,7 +6,7 @@ import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.service.MatchFlowService;
-import com.fcolucasvieira.racha_manager.session.service.PriorityService;
+import com.fcolucasvieira.racha_manager.session.service.CurrentMatchRebalanceService;
 import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -19,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FinishMatchUseCase {
     private final SessionRepository sessionRepository;
-    private final PriorityService priorityService;
+    private final CurrentMatchRebalanceService currentMatchRebalanceService;
     private final MatchFlowService matchFlowService;
 
     private static final Logger log = LoggerFactory.getLogger(FinishMatchUseCase.class);
@@ -69,7 +69,7 @@ public class FinishMatchUseCase {
                     session.getCurrentMatch().getTeamB().getNumber()
             );
 
-            priorityService.apply(session);
+            currentMatchRebalanceService.apply(session);
         }
 
         sessionRepository.save(session);

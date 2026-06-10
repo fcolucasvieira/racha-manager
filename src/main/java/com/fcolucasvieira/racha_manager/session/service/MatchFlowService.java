@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MatchFlowService {
 
+    // Investigar depois:
+    // Session pode absorver alguma validação?
+    // Regra de preenchimento após empate está correta?
     private final TeamFillService teamFillService;
 
     public void finishWithWinner(Session session, int winnerTeamNumber) {
