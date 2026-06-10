@@ -111,7 +111,7 @@ class SessionTest {
 
         team.addPlayer(player);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(team))
         );
 
@@ -122,12 +122,12 @@ class SessionTest {
     }
 
     @Test
-    void shouldNotUpdateTeamsWhenTeamsListBeNull() {
+    void shouldNotSetTeamsWhenTeamsListBeNull() {
         List<Team> teams = null;
 
         assertThrows(
                 ValidationException.class,
-                () -> session.updateTeams(teams)
+                () -> session.setTeams(teams)
         );
     }
 
@@ -140,12 +140,12 @@ class SessionTest {
     }
 
     @Test
-    void shouldNotUpdateCurrentMatchWhenMatchBeNull() {
+    void shouldNotSetCurrentMatchWhenMatchBeNull() {
         Match match = null;
 
         assertThrows(
                 ValidationException.class,
-                () -> session.updateCurrentMatch(match)
+                () -> session.setCurrentMatch(match)
         );
     }
 
@@ -156,7 +156,7 @@ class SessionTest {
         Team t2 = createTeam(2, 4);
         Team t3 = createTeam(3, 4);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
@@ -179,7 +179,7 @@ class SessionTest {
         // arrange
         Team t1 = createTeam(1, 4);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1))
         );
 
@@ -192,7 +192,7 @@ class SessionTest {
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 4);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2))
         );
 
@@ -213,7 +213,7 @@ class SessionTest {
         // t3 não jogou ainda
         Team t3 = createTeam(3, 4);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
@@ -236,7 +236,7 @@ class SessionTest {
         Team t2 = createTeam(2, 4);
         Team t3 = createTeam(3, 4);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
@@ -264,7 +264,7 @@ class SessionTest {
         Team t2 = createTeam(2, 4);
         Team t3 = createTeam(3, 4);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
@@ -279,7 +279,7 @@ class SessionTest {
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 4);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2))
         );
 
@@ -316,7 +316,7 @@ class SessionTest {
         Team t2 = createTeam(2, 4);
         Team t3 = createTeam(3, 4);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
@@ -327,28 +327,6 @@ class SessionTest {
 
         // assert
         assertEquals(3, removed.getNumber());
-
-        assertTrue(session.getQueue().isEmpty());
-    }
-
-    @Test
-    void shouldClearQueueSuccessfully() {
-        // arrange
-        Team t1 = createTeam(1, 4);
-        Team t2 = createTeam(2, 4);
-        Team t3 = createTeam(3, 4);
-
-        session.updateTeams(
-                new ArrayList<>(List.of(t1, t2, t3))
-        );
-
-        session.startQueue();
-
-        // act
-        session.clearQueue();
-
-        // assert
-        assertNull(session.getCurrentMatch());
 
         assertTrue(session.getQueue().isEmpty());
     }

@@ -41,7 +41,7 @@ public class MatchFlowService {
 
         // Caso a queue esteja vazia, o próximo jogo é o mesmo que o anterior (vencedor vs perdedor)
         if(session.getQueue().isEmpty()) {
-            session.updateCurrentMatch(
+            session.setCurrentMatch(
                     new Match(winner, loser)
             );
 
@@ -55,7 +55,7 @@ public class MatchFlowService {
         Team next = session.removeFirstTeamFromQueue();
 
         // implementa o currentMatch entre vencedor e primeiro time da fila
-        session.updateCurrentMatch(
+        session.setCurrentMatch(
                 new Match(winner, next)
         );
     }
@@ -97,7 +97,7 @@ public class MatchFlowService {
         teamFillService.fill(nextTeamB, session.getQueue());
 
         // atualiza currentMatch
-        session.updateCurrentMatch(
+        session.setCurrentMatch(
                 new Match(nextTeamA, nextTeamB)
         );
 

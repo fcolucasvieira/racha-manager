@@ -184,7 +184,7 @@ class AddPlayerToSessionUseCaseTest {
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 4);
 
-        session.updateTeams(new ArrayList<>(
+        session.setTeams(new ArrayList<>(
                 List.of(t1, t2))
         );
 

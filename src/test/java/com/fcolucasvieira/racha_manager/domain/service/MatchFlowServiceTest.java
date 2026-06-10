@@ -56,7 +56,7 @@ class MatchFlowServiceTest {
         List<Team> teams =
                 new ArrayList<>(List.of(t1, t2, t3));
 
-        session.updateTeams(teams);
+        session.setTeams(teams);
 
         session.startQueue();
 
@@ -83,7 +83,7 @@ class MatchFlowServiceTest {
         List<Team> teams =
                 new ArrayList<>(List.of(t1, t2));
 
-        session.updateTeams(teams);
+        session.setTeams(teams);
 
         session.startQueue();
 
@@ -117,9 +117,9 @@ class MatchFlowServiceTest {
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 4);
 
-        session.updateTeams(List.of(t1, t2));
+        session.setTeams(List.of(t1, t2));
 
-        session.updateCurrentMatch(
+        session.setCurrentMatch(
                 new Match(t1, t2)
         );
 
@@ -140,7 +140,7 @@ class MatchFlowServiceTest {
         List<Team> teams =
                 new ArrayList<>(List.of(t1, t2));
 
-        session.updateTeams(teams);
+        session.setTeams(teams);
 
         session.startQueue();
 
@@ -160,7 +160,7 @@ class MatchFlowServiceTest {
         Team t3 = createTeam(3, 4);
         Team t4 = createTeam(4, 4);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3, t4))
         );
 
@@ -192,7 +192,7 @@ class MatchFlowServiceTest {
         Team t3 = createTeam(3, 4);
         Team t4 = createTeam(4, 2);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3, t4))
         );
 

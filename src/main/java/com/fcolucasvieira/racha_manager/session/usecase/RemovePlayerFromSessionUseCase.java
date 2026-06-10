@@ -44,8 +44,6 @@ public class RemovePlayerFromSessionUseCase {
 
         // dissolve time se vazio
         if(team.getPlayers().isEmpty()) {
-            session.validateTeamRemoval(team);
-
             session.removeTeam(team);
 
             log.info(

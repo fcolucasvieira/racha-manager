@@ -2,7 +2,6 @@ package com.fcolucasvieira.racha_manager.session.usecase;
 
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.player.model.Player;
-import com.fcolucasvieira.racha_manager.session.constant.RachaRules;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
 import com.fcolucasvieira.racha_manager.session.service.InitialTeamsBalancerService;
@@ -48,7 +47,7 @@ public class AddPlayerToSessionUseCase {
         if (shouldCreateInitialTeams(session)) {
             List<Team> teams = initialTeamsBalancerService.createInitialTeams(session);
 
-            session.updateTeams(teams);
+            session.setTeams(teams);
 
             session.startQueue();
 

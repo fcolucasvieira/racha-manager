@@ -71,7 +71,7 @@ class FinishMatchUseCaseTest {
         Team t2 = createTeam(2, 4);
         Team t3 = createTeam(3, 1);
 
-        session.updateTeams(new ArrayList<>(List.of(t1, t2, t3)));
+        session.setTeams(new ArrayList<>(List.of(t1, t2, t3)));
 
         session.startQueue();
 
@@ -99,7 +99,7 @@ class FinishMatchUseCaseTest {
         Team t3 = createTeam(3, 4);
         Team t4 = createTeam(4, 4);
 
-        session.updateTeams(new ArrayList<>(List.of(t1, t2, t3, t4)));
+        session.setTeams(new ArrayList<>(List.of(t1, t2, t3, t4)));
 
         session.startQueue();
 
@@ -170,7 +170,7 @@ class FinishMatchUseCaseTest {
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 4);
 
-        session.updateTeams(new ArrayList<>(List.of(t1, t2)));
+        session.setTeams(new ArrayList<>(List.of(t1, t2)));
 
         session.startQueue();
 
@@ -200,7 +200,7 @@ class FinishMatchUseCaseTest {
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 4);
 
-        session.updateTeams(new ArrayList<>(List.of(t1, t2)));
+        session.setTeams(new ArrayList<>(List.of(t1, t2)));
 
         session.startQueue();
 

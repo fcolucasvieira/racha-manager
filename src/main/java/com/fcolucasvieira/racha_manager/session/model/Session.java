@@ -1,6 +1,5 @@
 package com.fcolucasvieira.racha_manager.session.model;
 
-import com.fcolucasvieira.racha_manager.session.constant.RachaRules;
 import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
@@ -67,6 +66,10 @@ public class Session {
 
     // Consulta qual time o jogador está
     public Team findPlayerTeam(UUID playerId) {
+        if(playerId == null) {
+            throw new ValidationException("Player ID cannot be null");
+        }
+
         return teams.stream()
                 .filter(team -> team.getPlayers().stream()
                         .anyMatch(player ->
@@ -77,7 +80,7 @@ public class Session {
 
     // Team
 
-    public void updateTeams(List<Team> teams) {
+    public void setTeams(List<Team> teams) {
         if(teams == null){
             throw new ValidationException("Teams cannot be null");
         }
@@ -90,22 +93,14 @@ public class Session {
             throw new ValidationException("Team cannot be null");
         }
 
-        if(teams != null) {
-            teams.remove(team);
+        if(hasStarted() && isCurrentMatchTeam(team)) {
+            throw new ConflictException("Cannot remove all players from current match team");
         }
+
+        teams.remove(team);
 
         if(queue != null){
             queue.remove(team);
-        }
-    }
-
-    public void validateTeamRemoval(Team team) {
-        if (!hasStarted()) {
-            return;
-        }
-
-        if (isCurrentMatchTeam(team)) {
-            throw new ConflictException("Cannot remove all players from a current match team");
         }
     }
 
@@ -123,7 +118,7 @@ public class Session {
         return currentMatch.getTeamA().equals(team) || currentMatch.getTeamB().equals(team);
     }
 
-    public void updateCurrentMatch(Match match) {
+    public void setCurrentMatch(Match match) {
         if(match == null) {
             throw new ValidationException("Match cannot be null");
         }
@@ -134,7 +129,7 @@ public class Session {
     // Queue
 
     public void startQueue() {
-        if (currentMatch != null) {
+        if (hasStarted()) {
             throw new ConflictException("Queue already started");
         }
 
@@ -210,13 +205,6 @@ public class Session {
         return queue != null;
     }
 
-    public void clearQueue() {
-        if (this.queue != null) {
-            this.queue.clear();
-        }
-        this.currentMatch = null;
-    }
-
     public boolean hasEnoughPlayersForDraw() {
         return getWaitingPlayersCount() >= (TEAM_SIZE * 2);
     }
@@ -230,6 +218,7 @@ public class Session {
                 mapToInt(team -> team.getPlayers().size())
                 .sum();
     }
+
     // Shuffled
 
     public void markAsShuffled() {

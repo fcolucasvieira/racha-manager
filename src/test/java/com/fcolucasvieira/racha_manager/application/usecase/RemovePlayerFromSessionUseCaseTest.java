@@ -79,7 +79,7 @@ class RemovePlayerFromSessionUseCaseTest {
 
         Team t1 = createTeam(1, 2);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1))
         );
 
@@ -129,7 +129,7 @@ class RemovePlayerFromSessionUseCaseTest {
         t1.addPlayer(removablePlayer);
         t1.addPlayer(createPlayer("P2"));
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1))
         );
 
@@ -161,7 +161,7 @@ class RemovePlayerFromSessionUseCaseTest {
 
         t1.addPlayer(removablePlayer);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1))
         );
 
@@ -193,7 +193,7 @@ class RemovePlayerFromSessionUseCaseTest {
         t1.addPlayer(createPlayer("P3"));
         t1.addPlayer(createPlayer("P4"));
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
@@ -226,7 +226,7 @@ class RemovePlayerFromSessionUseCaseTest {
         t3.addPlayer(removablePlayer);
         t3.addPlayer(createPlayer("P2"));
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
@@ -258,7 +258,7 @@ class RemovePlayerFromSessionUseCaseTest {
         t1.addPlayer(removablePlayer);
         t1.addPlayer(createPlayer("P2"));
 
-        session.updateTeams(new ArrayList<>(List.of(t1)));
+        session.setTeams(new ArrayList<>(List.of(t1)));
 
         t1.getPlayers().forEach(session::addPlayer);
 

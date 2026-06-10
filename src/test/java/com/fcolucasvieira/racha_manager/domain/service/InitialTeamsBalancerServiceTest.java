@@ -114,7 +114,7 @@ class InitialTeamsBalancerServiceTest {
             );
         }
 
-        session.updateTeams(List.of(
+        session.setTeams(List.of(
                 new Team(1),
                 new Team(2)
         ));

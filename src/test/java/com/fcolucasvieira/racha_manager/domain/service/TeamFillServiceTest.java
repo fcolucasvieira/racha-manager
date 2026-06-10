@@ -48,7 +48,7 @@ class TeamFillServiceTest {
         Team t2 = createTeam(2, 1);
         Team t3 = createTeam(3, 3);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
@@ -71,7 +71,7 @@ class TeamFillServiceTest {
         Team t3 = createTeam(3, 1);
         Team t4 = createTeam(4, 2);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3, t4))
         );
 
@@ -94,7 +94,7 @@ class TeamFillServiceTest {
         Team t2 = createTeam(2, 4);
         Team t3 = createTeam(3, 1);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
@@ -117,7 +117,7 @@ class TeamFillServiceTest {
         Team t3 = createTeam(3, 1);
         Team t4 = createTeam(4, 1);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3, t4))
         );
 
@@ -139,7 +139,7 @@ class TeamFillServiceTest {
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 2);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2))
         );
 
@@ -159,7 +159,7 @@ class TeamFillServiceTest {
         Team t2 = createTeam(2, 4);
         Team t3 = createTeam(3, 0);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
@@ -178,7 +178,7 @@ class TeamFillServiceTest {
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 0);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2))
         );
 
@@ -198,7 +198,7 @@ class TeamFillServiceTest {
         Team t2 = createTeam(2, 4);
         Team t3 = createTeam(3, 1);
 
-        session.updateTeams(
+        session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 

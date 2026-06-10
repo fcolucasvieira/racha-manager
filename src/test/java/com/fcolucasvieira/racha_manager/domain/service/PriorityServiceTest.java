@@ -50,7 +50,7 @@ class PriorityServiceTest {
                 List.of(t1, t2, t3)
         );
 
-        session.updateTeams(teams);
+        session.setTeams(teams);
 
         // currentMatch -> t1 vs t2
         // queue -> [t3(4)]
@@ -81,7 +81,7 @@ class PriorityServiceTest {
                 List.of(t1, t2, t3, t4, t5)
         );
 
-        session.updateTeams(teams);
+        session.setTeams(teams);
 
         // currentMatch -> t1 vs t2
         // queue -> [t3(1), t4(2), t5(4)]
@@ -116,7 +116,7 @@ class PriorityServiceTest {
                 List.of(t1, t2, t3)
         );
 
-        session.updateTeams(teams);
+        session.setTeams(teams);
 
         // currentMatch -> t1 vs t2
         // queue -> [t3(1)]
@@ -142,7 +142,7 @@ class PriorityServiceTest {
                 List.of(t1, t2, t3)
         );
 
-        session.updateTeams(teams);
+        session.setTeams(teams);
 
         // currentMatch -> t1 vs t2
         // queue -> [t3(3)]
