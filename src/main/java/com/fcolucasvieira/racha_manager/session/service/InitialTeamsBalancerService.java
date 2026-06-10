@@ -2,7 +2,7 @@ package com.fcolucasvieira.racha_manager.session.service;
 
 import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
-import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
 import org.slf4j.Logger;
@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.fcolucasvieira.racha_manager.session.constant.SessionRules.INITIAL_PLAYERS;
-import static com.fcolucasvieira.racha_manager.session.constant.SessionRules.TEAM_SIZE;
+import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITIAL_PLAYERS;
+import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.TEAM_SIZE;
 
 @Service
 public class InitialTeamsBalancerService {
@@ -26,31 +26,31 @@ public class InitialTeamsBalancerService {
         validateInitialBalance(session);
 
         // Lista baseada nos jogadores ativos da sessão
-        List<PlayerEntity> players =
+        List<Player> players =
                 new ArrayList<>(session.getActivePlayers());
 
         // Essa lista sofre balanceamento de jogadores
         Collections.shuffle(players);
 
-        // Definimos que a sessão já foi balanceada (útil para evitar novos balanceamentos em caso de retomada a 8 jogadores)
+        // Definimos que a sessão já foi balanceada (evita novos balanceamentos em caso de retomada a qtde. de INITIAL_PLAYERS)
         session.markAsShuffled();
 
         // Lista de times gerada para adição de jogadores já balanceados
         List<Team> teams = new ArrayList<>();
 
-        Team team1 = new Team(1);
-        Team team2 = new Team(2);
+        Team t1 = new Team(1);
+        Team t2 = new Team(2);
 
         for (int i = 0; i < TEAM_SIZE; i++) {
-            team1.addPlayer(players.get(i));
+            t1.addPlayer(players.get(i));
         }
 
         for (int i = TEAM_SIZE; i < INITIAL_PLAYERS; i++) {
-            team2.addPlayer(players.get(i));
+            t2.addPlayer(players.get(i));
         }
 
-        teams.add(team1);
-        teams.add(team2);
+        teams.add(t1);
+        teams.add(t2);
 
         log.info(
                 "[INITIAL_BALANCE_COMPLETED] sessionId={} teams={} players={}",

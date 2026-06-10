@@ -1,6 +1,6 @@
 package com.fcolucasvieira.racha_manager.application.usecase;
 
-import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.player.repository.PlayerRepository;
 import com.fcolucasvieira.racha_manager.player.usecase.CreatePlayerUseCase;
 import org.junit.jupiter.api.Test;
@@ -29,9 +29,9 @@ class CreatePlayerUseCaseTest {
     void shouldCreatePlayerSuccessfully() {
         String name = "Lucas";
 
-        when(repository.save(any(PlayerEntity.class)))
+        when(repository.save(any(Player.class)))
                 .thenAnswer(invocation -> {
-                    PlayerEntity player = invocation.getArgument(0);
+                    Player player = invocation.getArgument(0);
                     player.setId(UUID.randomUUID());
                     return player;
                 });

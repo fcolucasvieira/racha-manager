@@ -4,7 +4,7 @@ import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.session.model.Match;
 import com.fcolucasvieira.racha_manager.session.service.MatchFlowService;
-import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
 import com.fcolucasvieira.racha_manager.session.service.TeamFillService;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.fcolucasvieira.racha_manager.session.constant.SessionRules.TEAM_SIZE;
+import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.TEAM_SIZE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MatchFlowServiceTest {
@@ -34,7 +34,7 @@ class MatchFlowServiceTest {
 
         for (int i = 1; i <= countPlayers; i++) {
             team.addPlayer(
-                    new PlayerEntity(
+                    new Player(
                             UUID.randomUUID(),
                             "P" + i
                     )

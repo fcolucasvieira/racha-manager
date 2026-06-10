@@ -1,7 +1,7 @@
 package com.fcolucasvieira.racha_manager.application.usecase;
 
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
-import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
 import com.fcolucasvieira.racha_manager.session.service.PriorityService;
 import com.fcolucasvieira.racha_manager.session.model.Session;
@@ -43,8 +43,8 @@ class RemovePlayerFromSessionUseCaseTest {
     }
 
     // helper (criação de jogador)
-    private PlayerEntity createPlayer(String name) {
-        return new PlayerEntity(UUID.randomUUID(), name);
+    private Player createPlayer(String name) {
+        return new Player(UUID.randomUUID(), name);
     }
 
     // helper (criação de times)
@@ -101,7 +101,7 @@ class RemovePlayerFromSessionUseCaseTest {
     void shouldThrowExceptionWhenPLayerIsNotAssignedToAnyTeam() {
         Session session = new Session();
 
-        PlayerEntity player = new PlayerEntity(playerId, "P");
+        Player player = new Player(playerId, "P");
 
         session.addPlayer(player);
 
@@ -121,8 +121,8 @@ class RemovePlayerFromSessionUseCaseTest {
     void shouldRemovePlayerSuccessfully() {
         Session session = new Session();
 
-        PlayerEntity removablePlayer =
-                new PlayerEntity(playerId, "P1");
+        Player removablePlayer =
+                new Player(playerId, "P1");
 
         Team t1 = new Team(1);
 
@@ -155,7 +155,7 @@ class RemovePlayerFromSessionUseCaseTest {
     void shouldDissolveEmptyTeam() {
         Session session = new Session();
 
-        PlayerEntity removablePlayer = new PlayerEntity(playerId, "P1");
+        Player removablePlayer = new Player(playerId, "P1");
 
         Team t1 = new Team(1);
 
@@ -182,7 +182,7 @@ class RemovePlayerFromSessionUseCaseTest {
     void shouldApplyPriorityServiceWhenRemovingPlayerFromCurrentMatchTeam() {
         Session session = new Session();
 
-        PlayerEntity removablePlayer = new PlayerEntity(playerId, "P1");
+        Player removablePlayer = new Player(playerId, "P1");
 
         Team t1 = new Team(1);
         Team t2 = createTeam(2, 4);
@@ -217,7 +217,7 @@ class RemovePlayerFromSessionUseCaseTest {
     void shouldNotApplyPriorityServiceWhenRemovingPlayerOutsideCurrentMatch() {
         Session session = new Session();
 
-        PlayerEntity removablePlayer = new PlayerEntity(playerId, "P1");
+        Player removablePlayer = new Player(playerId, "P1");
 
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 4);
@@ -251,7 +251,7 @@ class RemovePlayerFromSessionUseCaseTest {
     void shouldNotApplyPriorityServiceWhenSessionHasNotStarted() {
         Session session = new Session();
 
-        PlayerEntity removablePlayer = new PlayerEntity(playerId, "P1");
+        Player removablePlayer = new Player(playerId, "P1");
 
         Team t1 = new Team(1);
 

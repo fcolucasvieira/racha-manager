@@ -1,21 +1,24 @@
 package com.fcolucasvieira.racha_manager.session.model;
 
-import com.fcolucasvieira.racha_manager.session.constant.SessionRules;
+import com.fcolucasvieira.racha_manager.session.constant.RachaRules;
 import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
-import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.player.model.Player;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITIAL_TEAMS;
+import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.TEAM_SIZE;
+
 @Getter
 public class Session {
 
     private final UUID id;
-    private final List<PlayerEntity> activePlayers;
+    private final List<Player> activePlayers;
     private List<Team> teams;
     private List<Team> queue;
     private Match currentMatch;
@@ -31,14 +34,14 @@ public class Session {
 
     // Player
 
-    public void addPlayer(PlayerEntity player) {
+    public void addPlayer(Player player) {
         validatePlayerForAddition(player);
         activePlayers.add(player);
     }
 
-    private void validatePlayerForAddition(PlayerEntity player) {
+    private void validatePlayerForAddition(Player player) {
         if(player == null || player.getId() == null) {
-            throw new ValidationException("Player cannot be null");
+            throw new ValidationException("Player or player ID cannot be null");
         }
 
         boolean alreadyExists = activePlayers.stream()
@@ -62,7 +65,7 @@ public class Session {
         }
     }
 
-    // Busca time em que o jogador está
+    // Consulta qual time o jogador está
     public Team findPlayerTeam(UUID playerId) {
         return teams.stream()
                 .filter(team -> team.getPlayers().stream()
@@ -135,7 +138,7 @@ public class Session {
             throw new ConflictException("Queue already started");
         }
 
-        if(teams.size() < 2){
+        if(teams.size() < INITIAL_TEAMS){
             throw new ConflictException("Not enough teams to start");
         }
 
@@ -215,7 +218,7 @@ public class Session {
     }
 
     public boolean hasEnoughPlayersForDraw() {
-        return getWaitingPlayersCount() >= (SessionRules.TEAM_SIZE * 2);
+        return getWaitingPlayersCount() >= (TEAM_SIZE * 2);
     }
 
     public int getWaitingPlayersCount() {
@@ -227,11 +230,6 @@ public class Session {
                 mapToInt(team -> team.getPlayers().size())
                 .sum();
     }
-
-    public boolean canStartQueue() {
-        return !hasStarted() && teams != null && teams.size() >= 2;
-    }
-
     // Shuffled
 
     public void markAsShuffled() {

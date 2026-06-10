@@ -9,10 +9,9 @@ import java.util.UUID;
 @Entity
 @Table(name = "players")
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class PlayerEntity {
+public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -20,9 +19,9 @@ public class PlayerEntity {
     @Column(nullable = false)
     private String name;
 
-    public PlayerEntity(String name) {
-        if(name == null){
-            throw new ValidationException("Name cannot be null");
+    public Player(String name) {
+        if(name == null || name.isBlank()){
+            throw new ValidationException("Name cannot be null or blank");
         }
 
         this.name = name;
@@ -31,7 +30,7 @@ public class PlayerEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PlayerEntity that)) return false;
+        if (!(o instanceof Player that)) return false;
         return id != null && id.equals(that.id);
     }
 

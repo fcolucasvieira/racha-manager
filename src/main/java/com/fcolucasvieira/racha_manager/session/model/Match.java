@@ -23,6 +23,10 @@ public class Match {
     }
 
     public Team getLoser(Team winner) {
+        if(winner == null) {
+            throw new ValidationException("Winner cannot be null");
+        }
+
         if (winner.equals(teamA)) return teamB;
         if (winner.equals(teamB)) return teamA;
 

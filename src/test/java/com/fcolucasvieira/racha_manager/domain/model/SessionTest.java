@@ -4,7 +4,7 @@ import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.session.model.Match;
-import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,8 +26,8 @@ class SessionTest {
     }
 
     // helper - criar jogador
-    private PlayerEntity createPlayer() {
-        return new PlayerEntity(
+    private Player createPlayer() {
+        return new Player(
                 UUID.randomUUID(),
                 "Player"
         );
@@ -47,7 +47,7 @@ class SessionTest {
     @Test
     void shouldNotAddDuplicatedPlayer() {
         // arrange
-        PlayerEntity player = createPlayer();
+        Player player = createPlayer();
 
         session.addPlayer(player);
 
@@ -61,7 +61,7 @@ class SessionTest {
     @Test
     void shouldNotAddPlayerNull() {
         // arrange
-        PlayerEntity player = null;
+        Player player = null;
 
         assertThrows(
                 ValidationException.class,
@@ -71,7 +71,7 @@ class SessionTest {
 
     @Test
     void shouldNotAddPlayerWithIdNull() {
-        PlayerEntity player = new PlayerEntity(null, "Player");
+        Player player = new Player(null, "Player");
 
         assertThrows(
                 ValidationException.class,
@@ -105,7 +105,7 @@ class SessionTest {
     void shouldfindPlayerTeamSuccessfully() {
         UUID playerId = UUID.randomUUID();
 
-        PlayerEntity player = new PlayerEntity(playerId, "Player");
+        Player player = new Player(playerId, "Player");
 
         Team team = new Team(1);
 

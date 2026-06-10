@@ -1,6 +1,6 @@
 package com.fcolucasvieira.racha_manager.domain.service;
 
-import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.service.PriorityService;
 import com.fcolucasvieira.racha_manager.session.model.Team;
@@ -30,7 +30,7 @@ class PriorityServiceTest {
 
         for (int i = 1; i <= playersCount; i++) {
             team.addPlayer(
-                    new PlayerEntity(UUID.randomUUID(), "P" + i)
+                    new Player(UUID.randomUUID(), "P" + i)
             );
         }
 

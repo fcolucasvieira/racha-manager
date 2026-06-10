@@ -3,19 +3,19 @@ package com.fcolucasvieira.racha_manager.session.model;
 import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
-import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.player.model.Player;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.TEAM_SIZE;
+
 @Getter
 public class Team {
-    private static final int TEAM_SIZE = 4;
-
     private final int number;
-    private final List<PlayerEntity> players;
+    private final List<Player> players;
     private boolean played;
 
     public Team(Integer number) {
@@ -28,13 +28,13 @@ public class Team {
         this.played = false;
     }
 
-    public void addPlayer(PlayerEntity player) {
+    public void addPlayer(Player player) {
         validatePlayerForAddition(player);
 
         players.add(player);
     }
 
-    public PlayerEntity removeFirstPlayer() {
+    public Player removeFirstPlayer() {
         if (players.isEmpty()) {
             throw new ConflictException("Team has no players");
         }
@@ -54,9 +54,9 @@ public class Team {
         }
     }
 
-    public void validatePlayerForAddition(PlayerEntity player) {
+    private void validatePlayerForAddition(Player player) {
         if(player == null || player.getId() == null) {
-            throw new ValidationException("Player cannot be null");
+            throw new ValidationException("Player or player ID cannot be null");
         }
 
         boolean alreadyExists = players.stream()
@@ -77,10 +77,6 @@ public class Team {
 
     public void markAsPlayed() {
         this.played = true;
-    }
-
-    public int missingPlayers() {
-        return Math.max(0, TEAM_SIZE - players.size());
     }
 
     @Override

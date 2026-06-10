@@ -2,7 +2,7 @@ package com.fcolucasvieira.racha_manager.domain.service;
 
 import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
-import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.service.InitialTeamsBalancerService;
 import com.fcolucasvieira.racha_manager.session.model.Team;
@@ -31,7 +31,7 @@ class InitialTeamsBalancerServiceTest {
         // players suficientes adicionados a sessão
         for(int i = 1; i <= INITIAL_PLAYERS; i++){
             session.addPlayer(
-                    new PlayerEntity(UUID.randomUUID(), "P" + i));
+                    new Player(UUID.randomUUID(), "P" + i));
         }
 
         List<Team> teams = service.createInitialTeams(session);
@@ -80,7 +80,7 @@ class InitialTeamsBalancerServiceTest {
 
         for(int i = 1; i <= INITIAL_PLAYERS - 1; i++) {
             session.addPlayer(
-                    new PlayerEntity(UUID.randomUUID(), "P" + i)
+                    new Player(UUID.randomUUID(), "P" + i)
             );
         }
 
@@ -95,7 +95,7 @@ class InitialTeamsBalancerServiceTest {
 
         for(int i = 1; i <= INITIAL_PLAYERS + 1; i++) {
             session.addPlayer(
-                    new PlayerEntity(UUID.randomUUID(), "P" + i)
+                    new Player(UUID.randomUUID(), "P" + i)
             );
         }
 
@@ -110,7 +110,7 @@ class InitialTeamsBalancerServiceTest {
 
         for (int i = 1; i <= INITIAL_PLAYERS; i++) {
             session.addPlayer(
-                    new PlayerEntity(UUID.randomUUID(), "P" + i)
+                    new Player(UUID.randomUUID(), "P" + i)
             );
         }
 

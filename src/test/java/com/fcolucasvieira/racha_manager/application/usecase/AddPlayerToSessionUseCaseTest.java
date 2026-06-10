@@ -2,7 +2,7 @@ package com.fcolucasvieira.racha_manager.application.usecase;
 
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.session.service.InitialTeamsBalancerService;
-import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.player.repository.PlayerRepository;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
@@ -47,8 +47,8 @@ class AddPlayerToSessionUseCaseTest {
     }
 
     // helper (criação de jogador)
-    private PlayerEntity createPlayer(String name) {
-        return new PlayerEntity(
+    private Player createPlayer(String name) {
+        return new Player(
                 UUID.randomUUID(),
                 name
         );
@@ -107,7 +107,7 @@ class AddPlayerToSessionUseCaseTest {
             session.addPlayer(createPlayer("P" + i));
         }
 
-        PlayerEntity p8 = new PlayerEntity(playerId, "P8");
+        Player p8 = new Player(playerId, "P8");
 
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 4);
@@ -139,7 +139,7 @@ class AddPlayerToSessionUseCaseTest {
             session.addPlayer(createPlayer("P" + i));
         }
 
-        PlayerEntity p3 = new PlayerEntity(playerId, "P3");
+        Player p3 = new Player(playerId, "P3");
 
         when(sessionRepository.findById(sessionId))
                 .thenReturn(Optional.of(session));
@@ -163,7 +163,7 @@ class AddPlayerToSessionUseCaseTest {
 
         session.markAsShuffled();
 
-        PlayerEntity p8 = new PlayerEntity(playerId, "P8");
+        Player p8 = new Player(playerId, "P8");
 
         when(sessionRepository.findById(sessionId))
                 .thenReturn(Optional.of(session));
@@ -192,7 +192,7 @@ class AddPlayerToSessionUseCaseTest {
 
         int previousPlayers = session.getActivePlayers().size();
 
-        PlayerEntity p9 = new PlayerEntity(playerId, "P9");
+        Player p9 = new Player(playerId, "P9");
 
         when(sessionRepository.findById(sessionId))
                 .thenReturn(Optional.of(session));

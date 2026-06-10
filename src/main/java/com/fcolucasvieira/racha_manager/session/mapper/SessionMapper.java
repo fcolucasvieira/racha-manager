@@ -5,7 +5,7 @@ import com.fcolucasvieira.racha_manager.player.dto.response.PlayerDTO;
 import com.fcolucasvieira.racha_manager.session.dto.response.SessionDTO;
 import com.fcolucasvieira.racha_manager.session.dto.response.TeamDTO;
 import com.fcolucasvieira.racha_manager.session.model.Match;
-import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
 import org.springframework.stereotype.Component;
@@ -49,7 +49,7 @@ public class SessionMapper {
         );
     }
 
-    private PlayerDTO toPlayerDTO(PlayerEntity player){
+    private PlayerDTO toPlayerDTO(Player player){
         return new PlayerDTO(
                 player.getId(),
                 player.getName()

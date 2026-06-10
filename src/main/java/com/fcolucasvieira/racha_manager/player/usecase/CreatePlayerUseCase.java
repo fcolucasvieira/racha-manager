@@ -1,6 +1,6 @@
 package com.fcolucasvieira.racha_manager.player.usecase;
 
-import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.player.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ public class CreatePlayerUseCase {
     private static final Logger log = LoggerFactory.getLogger(CreatePlayerUseCase.class);
 
     public UUID execute(String name) {
-        PlayerEntity player = new PlayerEntity(name);
+        Player player = new Player(name);
 
         repository.save(player);
 

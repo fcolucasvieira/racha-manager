@@ -1,7 +1,8 @@
 package com.fcolucasvieira.racha_manager.session.usecase;
 
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
-import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.player.model.Player;
+import com.fcolucasvieira.racha_manager.session.constant.RachaRules;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
 import com.fcolucasvieira.racha_manager.session.service.InitialTeamsBalancerService;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+
+import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITIAL_PLAYERS;
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +32,10 @@ public class AddPlayerToSessionUseCase {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NotFoundException("Session not found: " + sessionId));
 
-        PlayerEntity player = playerRepository.findById(playerId)
+        Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new NotFoundException("Player not found: " + playerId));
 
+        // Add jogador ao jogadores ativos da sessão
         session.addPlayer(player);
 
         log.info(
@@ -77,12 +81,13 @@ public class AddPlayerToSessionUseCase {
         return session.getTeams();
     }
 
+    // valida se pode iniciar o racha com base na qtde. de jogadores e se sessão não embaralhada
     private boolean shouldCreateInitialTeams(Session session) {
-        return session.getActivePlayers().size() == 8 &&
+        return session.getActivePlayers().size() == INITIAL_PLAYERS &&
                 !session.isShuffled();
     }
 
-    private void addPlayerIncremental(Session session, PlayerEntity player) {
+    private void addPlayerIncremental(Session session, Player player) {
         // Instancia teams da session
         List<Team> teams = session.getTeams();
 

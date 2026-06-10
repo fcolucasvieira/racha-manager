@@ -6,7 +6,7 @@ import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.session.service.MatchFlowService;
 import com.fcolucasvieira.racha_manager.session.service.PriorityService;
-import com.fcolucasvieira.racha_manager.player.model.PlayerEntity;
+import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.usecase.FinishMatchUseCase;
@@ -52,7 +52,7 @@ class FinishMatchUseCaseTest {
 
         for (int i = 1; i <= countPlayers; i++) {
             team.addPlayer(
-                    new PlayerEntity(
+                    new Player(
                             UUID.randomUUID(),
                             "P" + i
                     )
