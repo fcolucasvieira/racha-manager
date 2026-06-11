@@ -32,9 +32,6 @@ public class InitialTeamsBalancerService {
         // Essa lista sofre balanceamento de jogadores
         Collections.shuffle(players);
 
-        // Definimos que a sessão já foi balanceada (evita novos balanceamentos em caso de retomada a qtde. de INITIAL_PLAYERS)
-        session.markAsShuffled();
-
         // Lista de times gerada para adição de jogadores já balanceados
         List<Team> teams = new ArrayList<>();
 
@@ -51,6 +48,9 @@ public class InitialTeamsBalancerService {
 
         teams.add(t1);
         teams.add(t2);
+
+        // Definimos que a sessão já foi balanceada (evita novos balanceamentos em caso de retomada a qtde. de INITIAL_PLAYERS)
+        session.markAsShuffled();
 
         log.info(
                 "[INITIAL_BALANCE_COMPLETED] sessionId={} teams={} players={}",

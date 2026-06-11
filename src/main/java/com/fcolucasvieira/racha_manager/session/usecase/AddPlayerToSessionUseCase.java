@@ -34,7 +34,6 @@ public class AddPlayerToSessionUseCase {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new NotFoundException("Player not found: " + playerId));
 
-        // Add jogador ao jogadores ativos da sessão
         session.addPlayer(player);
 
         log.info(
@@ -58,17 +57,12 @@ public class AddPlayerToSessionUseCase {
                     session.getCurrentMatch().getTeamB().getNumber(),
                     session.getQueue().size()
             );
-
-            sessionRepository.save(session);
-
-            return session.getTeams();
         }
-
-        if (session.hasStarted()) {
-            addPlayerIncremental(session, player);
+        else if (session.hasStarted()) {
+            addPlayerToRunningSession(session, player);
 
             log.info(
-                    "[INCREMENTAL_PLAYER_ADDED] sessionId={} playerId={} totalTeams={}",
+                    "[PLAYER_ADDED_TO_RUNNING_SESSION] sessionId={} playerId={} totalTeams={}",
                     sessionId,
                     playerId,
                     session.getTeams().size()
@@ -86,7 +80,7 @@ public class AddPlayerToSessionUseCase {
                 !session.isShuffled();
     }
 
-    private void addPlayerIncremental(Session session, Player player) {
+    private void addPlayerToRunningSession(Session session, Player player) {
         // Instancia teams da session
         List<Team> teams = session.getTeams();
 
@@ -113,11 +107,8 @@ public class AddPlayerToSessionUseCase {
             // Adiciona o time (com o jogador) na lista de times
             teams.add(newTeam);
 
-            // Se fila já iniciou
-            if (session.hasStarted()) {
-                // Adiciona time a fila de prioridade (no final)
-                session.addTeamToQueue(newTeam);
-            }
+            // Adiciona time a fila de prioridade (no final)
+            session.addTeamToQueue(newTeam);
 
             return;
         }
