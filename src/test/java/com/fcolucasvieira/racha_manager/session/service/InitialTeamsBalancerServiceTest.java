@@ -1,10 +1,9 @@
-package com.fcolucasvieira.racha_manager.domain.service;
+package com.fcolucasvieira.racha_manager.session.service;
 
 import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
-import com.fcolucasvieira.racha_manager.session.service.InitialTeamsBalancerService;
 import com.fcolucasvieira.racha_manager.session.model.Team;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.UUID;
 
+import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InitialTeamsBalancerServiceTest {

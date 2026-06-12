@@ -1,4 +1,4 @@
-package com.fcolucasvieira.racha_manager.infrastructure.controller;
+package com.fcolucasvieira.racha_manager.player.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fcolucasvieira.racha_manager.player.dto.request.CreatePlayerRequest;

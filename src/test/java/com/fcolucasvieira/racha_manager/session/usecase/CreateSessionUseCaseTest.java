@@ -1,8 +1,7 @@
-package com.fcolucasvieira.racha_manager.application.usecase;
+package com.fcolucasvieira.racha_manager.session.usecase;
 
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
-import com.fcolucasvieira.racha_manager.session.usecase.CreateSessionUseCase;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,14 +50,21 @@ public class PlayerController {
     @Operation(
             summary = "Get all players",
             description = """
-    Retrieves a paginated list of players, including:
+    Retrieves a paginated list of players.
+    
+    Example request: 
+    
+    GET /players?page=0&size=20
 
+    Returns:
     - Player unique identifier (id)
     - Player name
     """
     )
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<PlayerDTO>>> getAll(@ParameterObject Pageable pageable) {
+    public ResponseEntity<ApiResponse<Page<PlayerDTO>>> getAll(
+            @PageableDefault(page = 0, size = 20)
+            @ParameterObject Pageable pageable) {
         var response = getAllUseCase.execute(pageable)
                 .map(player ->
                         new PlayerDTO(player.getId(), player.getName()));

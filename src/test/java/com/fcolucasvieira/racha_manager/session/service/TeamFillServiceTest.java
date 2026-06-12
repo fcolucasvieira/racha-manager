@@ -1,4 +1,4 @@
-package com.fcolucasvieira.racha_manager.domain.service;
+package com.fcolucasvieira.racha_manager.session.service;
 
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;

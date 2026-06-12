@@ -10,6 +10,8 @@ import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class SessionMapper {
     public SessionDTO toResponse(Session session) {
@@ -25,13 +27,23 @@ public class SessionMapper {
             return new SessionDTO(
                     session.getId(),
                     session.hasStarted(),
+                    toPlayerDTOList(session.getActivePlayers()),
                     currentMatchDTO,
-                    session.getQueue()
-                            .stream()
-                            .map(this::toTeamDTO)
-                            .toList()
+                    toTeamDTOList(session.getQueue())
             );
         }
+
+    private List<TeamDTO> toTeamDTOList(List<Team> teams) {
+        return teams.stream()
+                .map(this::toTeamDTO)
+                .toList();
+    }
+
+    private List<PlayerDTO> toPlayerDTOList(List<Player> players) {
+        return players.stream()
+                .map(this::toPlayerDTO)
+                .toList();
+    }
 
     private MatchDTO toMatchDTO(Match match) {
         return new MatchDTO(
@@ -43,9 +55,7 @@ public class SessionMapper {
     public TeamDTO toTeamDTO(Team team) {
         return new TeamDTO(
                 team.getNumber(),
-                team.getPlayers().stream()
-                        .map(this::toPlayerDTO)
-                        .toList()
+                toPlayerDTOList(team.getPlayers())
         );
     }
 

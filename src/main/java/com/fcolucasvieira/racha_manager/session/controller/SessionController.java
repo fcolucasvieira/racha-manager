@@ -108,6 +108,7 @@ public class SessionController {
             description = """
             Retrieves the current state of a session, including:
 
+            - Active players
             - Current match
             - Teams in queue
             - Session status

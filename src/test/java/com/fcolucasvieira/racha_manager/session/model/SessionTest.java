@@ -1,4 +1,4 @@
-package com.fcolucasvieira.racha_manager.domain.model;
+package com.fcolucasvieira.racha_manager.session.model;
 
 import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;

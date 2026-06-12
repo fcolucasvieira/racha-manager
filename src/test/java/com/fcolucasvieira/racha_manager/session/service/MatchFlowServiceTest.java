@@ -1,4 +1,4 @@
-package com.fcolucasvieira.racha_manager.domain.service;
+package com.fcolucasvieira.racha_manager.session.service;
 
 import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
