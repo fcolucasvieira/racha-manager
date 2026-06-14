@@ -4,15 +4,29 @@ services:
     container_name: racha-postgres
 
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
 
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${DB_PORT}:5432"
 
     volumes:
       - racha_manager_data:/var/lib/postgresql/data
+  app:
+    image: racha-manager:latest
+    container_name: racha-app
+
+    depends_on:
+      - postgres
+
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://{DB_HOST}:{DB_PORT}/${DB_NAME}
+      SPRING_DATASOURCE_USER: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+
+    ports:
+      - "8080:8080"
 
 volumes:
   racha_manager_data:
