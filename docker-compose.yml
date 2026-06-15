@@ -13,16 +13,17 @@ services:
 
     volumes:
       - racha_manager_data:/var/lib/postgresql/data
+
   app:
-    image: racha-manager:latest
+    build: .
     container_name: racha-app
 
     depends_on:
       - postgres
 
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://{DB_HOST}:{DB_PORT}/${DB_NAME}
-      SPRING_DATASOURCE_USER: ${DB_USER}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
 
     ports:
