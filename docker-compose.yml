@@ -18,6 +18,9 @@ services:
     build: .
     container_name: racha-app
 
+    profiles:
+      - production
+
     depends_on:
       - postgres
 
