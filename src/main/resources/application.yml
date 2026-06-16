@@ -15,9 +15,10 @@ spring:
       ddl-auto: validate
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
+    open-in-view: false
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: *
