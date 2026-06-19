@@ -1,5 +1,6 @@
 package com.fcolucasvieira.racha_manager.player.usecase;
 
+import com.fcolucasvieira.racha_manager.common.observability.BusinessMetricsService;
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.player.repository.PlayerRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import java.util.UUID;
 public class CreatePlayerUseCase {
 
     private final PlayerRepository repository;
+    private final BusinessMetricsService businessMetrics;
 
     private static final Logger log = LoggerFactory.getLogger(CreatePlayerUseCase.class);
 
@@ -27,6 +29,8 @@ public class CreatePlayerUseCase {
                 player.getId(),
                 player.getName()
         );
+
+        businessMetrics.incrementPlayersCreated();
 
         return player.getId();
     }

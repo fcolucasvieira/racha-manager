@@ -1,5 +1,6 @@
 package com.fcolucasvieira.racha_manager.session.usecase;
 
+import com.fcolucasvieira.racha_manager.common.observability.BusinessMetricsService;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,9 @@ class CreateSessionUseCaseTest {
     @Mock
     private SessionRepository repository;
 
+    @Mock
+    private BusinessMetricsService businessMetrics;
+
     @InjectMocks
     private CreateSessionUseCase useCase;
 
@@ -26,6 +30,8 @@ class CreateSessionUseCaseTest {
         UUID result = useCase.execute();
 
         assertNotNull(result);
+
         verify(repository).save(any(Session.class));
+        verify(businessMetrics).incrementSessionsCreated();
     }
 }

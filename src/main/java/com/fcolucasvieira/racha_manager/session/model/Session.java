@@ -64,7 +64,6 @@ public class Session {
         }
     }
 
-    // Consulta qual time o jogador está
     public Team findPlayerTeam(UUID playerId) {
         if(playerId == null) {
             throw new ValidationException("Player ID cannot be null");

@@ -1,5 +1,6 @@
 package com.fcolucasvieira.racha_manager.session.usecase;
 
+import com.fcolucasvieira.racha_manager.common.observability.BusinessMetricsService;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,18 +15,21 @@ import java.util.UUID;
 public class CreateSessionUseCase {
 
     private final SessionRepository repository;
+    private final BusinessMetricsService businessMetrics;
 
     private static final Logger log = LoggerFactory.getLogger(CreateSessionUseCase.class);
 
     public UUID execute() {
         Session session = new Session();
 
+        repository.save(session);
+
         log.info(
                 "[SESSION_CREATED] sessionId={}",
                 session.getId()
         );
 
-        repository.save(session);
+        businessMetrics.incrementSessionsCreated();
 
         return session.getId();
     }
