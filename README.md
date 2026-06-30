@@ -11,7 +11,7 @@ API REST para gerenciamento inteligente de equipes, jogadores e partidas esporti
 <p align="center">
   <!-- Plataforma -->
   <img src="https://img.shields.io/badge/Java-21-FFD700?style=for-the-badge&logo=openjdk&logoColor=FFD700"/>
-  <img src="https://img.shields.io/badge/Spring_Boot-4.x-6DB33F?style=for-the-badge&logo=springboot&logoColor=6DB33F"/>
+  <img src="https://img.shields.io/badge/Spring_Boot-4.0.5-6DB33F?style=for-the-badge&logo=springboot&logoColor=6DB33F"/>
   <img src="https://img.shields.io/badge/Spring_Data_JPA-ORM-6DB33F?style=for-the-badge&logo=spring&logoColor=6DB33F"/>
 
   <!-- Persistência -->
@@ -34,13 +34,15 @@ API REST para gerenciamento inteligente de equipes, jogadores e partidas esporti
   <img src="https://img.shields.io/badge/Grafana-Observability-F46800?style=for-the-badge&logo=grafana&logoColor=F46800"/>
 </p>
 
----
-
 <p align="center">
 
-## 🚀  Aplicação em Produção
+---
 
-🔗  [Swagger](http://147.15.45.10:8080/swagger-ui/index.html)
+# 🚀 Aplicação em Produção
+
+<a href="http://147.15.45.10:8080/swagger-ui/index.html">
+🔗 Swagger UI
+</a>
 
 </p>
 
@@ -94,12 +96,12 @@ Essa abordagem mantém a lógica de negócio concentrada em um único ponto, red
 
 Uma das principais decisões arquiteturais deste projeto foi separar claramente o que pertence à **persistência** do que pertence apenas ao **estado de execução da aplicação**.
 
-| Persistido no PostgreSQL | Mantido apenas em memória |
-|---------------------------|---------------------------|
+| Persistido | Runtime   |
+|-------------|-----------|
 | ✅ Player | ✅ Session |
-| | ✅ Team |
-| | ✅ Match |
-| | ✅ Queue |
+| | ✅ Team    |
+| | ✅ Match   |
+| | ✅ Queue   |
 
 Essa estratégia oferece diversas vantagens:
 
@@ -109,7 +111,7 @@ Essa estratégia oferece diversas vantagens:
 - 📦 Banco de dados utilizado apenas para informações permanentes;
 - 🔄 Facilidade para evoluir futuramente utilizando soluções como **Redis** para distribuição do estado da sessão.
 
-### Por que essa decisão?
+### 💡 Por que essa decisão?
 
 O foco da versão atual é o **gerenciamento de partidas em tempo real**, e não o armazenamento de histórico.
 
