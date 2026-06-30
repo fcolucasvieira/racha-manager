@@ -38,17 +38,15 @@ API REST para gerenciamento inteligente de equipes, jogadores e partidas esporti
 
 <p align="center">
 
-## 🌐 Aplicação em Produção
+## 🚀  Aplicação em Produção
 
-A documentação da API encontra-se disponível publicamente através do Swagger UI.
-
-**http://147.15.45.10:8080/swagger-ui/index.html**
+🔗  [Swagger](http://147.15.45.10:8080/swagger-ui/index.html)
 
 </p>
 
 ---
 
-# 🔍 Sobre
+# 📌 Sobre o projeto
 
 O **Racha Manager** é uma **API REST** desenvolvida para automatizar a organização de **partidas esportivas amadoras**, eliminando a necessidade de controlar manualmente **jogadores, equipes, filas de espera** e **rodadas** durante uma sessão.
 
@@ -60,128 +58,61 @@ Além de solucionar o problema de negócio, o projeto foi concebido como um estu
 
 ---
 
+# 🏛️ Arquitetura
 
-# 🎯 Principais funcionalidades
+O **Racha Manager** foi projetado seguindo princípios de **Domain-Driven Design (DDD)**, buscando manter a lógica de negócio isolada da infraestrutura e modelar o domínio da forma mais próxima possível do problema real.
 
-### 👥 Gestão de jogadores
+Neste projeto, a **Session** atua como **Aggregate Root**, sendo responsável por coordenar toda a sessão de jogo e garantir a consistência entre equipes, partidas e fila de espera.
 
-* Entrada e saída dinâmica de jogadores
-* Controle de participantes ativos
-* Atualização automática das equipes
-
-### ⚖️ Balanceamento de equipes
-
-* Formação inicial automática
-* Criação dinâmica de novos times
-* Controle de equipes completas e incompletas
-
-### 🏆 Fluxo de partidas
-
-* Encerramento por vitória
-* Encerramento por empate
-* Rotação automática da fila
-* Atualização contínua dos confrontos
-
-### 🔄 Sistema de prioridade
-
-* Reposição automática de equipes em jogo
-* Transferência inteligente de jogadores
-* Dissolução de equipes vazias
+Diferentemente de aplicações CRUD tradicionais, **apenas os jogadores são persistidos em banco de dados**. Todo o restante do estado da partida existe apenas enquanto a sessão está ativa em memória, tornando a aplicação mais simples, performática e preparada para futuras evoluções.
 
 ---
 
-# 🏗️ Arquitetura
+## Modelo de Domínio
 
-O projeto segue princípios de:
+<p align="center">
+  <img src="docs/images/core-domain-model.png" width="900">
+</p>
 
-* **Clean Architecture**
-* **Domain-Driven Design (DDD)**
-* Evolução para **Hexagonal Architecture**
+O modelo de domínio foi construído tendo a **Session** como entidade central, responsável por:
 
-Estrutura principal:
+- Gerenciar os jogadores ativos da sessão;
+- Organizar automaticamente as equipes;
+- Controlar a fila de espera;
+- Coordenar a partida em andamento;
+- Garantir a consistência de toda a sessão de jogo.
 
-```text
-Controller
-    ↓
-Use Case
-    ↓
-Domain Services
-    ↓
-Ports
-    ↓
-Persistence Adapters
-```
-
-Toda a lógica de negócio está concentrada no domínio, mantendo baixo acoplamento e alta testabilidade.
+Essa abordagem mantém a lógica de negócio concentrada em um único ponto, reduzindo acoplamento entre objetos e facilitando futuras evoluções do domínio.
 
 ---
 
-# 🧪 Testes
+## Estratégia de Persistência
 
-O projeto possui cobertura automatizada focada principalmente nas regras de negócio.
+<p align="center">
+  <img src="docs/images/persistence-strategy.png" width="900">
+</p>
 
-### Ferramentas
+Uma das principais decisões arquiteturais deste projeto foi separar claramente o que pertence à **persistência** do que pertence apenas ao **estado de execução da aplicação**.
 
-* JUnit 5
-* Mockito
-* JaCoCo
+| Persistido no PostgreSQL | Mantido apenas em memória |
+|---------------------------|---------------------------|
+| ✅ Player | ✅ Session |
+| | ✅ Team |
+| | ✅ Match |
+| | ✅ Queue |
 
-### Cobertura atual
+Essa estratégia oferece diversas vantagens:
 
-✅ Serviços de domínio
+- 🚀 Criação instantânea de novas sessões;
+- ⚡ Manipulação extremamente rápida do estado da partida;
+- 🧠 Modelo de domínio mais limpo e coeso;
+- 📦 Banco de dados utilizado apenas para informações permanentes;
+- 🔄 Facilidade para evoluir futuramente utilizando soluções como **Redis** para distribuição do estado da sessão.
 
-✅ Casos de uso (Use Cases)
+### Por que essa decisão?
 
-✅ Fluxos críticos da aplicação
+O foco da versão atual é o **gerenciamento de partidas em tempo real**, e não o armazenamento de histórico.
 
-📊 **90%+ de cobertura de código**
+Como sessões, equipes, partidas e filas possuem um ciclo de vida temporário, persistir essas estruturas aumentaria significativamente a complexidade da aplicação sem gerar benefícios para os requisitos atuais.
 
----
-
-# 🧰 Tecnologias utilizadas
-
-* Java 21
-* Spring Boot
-* Spring Data JPA
-* PostgreSQL
-* Maven
-* JUnit 5
-* Mockito
-* JaCoCo
-
----
-
-# 🚧 Status do projeto
-
-O projeto encontra-se em desenvolvimento ativo.
-
-Próximas etapas:
-
-* Arquitetura Hexagonal
-* Docker
-* Swagger/OpenAPI
-* Deploy em nuvem
-* CI/CD
-
----
-
-# 🚀 Objetivos de aprendizado
-
-Este projeto foi desenvolvido para aprofundar conhecimentos em:
-
-* Modelagem de regras de negócio complexas
-* Arquitetura de software
-* Testes automatizados
-* Boas práticas de desenvolvimento backend
-* Sistemas orientados ao domínio
-
----
-
-# 👨‍💻 Autor
-
-**Lucas Vieira**
-
-Estudante de Engenharia de Computação — UFC Sobral
-
-GitHub:
-https://github.com/fcolucasvieira
+Essa decisão mantém o domínio enxuto, facilita a manutenção do código e permite que novas funcionalidades sejam adicionadas futuramente sem necessidade de grandes mudanças arquiteturais.
