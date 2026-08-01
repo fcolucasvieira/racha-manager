@@ -13,7 +13,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CreatePlayerUseCase {
-
     private final PlayerRepository repository;
     private final BusinessMetricsService businessMetrics;
 

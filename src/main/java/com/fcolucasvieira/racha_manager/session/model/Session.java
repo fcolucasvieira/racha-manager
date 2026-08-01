@@ -13,32 +13,49 @@ import java.util.UUID;
 import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITIAL_TEAMS;
 import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.TEAM_SIZE;
 
+// Dúvidas gerais:
+// Quando usar final em atributos?
+// id e activePlayers usam final, por quê?
+// Waiting Queue devia ter objeto próprio?
+
 @Getter
 public class Session {
-
     private final UUID id;
+
     private final List<Player> activePlayers;
+
     private List<Team> teams;
+
+    // Objeto próprio? (Waiting Queue)
     private List<Team> queue;
+
     private Match currentMatch;
+
+    // Nome de atributo melhor? (trazer + clareza)
     private boolean shuffled;
 
     public Session() {
         this.id = UUID.randomUUID();
         this.activePlayers = new ArrayList<>();
+
+        // (Teams) Iniciar apenas quando houver da qtde. mínima de jogadores ativos p/ iniciar sessão?
         this.teams = new ArrayList<>();
         this.queue = null;
         this.shuffled = false;
     }
 
     // Player
-
+    // -> Adicionar jogador a lista de jogadores ativos da sessão
+    // -> Validar se jogador pode ser adicionado a lista de jogadores ativos da sessão
+    // -> Remover jogador da lista de jogadores ativos da sessão
+    // -> Buscar time no qual o jogador está na sessão
     public void addPlayer(Player player) {
         validatePlayerForAddition(player);
         activePlayers.add(player);
     }
 
     private void validatePlayerForAddition(Player player) {
+        // Retirar (player.getId == null)? (Construtor inicializa atributo através de UUID.randomUUID())
         if(player == null || player.getId() == null) {
             throw new ValidationException("Player or player ID cannot be null");
         }
@@ -78,7 +95,10 @@ public class Session {
     }
 
     // Team
+    // -> Inserir nova lista de times à sessão (substitui antiga)
+    // -> Remover time da lista de times da sessão
 
+    // Nome de atributo melhor? (trazer + clareza)
     public void setTeams(List<Team> teams) {
         if(teams == null){
             throw new ValidationException("Teams cannot be null");
@@ -92,6 +112,7 @@ public class Session {
             throw new ValidationException("Team cannot be null");
         }
 
+        // Validação duplicada? (Se time estiver na partida atual, então a sessão já iniciou)
         if(hasStarted() && isCurrentMatchTeam(team)) {
             throw new ConflictException("Cannot remove all players from current match team");
         }
@@ -104,7 +125,11 @@ public class Session {
     }
 
     // CurrentMatch
+    // -> Verificar se sessão já iniciou
+    // -> Verificar se time está na partida atual da sessão
+    // -> Setar/Atualizar partida atual da sessão
 
+    // Nome de método melhor? (trazer + clareza)
     public boolean hasStarted() {
         return currentMatch != null;
     }
@@ -126,6 +151,13 @@ public class Session {
     }
 
     // Queue
+    // -> Iniciar fila de espera da sessão
+    // -> Carregar/Exibir fila de espera
+    // -> Adicionar time a fila de espera
+    // -> Remover primeiro time da fila de espera
+    // -> Verificar se existe fila de espera
+    // -> Verificar se há jogadores suficientes na lista de espera para realizar empate na sessão
+    // -> Realizar contagem de jogadores na fila de espera da sessão
 
     public void startQueue() {
         if (hasStarted()) {
@@ -136,9 +168,9 @@ public class Session {
             throw new ConflictException("Not enough teams to start");
         }
 
+        // Isso gera uma nova lista idêntica a teams?
         this.queue = new ArrayList<>(teams);
 
-        // armazena os dois primeiros times da fila (jogo atual)
         Team t1 = queue.removeFirst();
         Team t2 = queue.removeFirst();
 
@@ -219,6 +251,7 @@ public class Session {
     }
 
     // Shuffled
+    // -> Marcar sessão como embaralhada
 
     public void markAsShuffled() {
         this.shuffled = true;
