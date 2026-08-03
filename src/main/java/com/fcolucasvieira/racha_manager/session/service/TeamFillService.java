@@ -39,7 +39,8 @@ public class TeamFillService {
         }
     }
 
-    // Violação de SRP (Single Responsability Principle)
+    // Viola SRP (Single Responsability Principle)
+    // Mistura duas responsabilidades: -> preencher times; -> remover times vazios
     // Regra pertencente a Session
     // Receber Session completa? Talvez receber apenas Teams (reduz acoplamento).
     public void dissolveEmptyTeams(Session session) {
