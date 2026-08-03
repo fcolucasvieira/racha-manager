@@ -16,8 +16,11 @@ import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.TEAM_
 public class Team {
     private final int number;
     private final List<Player> players;
+
+    // hasPlayed (nome + descritivo)?
     private boolean played;
 
+    // Substituir Integer por int (evitar ausência de valor)
     public Team(Integer number) {
         if(number <= 0) {
             throw new ValidationException("Team number must be valid");
@@ -42,6 +45,7 @@ public class Team {
         return players.remove(0);
     }
 
+    // Remover através de Player ou playerId? Player! (Domínio trabalha c/ objetos)
     public void removePlayerById(UUID playerId) {
         if (playerId == null) {
             throw new ValidationException("Player ID cannot be null");
@@ -54,7 +58,10 @@ public class Team {
         }
     }
 
+    // Duplicação da validação presente em Session
+    // Invariante repetida: um jogador não entra duas vezes no time
     private void validatePlayerForAddition(Player player) {
+        // Retirar (player.getId() == null) (Construtor SEMPRE inicializa este atributo)
         if(player == null || player.getId() == null) {
             throw new ValidationException("Player or player ID cannot be null");
         }
@@ -74,6 +81,10 @@ public class Team {
     public boolean isIncomplete() {
         return players.size() < TEAM_SIZE;
     }
+
+    // isEmpty() ?
+    // getPlayersCount() ?
+    // hasPlayers() ?
 
     public void markAsPlayed() {
         this.played = true;

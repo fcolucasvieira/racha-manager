@@ -12,9 +12,11 @@ import java.util.List;
 public class TeamFillService {
     private static final Logger log = LoggerFactory.getLogger(TeamFillService.class);
 
+    // WaitingQueue substitui List<Team> queue
     public void fill(Team target, List<Team> queue) {
         // loop entre times da queue (em ordem)
         for (Team donor : queue) {
+            // melhoria de (donor.getPlayers().isEmpty()) -> Team encapsula seu estaddo
             // loop para adição de jogadores ao time alvo enquanto estiver incompleto
             while (target.isIncomplete() && !donor.getPlayers().isEmpty()) {
 
@@ -37,6 +39,9 @@ public class TeamFillService {
         }
     }
 
+    // Violação de SRP (Single Responsability Principle)
+    // Regra pertencente a Session
+    // Receber Session completa? Talvez receber apenas Teams (reduz acoplamento).
     public void dissolveEmptyTeams(Session session) {
         List<Team> teamsToRemove = session.getTeams().stream()
                 .filter(team ->

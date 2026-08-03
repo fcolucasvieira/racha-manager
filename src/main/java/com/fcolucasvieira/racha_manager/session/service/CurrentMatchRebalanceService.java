@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+// Avaliar mover esta orquestração para Session
 @Service
 @RequiredArgsConstructor
 public class CurrentMatchRebalanceService {
@@ -35,6 +36,7 @@ public class CurrentMatchRebalanceService {
         Team teamA = currentMatch.getTeamA();
         Team teamB = currentMatch.getTeamB();
 
+        // Waiting Queue substitui session.getQueue()
         // uso de .getQueue() para uma cópia da queue na session
         List<Team> queue = session.getQueue();
 

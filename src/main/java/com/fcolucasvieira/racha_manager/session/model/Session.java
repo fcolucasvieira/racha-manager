@@ -13,22 +13,14 @@ import java.util.UUID;
 import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITIAL_TEAMS;
 import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.TEAM_SIZE;
 
-// Dúvidas gerais:
-// Quando usar final em atributos?
-// id e activePlayers usam final, por quê?
-// Waiting Queue devia ter objeto próprio?
-
 @Getter
 public class Session {
     private final UUID id;
-
     private final List<Player> activePlayers;
-
     private List<Team> teams;
 
     // Objeto próprio? (Waiting Queue)
     private List<Team> queue;
-
     private Match currentMatch;
 
     // Nome de atributo melhor? (trazer + clareza)
@@ -54,8 +46,9 @@ public class Session {
         activePlayers.add(player);
     }
 
+    // Invariante repetida: um jogador não entra duas vezes na sessão
     private void validatePlayerForAddition(Player player) {
-        // Retirar (player.getId == null)? (Construtor inicializa atributo através de UUID.randomUUID())
+        // Retirar (player.getId == null) (Construtor SEMPRE inicializa este atributo)
         if(player == null || player.getId() == null) {
             throw new ValidationException("Player or player ID cannot be null");
         }
@@ -95,7 +88,7 @@ public class Session {
     }
 
     // Team
-    // -> Inserir nova lista de times à sessão (substitui antiga)
+    // -> Inserir nova lista de times à sessão (substituir antiga)
     // -> Remover time da lista de times da sessão
 
     // Nome de atributo melhor? (trazer + clareza)
@@ -150,6 +143,8 @@ public class Session {
         this.currentMatch = match;
     }
 
+    // Waiting Queue deve ser objeto próprio!
+
     // Queue
     // -> Iniciar fila de espera da sessão
     // -> Carregar/Exibir fila de espera
@@ -168,7 +163,6 @@ public class Session {
             throw new ConflictException("Not enough teams to start");
         }
 
-        // Isso gera uma nova lista idêntica a teams?
         this.queue = new ArrayList<>(teams);
 
         Team t1 = queue.removeFirst();

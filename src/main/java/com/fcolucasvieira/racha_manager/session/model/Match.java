@@ -4,6 +4,7 @@ import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import lombok.Getter;
 
+// (Futuro) Match deverá conhecer resultado da partida
 @Getter
 public class Match {
     private final Team teamA;

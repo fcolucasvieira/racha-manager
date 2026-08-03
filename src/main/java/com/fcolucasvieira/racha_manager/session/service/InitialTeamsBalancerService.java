@@ -16,6 +16,7 @@ import java.util.List;
 import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITIAL_PLAYERS;
 import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.TEAM_SIZE;
 
+// Futuramente, generalizar algoritmo para N times e M jogadores p/ time
 @Service
 public class InitialTeamsBalancerService {
 
@@ -35,6 +36,7 @@ public class InitialTeamsBalancerService {
         // Lista de times gerada para adição de jogadores já balanceados
         List<Team> teams = new ArrayList<>();
 
+        // Avaliar extração futura para TeamFactory (V2)
         Team t1 = new Team(1);
         Team t2 = new Team(2);
 
@@ -49,6 +51,7 @@ public class InitialTeamsBalancerService {
         teams.add(t1);
         teams.add(t2);
 
+        // session.initializeTeams() (nome + descritivo)
         // Definimos que a sessão já foi balanceada (evita novos balanceamentos em caso de retomada a qtde. de INITIAL_PLAYERS)
         session.markAsShuffled();
 
@@ -75,6 +78,8 @@ public class InitialTeamsBalancerService {
             throw new ConflictException("Initial balance requires exactly " + INITIAL_PLAYERS + " players");
         }
 
+        // (session.getTeams() != null) não faz sentido,
+        // visto que o construtor de session inicializa teams.
         if (session.getTeams() != null && !session.getTeams().isEmpty()) {
             throw new ConflictException("Session already contains teams");
         }

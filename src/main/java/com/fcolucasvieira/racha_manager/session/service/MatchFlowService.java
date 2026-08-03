@@ -11,10 +11,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MatchFlowService {
-
-    // Investigar depois:
-    // Session pode absorver alguma validação?
-    // Regra de preenchimento após empate está correta?
+    // Por que MatchFlowService conhece TeamFillService?
+    // MatchFlowService deve delegar apenas o encerramento de partidas
     private final TeamFillService teamFillService;
 
     public void finishWithWinner(Session session, int winnerTeamNumber) {
@@ -42,6 +40,7 @@ public class MatchFlowService {
         winner.markAsPlayed();
         loser.markAsPlayed();
 
+        // Quem deveria saber se a fila está vazia? (WaitingQueue)
         // Caso a queue esteja vazia, o próximo jogo é o mesmo que o anterior (vencedor vs perdedor)
         if(session.getQueue().isEmpty()) {
             session.setCurrentMatch(
@@ -51,9 +50,11 @@ public class MatchFlowService {
             return;
         }
 
+        // Quem deveria saber adicionar time a fila? (WaitingQueue)
         // derrotado vai para o final da fila
         session.addTeamToQueue(loser);
 
+        // Quem deveria saber remover o time inicial da fila? (WaitingQueue)
         // seleta o primeiro time da queue
         Team next = session.removeFirstTeamFromQueue();
 
@@ -83,10 +84,12 @@ public class MatchFlowService {
         teamA.markAsPlayed();
         teamB.markAsPlayed();
 
+        // Quem deveria saber adicionar time a fila? (WaitingQueue)
         // joga os dois times para o final da fila (em ordem -> 1° A; 2º B)
         session.addTeamToQueue(teamA);
         session.addTeamToQueue(teamB);
 
+        // Quem deveria saber remover time inicial da fila? (WaitingQueue)
         // seleta o primeiro time da fila para o currentMatch
         Team nextTeamA = session.removeFirstTeamFromQueue();
 
