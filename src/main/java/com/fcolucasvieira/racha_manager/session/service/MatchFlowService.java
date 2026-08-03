@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MatchFlowService {
     // Por que MatchFlowService conhece TeamFillService?
-    // MatchFlowService deve delegar apenas o encerramento de partidas
+    // MatchFlowService (Delegar APENAS o encerramento de partidas)
     private final TeamFillService teamFillService;
 
     public void finishWithWinner(Session session, int winnerTeamNumber) {

@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-// Avaliar mover esta orquestração para Session
+// Domain Service anêmico
+// Avaliar orquestração realocada em Session
 @Service
 @RequiredArgsConstructor
 public class CurrentMatchRebalanceService {
