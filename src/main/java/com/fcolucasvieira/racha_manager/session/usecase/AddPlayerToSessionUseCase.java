@@ -20,7 +20,6 @@ import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITI
 @Service
 @RequiredArgsConstructor
 public class AddPlayerToSessionUseCase {
-
     private final SessionRepository sessionRepository;
     private final PlayerRepository playerRepository;
     private final InitialTeamsBalancerService initialTeamsBalancerService;
@@ -74,12 +73,14 @@ public class AddPlayerToSessionUseCase {
         return session.getTeams();
     }
 
+    // Regra de negócio (Session)
     // valida se pode iniciar o racha com base na qtde. de jogadores e se sessão não embaralhada
     private boolean shouldCreateInitialTeams(Session session) {
         return session.getActivePlayers().size() == INITIAL_PLAYERS &&
                 !session.isShuffled();
     }
 
+    // Pertence ao domínio (Session)
     private void addPlayerToRunningSession(Session session, Player player) {
         // Instancia teams da session
         List<Team> teams = session.getTeams();
