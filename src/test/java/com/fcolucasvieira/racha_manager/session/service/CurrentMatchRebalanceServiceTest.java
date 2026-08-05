@@ -2,9 +2,7 @@ package com.fcolucasvieira.racha_manager.session.service;
 
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
-import com.fcolucasvieira.racha_manager.session.service.CurrentMatchRebalanceService;
 import com.fcolucasvieira.racha_manager.session.model.Team;
-import com.fcolucasvieira.racha_manager.session.service.TeamFillService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -54,7 +52,7 @@ class CurrentMatchRebalanceServiceTest {
 
         // currentMatch -> t1 vs t2
         // queue -> [t3(4)]
-        session.startQueue();
+        session.initializeSession();
 
         service.apply(session);
 
@@ -85,17 +83,17 @@ class CurrentMatchRebalanceServiceTest {
 
         // currentMatch -> t1 vs t2
         // queue -> [t3(1), t4(2), t5(4)]
-        session.startQueue();
+        session.initializeSession();
 
         service.apply(session);
 
         assertTrue(t1.isFull());
         assertTrue(t2.isFull());
 
-        assertEquals(1, session.getQueue().size());
-        assertEquals(5, session.getQueue().get(0).getNumber());
+        assertEquals(1, session.getWaitingTeams().size());
+        assertEquals(5, session.getWaitingTeams().get(0).getNumber());
 
-        assertEquals(3, session.getQueue().get(0).getPlayers().size());
+        assertEquals(3, session.getWaitingTeams().get(0).getPlayers().size());
 
         assertEquals(3, session.getTeams().size());
 
@@ -120,7 +118,7 @@ class CurrentMatchRebalanceServiceTest {
 
         // currentMatch -> t1 vs t2
         // queue -> [t3(1)]
-        session.startQueue();
+        session.initializeSession();
 
         service.apply(session);
 
@@ -146,13 +144,13 @@ class CurrentMatchRebalanceServiceTest {
 
         // currentMatch -> t1 vs t2
         // queue -> [t3(3)]
-        session.startQueue();
+        session.initializeSession();
 
         service.apply(session);
 
         assertTrue(t1.isFull());
 
-        assertEquals(1, session.getQueue().size());
+        assertEquals(1, session.getWaitingTeams().size());
 
         assertEquals(1, t3.getPlayers().size());
 
@@ -169,7 +167,7 @@ class CurrentMatchRebalanceServiceTest {
         );
 
         assertNull(session.getCurrentMatch());
-        assertTrue(session.getQueue().isEmpty());
+        assertTrue(session.getWaitingTeams().isEmpty());
         assertTrue(session.getTeams().isEmpty());
     }
 }

@@ -29,7 +29,7 @@ public class SessionMapper {
                     session.hasStarted(),
                     toPlayerDTOList(session.getActivePlayers()),
                     currentMatchDTO,
-                    toTeamDTOList(session.getQueue())
+                    toTeamDTOList(session.getWaitingTeams())
             );
         }
 

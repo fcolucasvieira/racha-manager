@@ -47,14 +47,14 @@ public class AddPlayerToSessionUseCase {
 
             session.setTeams(teams);
 
-            session.startQueue();
+            session.initializeSession();
 
             log.info(
                     "[QUEUE_STARTED] sessionId={} currentMatch={}vs{} queueSize={}",
                     sessionId,
                     session.getCurrentMatch().getTeamA().getNumber(),
                     session.getCurrentMatch().getTeamB().getNumber(),
-                    session.getQueue().size()
+                    session.getWaitingTeams().size()
             );
         }
         else if (session.hasStarted()) {

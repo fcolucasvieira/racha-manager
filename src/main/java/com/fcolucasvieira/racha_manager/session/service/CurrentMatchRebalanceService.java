@@ -37,9 +37,9 @@ public class CurrentMatchRebalanceService {
         Team teamA = currentMatch.getTeamA();
         Team teamB = currentMatch.getTeamB();
 
-        // Waiting Queue substitui session.getQueue()
-        // uso de .getQueue() para uma cópia da queue na session
-        List<Team> queue = session.getQueue();
+        // Waiting Queue substitui session.getWaitingTeams()
+        // uso de .getWaitingTeams() para uma cópia da queue na session
+        List<Team> queue = session.getWaitingTeams();
 
         // completar teamA
         teamFillService.fill(teamA, queue);

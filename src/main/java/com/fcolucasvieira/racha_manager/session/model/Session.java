@@ -94,9 +94,8 @@ public class Session {
     }
 
     public void removeTeam(Team team) {
-        if(team == null) {
+        if(team == null)
             throw new ValidationException("Team can't be null");
-        }
 
         // Validação duplicada? (Se time estiver na partida atual, então a sessão já iniciou)
         if(hasStarted() && isCurrentMatchTeam(team))
@@ -110,11 +109,9 @@ public class Session {
             waitingQueue.remove(team);
     }
 
-    // hasStarted() deveria validar se a sessão iniciou
-    // Se a sessão iniciou temos: WaitingQueue (mesmo que vazia) e CurrentMatch
     // Nome de metodo melhor? (trazer + clareza)
     public boolean hasStarted() {
-        return currentMatch != null && waitingQueue != null;
+        return currentMatch != null;
     }
 
     public boolean isCurrentMatchTeam(Team team) {
@@ -132,15 +129,12 @@ public class Session {
         this.currentMatch = match;
     }
 
-    // Nome de metodo melhor? (trazer + clareza)
-    public void startQueue() {
-        if (hasStarted()) {
+    public void initializeSession() {
+        if (hasStarted())
             throw new ConflictException("Session already started with current match and waiting queue");
-        }
 
-        if(teams.size() < INITIAL_TEAMS){
+        if(teams.size() < INITIAL_TEAMS)
             throw new ConflictException("Not enough teams to start");
-        }
 
         this.waitingQueue = new WaitingQueue(teams);
 
@@ -150,42 +144,14 @@ public class Session {
         this.currentMatch = new Match(t1, t2);
     }
 
-    public List<Team> getQueue() {
+    public List<Team> getWaitingTeams() {
         return waitingQueue == null
                 ? List.of()
                 : waitingQueue.asList();
     }
 
-    public void addTeamToQueue(Team team) {
-        if(waitingQueue == null)
-            throw new ConflictException("Waiting queue not initialized");
-
-        waitingQueue.add(team);
-    }
-
-    public Team removeFirstTeamFromQueue() {
-        if(waitingQueue == null)
-            throw new ConflictException("Waiting queue not initialized");
-
-        return waitingQueue.poll();
-    }
-
     public boolean hasWaitingQueue() {
         return waitingQueue != null;
-    }
-
-    public boolean hasEnoughPlayersForDraw() {
-        if(waitingQueue == null)
-            return false;
-
-        return waitingQueue.hasEnoughForDraw();
-    }
-
-    public int getWaitingPlayersCount() {
-        if(waitingQueue == null)
-            return 0;
-
-        return waitingQueue.playersCount();
     }
 
     public void markAsShuffled() {

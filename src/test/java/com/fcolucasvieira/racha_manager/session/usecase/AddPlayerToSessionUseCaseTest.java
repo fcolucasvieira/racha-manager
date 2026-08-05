@@ -187,7 +187,7 @@ class AddPlayerToSessionUseCaseTest {
                 List.of(t1, t2))
         );
 
-        session.startQueue();
+        session.initializeSession();
 
         int previousPlayers = session.getActivePlayers().size();
 

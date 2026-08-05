@@ -200,7 +200,7 @@ class RemovePlayerFromSessionUseCaseTest {
                 team -> team.getPlayers().forEach(session::addPlayer)
         );
 
-        session.startQueue();
+        session.initializeSession();
 
         when(repository.findById(sessionId))
                 .thenReturn(Optional.of(session));
@@ -233,7 +233,7 @@ class RemovePlayerFromSessionUseCaseTest {
                 team -> team.getPlayers().forEach(session::addPlayer)
         );
 
-        session.startQueue();
+        session.initializeSession();
 
         when(repository.findById(sessionId))
                 .thenReturn(Optional.of(session));

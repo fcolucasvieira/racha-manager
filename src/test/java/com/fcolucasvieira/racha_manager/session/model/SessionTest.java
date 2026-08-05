@@ -3,10 +3,7 @@ package com.fcolucasvieira.racha_manager.session.model;
 import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
-import com.fcolucasvieira.racha_manager.session.model.Match;
 import com.fcolucasvieira.racha_manager.player.model.Player;
-import com.fcolucasvieira.racha_manager.session.model.Session;
-import com.fcolucasvieira.racha_manager.session.model.Team;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -145,7 +142,7 @@ class SessionTest {
                 List.of(t1, t2, t3)
         );
 
-        session.startQueue();
+        session.initializeSession();
 
         assertThrows(
                 ConflictException.class,
@@ -164,7 +161,7 @@ class SessionTest {
     }
 
     @Test
-    void shouldStartQueueSuccessfully() {
+    void shouldInitializeSessionSuccessfully() {
         Team t1 = createTeam(1);
         Team t2 = createTeam(2);
         Team t3 = createTeam(3);
@@ -173,7 +170,7 @@ class SessionTest {
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
-        session.startQueue();
+        session.initializeSession();
 
         assertNotNull(session.getCurrentMatch());
 
@@ -188,7 +185,7 @@ class SessionTest {
     }
 
     @Test
-    void shouldNotStartQueueWithLessThanTwoTeams() {
+    void shouldNotInitializeSessionWithLessThanTwoTeams() {
         Team t1 = createTeam(1);
 
         session.setTeams(
@@ -197,12 +194,12 @@ class SessionTest {
 
         assertThrows(
                 ConflictException.class,
-                () -> session.startQueue()
+                () -> session.initializeSession()
         );
     }
 
     @Test
-    void shouldNotStartQueueWhenQueueAlreadyStarted() {
+    void shouldNotInitializeSessionAlreadyStarted() {
         Team t1 = createTeam(1);
         Team t2 = createTeam(2);
 
@@ -210,11 +207,11 @@ class SessionTest {
                 new ArrayList<>(List.of(t1, t2))
         );
 
-        session.startQueue();
+        session.initializeSession();
 
         assertThrows(
                 ConflictException.class,
-                () -> session.startQueue()
+                () -> session.initializeSession()
         );
     }
 
@@ -246,7 +243,7 @@ class SessionTest {
                 List.of(t1, t2, t3)
         );
 
-        session.startQueue();
+        session.initializeSession();
 
         Team removed = session.removeFirstTeamFromQueue();
 

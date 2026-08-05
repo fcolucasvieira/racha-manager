@@ -72,7 +72,7 @@ class FinishMatchUseCaseTest {
 
         session.setTeams(new ArrayList<>(List.of(t1, t2, t3)));
 
-        session.startQueue();
+        session.initializeSession();
 
         when(repository.findById(sessionId))
                 .thenReturn(Optional.of(session));
@@ -100,7 +100,7 @@ class FinishMatchUseCaseTest {
 
         session.setTeams(new ArrayList<>(List.of(t1, t2, t3, t4)));
 
-        session.startQueue();
+        session.initializeSession();
 
         when(repository.findById(sessionId))
                 .thenReturn(Optional.of(session));
@@ -171,7 +171,7 @@ class FinishMatchUseCaseTest {
 
         session.setTeams(new ArrayList<>(List.of(t1, t2)));
 
-        session.startQueue();
+        session.initializeSession();
 
         when(repository.findById(sessionId))
                 .thenReturn(Optional.of(session));
@@ -201,7 +201,7 @@ class FinishMatchUseCaseTest {
 
         session.setTeams(new ArrayList<>(List.of(t1, t2)));
 
-        session.startQueue();
+        session.initializeSession();
 
         when(repository.findById(sessionId))
                 .thenReturn(Optional.of(session));

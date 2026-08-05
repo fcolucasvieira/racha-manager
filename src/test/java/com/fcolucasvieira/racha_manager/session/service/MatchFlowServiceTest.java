@@ -3,11 +3,9 @@ package com.fcolucasvieira.racha_manager.session.service;
 import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.session.model.Match;
-import com.fcolucasvieira.racha_manager.session.service.MatchFlowService;
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
-import com.fcolucasvieira.racha_manager.session.service.TeamFillService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,15 +56,15 @@ class MatchFlowServiceTest {
 
         session.setTeams(teams);
 
-        session.startQueue();
+        session.initializeSession();
 
         service.finishWithWinner(session, 1);
 
         assertEquals(1, session.getCurrentMatch().getTeamA().getNumber());
         assertEquals(3, session.getCurrentMatch().getTeamB().getNumber());
 
-        assertEquals(1, session.getQueue().size());
-        assertEquals(2, session.getQueue().get(0).getNumber());
+        assertEquals(1, session.getWaitingTeams().size());
+        assertEquals(2, session.getWaitingTeams().get(0).getNumber());
 
         assertTrue(t1.isPlayed());
         assertTrue(t2.isPlayed());
@@ -85,14 +83,14 @@ class MatchFlowServiceTest {
 
         session.setTeams(teams);
 
-        session.startQueue();
+        session.initializeSession();
 
         service.finishWithWinner(session, 1);
 
         assertEquals(1, session.getCurrentMatch().getTeamA().getNumber());
         assertEquals(2, session.getCurrentMatch().getTeamB().getNumber());
 
-        assertTrue(session.getQueue().isEmpty());
+        assertTrue(session.getWaitingTeams().isEmpty());
 
         assertTrue(t1.isPlayed());
         assertTrue(t2.isPlayed());
@@ -142,7 +140,7 @@ class MatchFlowServiceTest {
 
         session.setTeams(teams);
 
-        session.startQueue();
+        session.initializeSession();
 
         assertThrows(
                 ValidationException.class,
@@ -166,17 +164,17 @@ class MatchFlowServiceTest {
 
         // currentMatch -> t1 vs t2
         // queue -> [t3, t4]
-        session.startQueue();
+        session.initializeSession();
 
         service.finishWithDraw(session);
 
         assertEquals(3, session.getCurrentMatch().getTeamA().getNumber());
         assertEquals(4, session.getCurrentMatch().getTeamB().getNumber());
 
-        assertEquals(2, session.getQueue().size());
+        assertEquals(2, session.getWaitingTeams().size());
 
-        assertEquals(1, session.getQueue().get(0).getNumber());
-        assertEquals(2, session.getQueue().get(1).getNumber());
+        assertEquals(1, session.getWaitingTeams().get(0).getNumber());
+        assertEquals(2, session.getWaitingTeams().get(1).getNumber());
 
         assertTrue(t1.isPlayed());
         assertTrue(t2.isPlayed());
@@ -198,7 +196,7 @@ class MatchFlowServiceTest {
 
         // currentMatch -> t1 vs t2
         // queue -> [t3, t4]
-        session.startQueue();
+        session.initializeSession();
 
         assertThrows(
                 ConflictException.class,

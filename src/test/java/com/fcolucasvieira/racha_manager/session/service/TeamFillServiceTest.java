@@ -3,7 +3,6 @@ package com.fcolucasvieira.racha_manager.session.service;
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
-import com.fcolucasvieira.racha_manager.session.service.TeamFillService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,9 +51,9 @@ class TeamFillServiceTest {
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
-        session.startQueue();
+        session.initializeSession();
 
-        teamFillService.fill(t2, session.getQueue());
+        teamFillService.fill(t2, session.getWaitingTeams());
 
         assertTrue(t2.isFull());
 
@@ -75,9 +74,9 @@ class TeamFillServiceTest {
                 new ArrayList<>(List.of(t1, t2, t3, t4))
         );
 
-        session.startQueue();
+        session.initializeSession();
 
-        teamFillService.fill(t2, session.getQueue());
+        teamFillService.fill(t2, session.getWaitingTeams());
 
         assertTrue(t2.isFull());
 
@@ -98,9 +97,9 @@ class TeamFillServiceTest {
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
-        session.startQueue();
+        session.initializeSession();
 
-        teamFillService.fill(t2, session.getQueue());
+        teamFillService.fill(t2, session.getWaitingTeams());
 
         assertTrue(t2.isFull());
 
@@ -121,9 +120,9 @@ class TeamFillServiceTest {
                 new ArrayList<>(List.of(t1, t2, t3, t4))
         );
 
-        session.startQueue();
+        session.initializeSession();
 
-        teamFillService.fill(t2, session.getQueue());
+        teamFillService.fill(t2, session.getWaitingTeams());
 
         assertEquals(3, t2.getPlayers().size());
 
@@ -143,9 +142,9 @@ class TeamFillServiceTest {
                 new ArrayList<>(List.of(t1, t2))
         );
 
-        session.startQueue();
+        session.initializeSession();
 
-        teamFillService.fill(t2, session.getQueue());
+        teamFillService.fill(t2, session.getWaitingTeams());
 
         assertEquals(2, t2.getPlayers().size());
     }
@@ -163,7 +162,7 @@ class TeamFillServiceTest {
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
-        session.startQueue();
+        session.initializeSession();
 
         teamFillService.dissolveEmptyTeams(session);
 
@@ -182,7 +181,7 @@ class TeamFillServiceTest {
                 new ArrayList<>(List.of(t1, t2))
         );
 
-        session.startQueue();
+        session.initializeSession();
 
         teamFillService.dissolveEmptyTeams(session);
 
@@ -202,7 +201,7 @@ class TeamFillServiceTest {
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
-        session.startQueue();
+        session.initializeSession();
 
         teamFillService.dissolveEmptyTeams(session);
 
