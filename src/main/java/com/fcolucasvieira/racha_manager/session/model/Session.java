@@ -15,9 +15,13 @@ import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITI
 @Getter
 public class Session {
     private final UUID id;
+
     private final List<Player> activePlayers;
+
     private List<Team> teams;
+
     private WaitingQueue waitingQueue;
+
     private Match currentMatch;
 
     // Nome de atributo melhor? (trazer + clareza)
@@ -25,10 +29,14 @@ public class Session {
 
     public Session() {
         this.id = UUID.randomUUID();
+
         this.activePlayers = new ArrayList<>();
+
         // (Teams) Iniciar apenas quando houver da qtde. mínima de jogadores ativos p/ iniciar sessão?
         this.teams = new ArrayList<>();
+
         this.waitingQueue = null;
+
         this.shuffled = false;
     }
 
@@ -40,9 +48,8 @@ public class Session {
     // Invariante repetida: um jogador não entra duas vezes na sessão
     private void validatePlayerForAddition(Player player) {
         // Retirar (player.getId == null) (Construtor SEMPRE inicializa este atributo)
-        if(player == null || player.getId() == null) {
+        if(player == null || player.getId() == null)
             throw new ValidationException("Player or player ID cannot be null");
-        }
 
         boolean alreadyExists = activePlayers.stream()
                 .anyMatch(p-> p.getId().equals(player.getId()));
@@ -53,9 +60,8 @@ public class Session {
     }
 
     public void removePlayer(UUID playerId) {
-        if (playerId == null) {
-            throw new ValidationException("Player ID cannot be null");
-        }
+        if (playerId == null)
+            throw new ValidationException("Player Id cannot be null");
 
         boolean removed = activePlayers
                 .removeIf(p -> p.getId().equals(playerId));
@@ -89,30 +95,31 @@ public class Session {
 
     public void removeTeam(Team team) {
         if(team == null) {
-            throw new ValidationException("Team cannot be null");
+            throw new ValidationException("Team can't be null");
         }
 
         // Validação duplicada? (Se time estiver na partida atual, então a sessão já iniciou)
-        if(hasStarted() && isCurrentMatchTeam(team)) {
-            throw new ConflictException("Cannot remove all players from current match team");
-        }
+        if(hasStarted() && isCurrentMatchTeam(team))
+            throw new ConflictException(
+                    "Team cannot be removed if the session has not started or is currently in a match"
+            );
 
         teams.remove(team);
 
-        if(waitingQueue != null){
-            waitingQueue.remove(team);
-        }
+        // Se existe currentMatch, existe waitingQueue
+        waitingQueue.remove(team);
     }
 
-    // Nome de método melhor? (trazer + clareza)
+    // hasStarted() deveria validar se a sessão iniciou
+    // Se a sessão iniciou temos: WaitingQueue (mesmo que vazia) e CurrentMatch
+    // Nome de metodo melhor? (trazer + clareza)
     public boolean hasStarted() {
         return currentMatch != null;
     }
 
     public boolean isCurrentMatchTeam(Team team) {
-        if(!hasStarted()) {
+        if(!hasStarted())
             return false;
-        }
 
         return currentMatch.getTeamA().equals(team) || currentMatch.getTeamB().equals(team);
     }
@@ -125,9 +132,10 @@ public class Session {
         this.currentMatch = match;
     }
 
+    // Nome de metodo melhor? (trazer + clareza)
     public void startQueue() {
         if (hasStarted()) {
-            throw new ConflictException("Queue already started");
+            throw new ConflictException("Session already started with current match and waiting queue");
         }
 
         if(teams.size() < INITIAL_TEAMS){
@@ -147,22 +155,20 @@ public class Session {
     }
 
     public void addTeamToQueue(Team team) {
-        if(waitingQueue == null){
-            throw new ConflictException("Queue not initialized");
-        }
+        if(waitingQueue == null)
+            throw new ConflictException("Waiting queue not initialized");
 
         waitingQueue.add(team);
     }
 
     public Team removeFirstTeamFromQueue() {
-        if(waitingQueue == null) {
-            throw new ConflictException("Queue not initialized");
-        }
+        if(waitingQueue == null)
+            throw new ConflictException("Waiting queue not initialized");
 
         return waitingQueue.poll();
     }
 
-    public boolean hasQueue() {
+    public boolean hasWaitingQueue() {
         return waitingQueue != null;
     }
 
@@ -179,9 +185,6 @@ public class Session {
 
         return waitingQueue.playersCount();
     }
-
-    // Shuffled
-    // -> Marcar sessão como embaralhada
 
     public void markAsShuffled() {
         this.shuffled = true;

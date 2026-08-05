@@ -25,7 +25,7 @@ class SessionTest {
         session = new Session();
     }
 
-    // helper - criar jogador
+    // helper (criar jogador)
     private Player createPlayer() {
         return new Player(
                 UUID.randomUUID(),
@@ -33,11 +33,11 @@ class SessionTest {
         );
     }
 
-    // helper - criar time
-    private Team createTeam(int number, int playersCount) {
+    // helper (criar time)
+    private Team createTeam(int number) {
         Team team = new Team(number);
 
-        for (int i = 1; i <= playersCount; i++) {
+        for (int i = 1; i <= 4; i++) {
             team.addPlayer(createPlayer());
         }
 
@@ -46,12 +46,10 @@ class SessionTest {
 
     @Test
     void shouldNotAddDuplicatedPlayer() {
-        // arrange
         Player player = createPlayer();
 
         session.addPlayer(player);
 
-        // act & assert
         assertThrows(
                 ConflictException.class,
                 () -> session.addPlayer(player)
@@ -60,7 +58,6 @@ class SessionTest {
 
     @Test
     void shouldNotAddPlayerNull() {
-        // arrange
         Player player = null;
 
         assertThrows(
@@ -69,6 +66,7 @@ class SessionTest {
         );
     }
 
+    // Como esta validação é desnecessária, futuramente, teste será removido
     @Test
     void shouldNotAddPlayerWithIdNull() {
         Player player = new Player(null, "Player");
@@ -81,10 +79,8 @@ class SessionTest {
 
     @Test
     void shouldNotRemovePlayerWhenPlayerNotExists() {
-        // arrange
         UUID playerId = UUID.randomUUID();
 
-        // act & assert
         assertThrows(
                 NotFoundException.class,
                 () -> session.removePlayer(playerId)
@@ -102,7 +98,7 @@ class SessionTest {
     }
 
     @Test
-    void shouldfindPlayerTeamSuccessfully() {
+    void shouldFindPlayerTeamSuccessfully() {
         UUID playerId = UUID.randomUUID();
 
         Player player = new Player(playerId, "Player");
@@ -140,6 +136,24 @@ class SessionTest {
     }
 
     @Test
+    void shouldNotRemoveTeamWhenTeamIsInCurrentMatch() {
+        Team t1 = new Team(1);
+        Team t2 = new Team(2);
+        Team t3 = new Team(3);
+
+        session.setTeams(
+                List.of(t1, t2, t3)
+        );
+
+        session.startQueue();
+
+        assertThrows(
+                ConflictException.class,
+                () -> session.removeTeam(t1)
+        );
+    }
+
+    @Test
     void shouldNotSetCurrentMatchWhenMatchBeNull() {
         Match match = null;
 
@@ -151,46 +165,46 @@ class SessionTest {
 
     @Test
     void shouldStartQueueSuccessfully() {
-        // arrange
-        Team t1 = createTeam(1, 4);
-        Team t2 = createTeam(2, 4);
-        Team t3 = createTeam(3, 4);
+        Team t1 = createTeam(1);
+        Team t2 = createTeam(2);
+        Team t3 = createTeam(3);
 
         session.setTeams(
                 new ArrayList<>(List.of(t1, t2, t3))
         );
 
-        // act
         session.startQueue();
 
-        // assert
         assertNotNull(session.getCurrentMatch());
 
         assertEquals(1, session.getCurrentMatch().getTeamA().getNumber());
         assertEquals(2, session.getCurrentMatch().getTeamB().getNumber());
 
-        assertEquals(1, session.getQueue().size());
+        WaitingQueue waitingQueue = session.getWaitingQueue();
 
-        assertEquals(3, session.getQueue().getFirst().getNumber());
+        assertEquals(1, waitingQueue.getTeams().size());
+
+        assertEquals(3, waitingQueue.getTeams().getFirst().getNumber());
     }
 
     @Test
     void shouldNotStartQueueWithLessThanTwoTeams() {
-        // arrange
-        Team t1 = createTeam(1, 4);
+        Team t1 = createTeam(1);
 
         session.setTeams(
                 new ArrayList<>(List.of(t1))
         );
 
-        // act & assert
-        assertThrows(ConflictException.class, () -> session.startQueue());
+        assertThrows(
+                ConflictException.class,
+                () -> session.startQueue()
+        );
     }
 
     @Test
     void shouldNotStartQueueWhenQueueAlreadyStarted() {
-        Team t1 = createTeam(1, 4);
-        Team t2 = createTeam(2, 4);
+        Team t1 = createTeam(1);
+        Team t2 = createTeam(2);
 
         session.setTeams(
                 new ArrayList<>(List.of(t1, t2))
@@ -204,83 +218,85 @@ class SessionTest {
         );
     }
 
+    // Teste deve ser reajustado para classe de testes da WaitingQueue
     @Test
     void shouldPrioritizeRookieTeamBeforePlayedTeams() {
-        // arrange
-        Team t1 = createTeam(1, 4);
-        Team t2 = createTeam(2, 4);
+        Team t1 = createTeam(1);
+        Team t2 = createTeam(2);
+        Team t3 = createTeam(3);
 
-        // t3 não jogou ainda
-        Team t3 = createTeam(3, 4);
+        t3.markAsPlayed();
 
         session.setTeams(
-                new ArrayList<>(List.of(t1, t2, t3))
+                List.of(t1, t2, t3)
         );
 
         session.startQueue();
 
-        Team t4 = createTeam(4, 4);
+        Team t4 = createTeam(4);
 
-        // act
         session.addTeamToQueue(t4);
 
-        // assert
-        assertEquals(3, session.getQueue().get(0).getNumber());
-        assertEquals(4, session.getQueue().get(1).getNumber());
+        WaitingQueue waitingQueue = session.getWaitingQueue();
+
+        assertEquals(4, waitingQueue.getTeams().get(0).getNumber());
+        assertEquals(3, waitingQueue.getTeams().get(1).getNumber());
     }
 
+    // Teste deve ser reajustado para classe de testes da WaitingQueue
     @Test
     void shouldAddPlayedTeamAtEndOfQueue() {
-        // arrange
-        Team t1 = createTeam(1, 4);
-        Team t2 = createTeam(2, 4);
-        Team t3 = createTeam(3, 4);
+        Team t1 = createTeam(1);
+        Team t2 = createTeam(2);
+        Team t3 = createTeam(3);
 
         session.setTeams(
-                new ArrayList<>(List.of(t1, t2, t3))
+                List.of(t1, t2, t3)
         );
 
         session.startQueue();
 
-        Team t4 = createTeam(4, 4);
+        Team t4 = createTeam(4);
 
-        // t4 já participou de partidas
         t4.markAsPlayed();
 
-        // act
         session.addTeamToQueue(t4);
 
-        // assert
-        assertEquals(2, session.getQueue().size());
+        WaitingQueue waitingQueue = session.getWaitingQueue();
 
-        assertEquals(3, session.getQueue().get(0).getNumber());
-        assertEquals(4, session.getQueue().get(1).getNumber());
+        assertEquals(2, waitingQueue.getTeams().size());
+
+        assertEquals(3, waitingQueue.getTeams().get(0).getNumber());
+        assertEquals(4, waitingQueue.getTeams().get(1).getNumber());
     }
 
+    // Teste deve ser reajustado para classe de testes da WaitingQueue
     @Test
     void shouldNotAddDuplicatedTeamToQueue() {
-        // arrange
-        Team t1 = createTeam(1, 4);
-        Team t2 = createTeam(2, 4);
-        Team t3 = createTeam(3, 4);
+        Team t1 = createTeam(1);
+        Team t2 = createTeam(2);
+        Team t3 = createTeam(3);
 
         session.setTeams(
-                new ArrayList<>(List.of(t1, t2, t3))
+                List.of(t1, t2, t3)
         );
 
         session.startQueue();
 
-        // act & assert
-        assertThrows(ConflictException.class, () -> session.addTeamToQueue(t3));
+        assertThrows(
+                ConflictException.class,
+                () -> session.addTeamToQueue(t3)
+        );
     }
 
+    // Teste deve ser reajustado para classe de testes da WaitingQueue
     @Test
     void shouldNotAddTeamToQueueWhenTeamBeNull() {
-        Team t1 = createTeam(1, 4);
-        Team t2 = createTeam(2, 4);
+        Team t1 = createTeam(1);
+        Team t2 = createTeam(2);
 
         session.setTeams(
-                new ArrayList<>(List.of(t1, t2))
+                List.of(t1, t2)
         );
 
         session.startQueue();
@@ -291,9 +307,11 @@ class SessionTest {
         );
     }
 
+
+    // Teste deve ser reajustado para classe de testes da WaitingQueue
     @Test
     void shouldNotAddTeamToQueueWhenQueueNotInitialized() {
-        Team team = createTeam(1, 4);
+        Team team = createTeam(1);
 
         assertThrows(
                 ConflictException.class,
@@ -301,6 +319,7 @@ class SessionTest {
         );
     }
 
+    // Teste deve ser reajustado para classe de testes da WaitingQueue
     @Test
     void shouldNotRemoveFirstTeamFromQueueWhenQueueIsEmpty() {
         assertThrows(
@@ -311,24 +330,23 @@ class SessionTest {
 
     @Test
     void shouldRemoveFirstTeamFromQueue() {
-        // arrange
-        Team t1 = createTeam(1, 4);
-        Team t2 = createTeam(2, 4);
-        Team t3 = createTeam(3, 4);
+        Team t1 = createTeam(1);
+        Team t2 = createTeam(2);
+        Team t3 = createTeam(3);
 
         session.setTeams(
-                new ArrayList<>(List.of(t1, t2, t3))
+                List.of(t1, t2, t3)
         );
 
         session.startQueue();
 
-        // act
         Team removed = session.removeFirstTeamFromQueue();
 
-        // assert
         assertEquals(3, removed.getNumber());
 
-        assertTrue(session.getQueue().isEmpty());
+        WaitingQueue waitingQueue = session.getWaitingQueue();
+
+        assertTrue(waitingQueue.getTeams().isEmpty());
     }
 
     @Test

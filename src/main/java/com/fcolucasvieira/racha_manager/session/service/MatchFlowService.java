@@ -116,7 +116,7 @@ public class MatchFlowService {
             throw new ConflictException("No match in progress");
         }
 
-        if(!session.hasQueue()) {
+        if(!session.hasWaitingQueue()) {
             throw new ConflictException("Queue not initialized");
         }
     }

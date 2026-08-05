@@ -15,16 +15,15 @@ public class WaitingQueue {
     private final LinkedList<Team> teams;
 
     public WaitingQueue(List<Team> teams) {
-        if (teams == null) {
+        if (teams == null)
             throw new ValidationException("Teams can't be null");
-        }
 
         this.teams = new LinkedList<>(teams);
     }
 
     public void add(Team team) {
         if(team == null)
-            throw new ValidationException("Team cannot be null");
+            throw new ValidationException("Team can't be null");
 
         if(teams.contains(team))
             throw new ConflictException("Team already exists in queue");
@@ -49,6 +48,12 @@ public class WaitingQueue {
     }
 
     public void remove(Team team) {
+        if(team == null)
+            throw new ValidationException("Team can't be null");
+
+        if(!teams.contains(team))
+            throw new ValidationException("Team does not exist in queue");
+
         teams.remove(team);
     }
 
@@ -59,9 +64,6 @@ public class WaitingQueue {
 
         return teams.removeFirst();
     }
-
-    // isEmpty(), contains(), size() são metodos derivados nascem de atributos
-    // (desnecessário implementar)
 
     public int playersCount() {
         return teams.stream()
