@@ -11,16 +11,13 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITIAL_TEAMS;
-import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.TEAM_SIZE;
 
 @Getter
 public class Session {
     private final UUID id;
     private final List<Player> activePlayers;
     private List<Team> teams;
-    // Objeto próprio? (Waiting Queue)
     private WaitingQueue waitingQueue;
-    private List<Team> queue;
     private Match currentMatch;
 
     // Nome de atributo melhor? (trazer + clareza)
@@ -29,19 +26,12 @@ public class Session {
     public Session() {
         this.id = UUID.randomUUID();
         this.activePlayers = new ArrayList<>();
-
         // (Teams) Iniciar apenas quando houver da qtde. mínima de jogadores ativos p/ iniciar sessão?
         this.teams = new ArrayList<>();
         this.waitingQueue = null;
-        this.queue = null;
         this.shuffled = false;
     }
 
-    // Player
-    // -> Adicionar jogador a lista de jogadores ativos da sessão
-    // -> Validar se jogador pode ser adicionado a lista de jogadores ativos da sessão
-    // -> Remover jogador da lista de jogadores ativos da sessão
-    // -> Buscar time no qual o jogador está na sessão
     public void addPlayer(Player player) {
         validatePlayerForAddition(player);
         activePlayers.add(player);
@@ -88,10 +78,6 @@ public class Session {
                 .orElseThrow(() -> new NotFoundException("Player is not in a team"));
     }
 
-    // Team
-    // -> Inserir nova lista de times à sessão (substituir antiga)
-    // -> Remover time da lista de times da sessão
-
     // Nome de atributo melhor? (trazer + clareza)
     public void setTeams(List<Team> teams) {
         if(teams == null){
@@ -113,15 +99,10 @@ public class Session {
 
         teams.remove(team);
 
-        if(queue != null){
-            queue.remove(team);
+        if(waitingQueue != null){
+            waitingQueue.remove(team);
         }
     }
-
-    // CurrentMatch
-    // -> Verificar se sessão já iniciou
-    // -> Verificar se time está na partida atual da sessão
-    // -> Setar/Atualizar partida atual da sessão
 
     // Nome de método melhor? (trazer + clareza)
     public boolean hasStarted() {
@@ -144,17 +125,6 @@ public class Session {
         this.currentMatch = match;
     }
 
-    // Waiting Queue deve ser objeto próprio!
-
-    // Queue
-    // -> Iniciar fila de espera da sessão
-    // -> Carregar/Exibir fila de espera
-    // -> Adicionar time a fila de espera
-    // -> Remover primeiro time da fila de espera
-    // -> Verificar se existe fila de espera
-    // -> Verificar se há jogadores suficientes na lista de espera para realizar empate na sessão
-    // -> Realizar contagem de jogadores na fila de espera da sessão
-
     public void startQueue() {
         if (hasStarted()) {
             throw new ConflictException("Queue already started");
@@ -164,73 +134,36 @@ public class Session {
             throw new ConflictException("Not enough teams to start");
         }
 
-        this.queue = new ArrayList<>(teams);
+        this.waitingQueue = new WaitingQueue(teams);
 
-        this.waitingQueue = new WaitingQueue(queue);
-
-        Team t1 = queue.removeFirst();
-        Team t2 = queue.removeFirst();
+        Team t1 = waitingQueue.poll();
+        Team t2 = waitingQueue.poll();
 
         this.currentMatch = new Match(t1, t2);
     }
 
     public List<Team> getQueue() {
-        return queue == null ? List.of() : List.copyOf(queue);
+        return waitingQueue == null ? List.of() : waitingQueue.asList();
     }
 
     public void addTeamToQueue(Team team) {
-        if(team == null) {
-            throw new ValidationException("Team cannot be null");
-        }
-
-        if(this.queue == null) {
+        if(waitingQueue == null){
             throw new ConflictException("Queue not initialized");
         }
 
-        if(this.queue.contains(team)) {
-            throw new ConflictException("Team already in queue");
-        }
-
-        // se o time ainda não jogou, adicioná-lo atrás do último novato da fila
-        if(!team.isPlayed()) {
-
-            // gera uma lista com times novatos através da queue
-            List<Team> rookieTeams = queue.stream()
-                    .filter(t -> !t.isPlayed())
-                    .toList();
-
-            // se a lista estiver vazia, não há times novatos. logo, o time novato é adicionado ao início da queue
-            if(rookieTeams.isEmpty()) {
-                this.queue.addFirst(team);
-
-                return;
-            }
-
-            // seleta o último time da queue como novato
-            Team lastRookie = rookieTeams.getLast();
-
-            // seleta índice do último time novato na queue
-            int rookieIndex = queue.indexOf(lastRookie);
-
-            this.queue.add(rookieIndex + 1, team);
-
-            return;
-        }
-
-        // caso contrário, adicioná-lo ao final da fila
-        this.queue.add(team);
+        waitingQueue.add(team);
     }
 
     public Team removeFirstTeamFromQueue() {
-        if(queue == null || queue.isEmpty()) {
-            throw new ConflictException("Queue is empty");
+        if(waitingQueue == null) {
+            throw new ConflictException("Queue not initialized");
         }
 
-        return queue.removeFirst();
+        return waitingQueue.poll();
     }
 
     public boolean hasQueue() {
-        return queue != null;
+        return waitingQueue != null;
     }
 
     public boolean hasEnoughPlayersForDraw() {
