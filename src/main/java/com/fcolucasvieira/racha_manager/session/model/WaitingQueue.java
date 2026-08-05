@@ -3,10 +3,12 @@ package com.fcolucasvieira.racha_manager.session.model;
 import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.session.constant.RachaRules;
+import lombok.Getter;
 
 import java.util.LinkedList;
 import java.util.List;
 
+@Getter
 public class WaitingQueue {
     // Uso de LinkedList (complexidade O(1)) em inserções/remoções
     // em ínicio, meio e fim da fila

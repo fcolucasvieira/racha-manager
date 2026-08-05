@@ -18,8 +18,8 @@ public class Session {
     private final UUID id;
     private final List<Player> activePlayers;
     private List<Team> teams;
-
     // Objeto próprio? (Waiting Queue)
+    private WaitingQueue waitingQueue;
     private List<Team> queue;
     private Match currentMatch;
 
@@ -32,6 +32,7 @@ public class Session {
 
         // (Teams) Iniciar apenas quando houver da qtde. mínima de jogadores ativos p/ iniciar sessão?
         this.teams = new ArrayList<>();
+        this.waitingQueue = null;
         this.queue = null;
         this.shuffled = false;
     }
@@ -165,6 +166,8 @@ public class Session {
 
         this.queue = new ArrayList<>(teams);
 
+        this.waitingQueue = new WaitingQueue(queue);
+
         Team t1 = queue.removeFirst();
         Team t2 = queue.removeFirst();
 
@@ -231,17 +234,17 @@ public class Session {
     }
 
     public boolean hasEnoughPlayersForDraw() {
-        return getWaitingPlayersCount() >= (TEAM_SIZE * 2);
+        if(waitingQueue == null)
+            return false;
+
+        return waitingQueue.hasEnoughForDraw();
     }
 
     public int getWaitingPlayersCount() {
-        if(queue == null){
+        if(waitingQueue == null)
             return 0;
-        }
 
-        return queue.stream().
-                mapToInt(team -> team.getPlayers().size())
-                .sum();
+        return waitingQueue.playersCount();
     }
 
     // Shuffled
