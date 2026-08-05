@@ -19,7 +19,7 @@ class CurrentMatchRebalanceServiceTest {
 
     @BeforeEach
     void setup() {
-        service = new CurrentMatchRebalanceService(new TeamFillService());
+        service = new CurrentMatchRebalanceService(new TeamCompletionService());
     }
 
     // helper (criação de times)

@@ -23,7 +23,7 @@ class MatchFlowServiceTest {
 
     @BeforeEach
     void setup() {
-        service = new MatchFlowService(new TeamFillService());
+        service = new MatchFlowService(new TeamCompletionService());
     }
 
     // helper (criação de times)

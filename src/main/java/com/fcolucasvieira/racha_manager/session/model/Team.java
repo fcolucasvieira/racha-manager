@@ -82,9 +82,13 @@ public class Team {
         return players.size() < TEAM_SIZE;
     }
 
-    // isEmpty() ?
-    // getPlayersCount() ?
-    // hasPlayers() ?
+    public boolean hasPlayers() {
+        return !players.isEmpty();
+    }
+
+    public int getPlayersCount() {
+        return players.size();
+    }
 
     public void markAsPlayed() {
         this.played = true;

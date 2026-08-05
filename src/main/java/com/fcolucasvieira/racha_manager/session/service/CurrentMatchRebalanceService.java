@@ -15,8 +15,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CurrentMatchRebalanceService {
-
-    private final TeamFillService teamFillService;
+    private final TeamCompletionService teamCompletionService;
 
     private static final Logger log = LoggerFactory.getLogger(CurrentMatchRebalanceService.class);
 
@@ -42,11 +41,11 @@ public class CurrentMatchRebalanceService {
         List<Team> queue = session.getWaitingTeams();
 
         // completar teamA
-        teamFillService.fill(teamA, queue);
+        teamCompletionService.fill(teamA, queue);
         // completar teamB
-        teamFillService.fill(teamB, queue);
+        teamCompletionService.fill(teamB, queue);
 
         // dissolver times vazios
-        teamFillService.dissolveEmptyTeams(session);
+        teamCompletionService.dissolveEmptyTeams(session);
     }
 }

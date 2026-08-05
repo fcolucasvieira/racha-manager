@@ -19,40 +19,27 @@ import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.TEAM_
 // (Futuro) Generalizar algoritmo para N times e M jogadores por time
 @Service
 public class InitialTeamsBalancerService {
-
     private static final Logger log = LoggerFactory.getLogger(InitialTeamsBalancerService.class);
 
     public List<Team> createInitialTeams(Session session) {
+        validateInitialShuffle(session);
 
-        validateInitialBalance(session);
+        List<Player> players = new ArrayList<>(
+                session.getActivePlayers()
+        );
 
-        // Lista baseada nos jogadores ativos da sessão
-        List<Player> players =
-                new ArrayList<>(session.getActivePlayers());
-
-        // Essa lista sofre balanceamento de jogadores
         Collections.shuffle(players);
 
-        // Lista de times gerada para adição de jogadores já balanceados
-        List<Team> teams = new ArrayList<>();
-
-        // (Futuro) Gerar TeamFactory?
         Team t1 = new Team(1);
         Team t2 = new Team(2);
 
-        for (int i = 0; i < TEAM_SIZE; i++) {
-            t1.addPlayer(players.get(i));
+        List<Team> teams = List.of(t1, t2);
+
+        for(int i = 0; i < INITIAL_PLAYERS; i++) {
+            teams.get(i / TEAM_SIZE)
+                    .addPlayer(players.get(i));
         }
 
-        for (int i = TEAM_SIZE; i < INITIAL_PLAYERS; i++) {
-            t2.addPlayer(players.get(i));
-        }
-
-        teams.add(t1);
-        teams.add(t2);
-
-        // nome de método melhor? (nome + descritivo)
-        // Definimos que a sessão já foi balanceada (evita novos balanceamentos em caso de retomada a qtde. de INITIAL_PLAYERS)
         session.markAsShuffled();
 
         log.info(
@@ -65,7 +52,7 @@ public class InitialTeamsBalancerService {
         return teams;
     }
 
-    private void validateInitialBalance(Session session) {
+    private void validateInitialShuffle(Session session) {
         if (session == null) {
             throw new ValidationException("Session cannot be null");
         }

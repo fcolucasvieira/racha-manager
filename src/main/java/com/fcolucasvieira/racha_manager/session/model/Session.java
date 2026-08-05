@@ -109,6 +109,17 @@ public class Session {
             waitingQueue.remove(team);
     }
 
+    public void removeEmptyTeams() {
+        List<Team> emptyTeams = teams.stream()
+                .filter(t -> !t.hasPlayers() &&
+                        !isCurrentMatchTeam(t))
+                .toList();
+
+        for(Team team : emptyTeams) {
+            removeTeam(team);
+        }
+    }
+
     // Nome de metodo melhor? (trazer + clareza)
     public boolean hasStarted() {
         return currentMatch != null;
@@ -147,7 +158,7 @@ public class Session {
     public List<Team> getWaitingTeams() {
         return waitingQueue == null
                 ? List.of()
-                : waitingQueue.asList();
+                : waitingQueue.teams();
     }
 
     public boolean hasWaitingQueue() {

@@ -74,7 +74,7 @@ public class WaitingQueue {
         return playersCount() >= RachaRules.INITIAL_PLAYERS;
     }
 
-    public List<Team> asList() {
+    public List<Team> teams() {
         return List.copyOf(teams);
     }
 }

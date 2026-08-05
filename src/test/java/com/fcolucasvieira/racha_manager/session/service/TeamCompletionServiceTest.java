@@ -13,12 +13,12 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TeamFillServiceTest {
-    private TeamFillService teamFillService;
+class TeamCompletionServiceTest {
+    private TeamCompletionService teamCompletionService;
 
     @BeforeEach
     void setUp() {
-        teamFillService = new TeamFillService();
+        teamCompletionService = new TeamCompletionService();
 
     }
 
@@ -53,7 +53,7 @@ class TeamFillServiceTest {
 
         session.initializeSession();
 
-        teamFillService.fill(t2, session.getWaitingTeams());
+        teamCompletionService.fill(t2, session.getWaitingTeams());
 
         assertTrue(t2.isFull());
 
@@ -76,7 +76,7 @@ class TeamFillServiceTest {
 
         session.initializeSession();
 
-        teamFillService.fill(t2, session.getWaitingTeams());
+        teamCompletionService.fill(t2, session.getWaitingTeams());
 
         assertTrue(t2.isFull());
 
@@ -99,7 +99,7 @@ class TeamFillServiceTest {
 
         session.initializeSession();
 
-        teamFillService.fill(t2, session.getWaitingTeams());
+        teamCompletionService.fill(t2, session.getWaitingTeams());
 
         assertTrue(t2.isFull());
 
@@ -122,7 +122,7 @@ class TeamFillServiceTest {
 
         session.initializeSession();
 
-        teamFillService.fill(t2, session.getWaitingTeams());
+        teamCompletionService.fill(t2, session.getWaitingTeams());
 
         assertEquals(3, t2.getPlayers().size());
 
@@ -144,7 +144,7 @@ class TeamFillServiceTest {
 
         session.initializeSession();
 
-        teamFillService.fill(t2, session.getWaitingTeams());
+        teamCompletionService.fill(t2, session.getWaitingTeams());
 
         assertEquals(2, t2.getPlayers().size());
     }
@@ -164,7 +164,7 @@ class TeamFillServiceTest {
 
         session.initializeSession();
 
-        teamFillService.dissolveEmptyTeams(session);
+        teamCompletionService.dissolveEmptyTeams(session);
 
         assertFalse(session.getTeams().contains(t3));
     }
@@ -183,7 +183,7 @@ class TeamFillServiceTest {
 
         session.initializeSession();
 
-        teamFillService.dissolveEmptyTeams(session);
+        teamCompletionService.dissolveEmptyTeams(session);
 
         assertTrue(session.getTeams().contains(t2));
     }
@@ -203,7 +203,7 @@ class TeamFillServiceTest {
 
         session.initializeSession();
 
-        teamFillService.dissolveEmptyTeams(session);
+        teamCompletionService.dissolveEmptyTeams(session);
 
         assertTrue(session.getTeams().contains(t3));
     }

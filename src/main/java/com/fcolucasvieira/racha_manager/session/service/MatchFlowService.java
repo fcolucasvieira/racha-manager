@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class MatchFlowService {
     // Por que MatchFlowService conhece TeamFillService?
     // MatchFlowService (Delegar APENAS o encerramento de partidas)
-    private final TeamFillService teamFillService;
+    private final TeamCompletionService teamCompletionService;
 
     public void finishWithWinner(Session session, int winnerTeamNumber) {
         // valida se há currentMatch e queue na sessão
@@ -94,13 +94,13 @@ public class MatchFlowService {
         Team nextTeamA = session.removeFirstTeamFromQueue();
 
         // ajusta o primeiro time do novo currentMatch
-        teamFillService.fill(nextTeamA, session.getWaitingTeams());
+        teamCompletionService.fill(nextTeamA, session.getWaitingTeams());
 
         // seleta o segundo time da fila para o currentMatch
         Team nextTeamB = session.removeFirstTeamFromQueue();
 
         // ajusta o segundo time do novo currentMatch
-        teamFillService.fill(nextTeamB, session.getWaitingTeams());
+        teamCompletionService.fill(nextTeamB, session.getWaitingTeams());
 
         // atualiza currentMatch
         session.setCurrentMatch(
@@ -108,7 +108,7 @@ public class MatchFlowService {
         );
 
         // dissolve times incompletos da sessão
-        teamFillService.dissolveEmptyTeams(session);
+        teamCompletionService.dissolveEmptyTeams(session);
     }
 
     private void validateSessionState(Session session) {

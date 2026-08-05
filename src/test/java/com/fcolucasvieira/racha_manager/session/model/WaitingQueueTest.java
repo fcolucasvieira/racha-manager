@@ -202,12 +202,12 @@ class WaitingQueueTest {
     }
 
     @Test
-    void shouldReturnImmutableListFromAsList() {
+    void shouldReturnImmutableListFromTeams() {
         Team t1 = createTeam(1);
 
         waitingQueue.add(t1);
 
-        List<Team> list = waitingQueue.asList();
+        List<Team> list = waitingQueue.teams();
 
         assertEquals(1, list.size());
 
