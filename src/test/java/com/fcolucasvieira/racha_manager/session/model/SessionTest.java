@@ -218,97 +218,6 @@ class SessionTest {
         );
     }
 
-    // Teste deve ser reajustado para classe de testes da WaitingQueue
-    @Test
-    void shouldPrioritizeRookieTeamBeforePlayedTeams() {
-        Team t1 = createTeam(1);
-        Team t2 = createTeam(2);
-        Team t3 = createTeam(3);
-
-        t3.markAsPlayed();
-
-        session.setTeams(
-                List.of(t1, t2, t3)
-        );
-
-        session.startQueue();
-
-        Team t4 = createTeam(4);
-
-        session.addTeamToQueue(t4);
-
-        WaitingQueue waitingQueue = session.getWaitingQueue();
-
-        assertEquals(4, waitingQueue.getTeams().get(0).getNumber());
-        assertEquals(3, waitingQueue.getTeams().get(1).getNumber());
-    }
-
-    // Teste deve ser reajustado para classe de testes da WaitingQueue
-    @Test
-    void shouldAddPlayedTeamAtEndOfQueue() {
-        Team t1 = createTeam(1);
-        Team t2 = createTeam(2);
-        Team t3 = createTeam(3);
-
-        session.setTeams(
-                List.of(t1, t2, t3)
-        );
-
-        session.startQueue();
-
-        Team t4 = createTeam(4);
-
-        t4.markAsPlayed();
-
-        session.addTeamToQueue(t4);
-
-        WaitingQueue waitingQueue = session.getWaitingQueue();
-
-        assertEquals(2, waitingQueue.getTeams().size());
-
-        assertEquals(3, waitingQueue.getTeams().get(0).getNumber());
-        assertEquals(4, waitingQueue.getTeams().get(1).getNumber());
-    }
-
-    // Teste deve ser reajustado para classe de testes da WaitingQueue
-    @Test
-    void shouldNotAddDuplicatedTeamToQueue() {
-        Team t1 = createTeam(1);
-        Team t2 = createTeam(2);
-        Team t3 = createTeam(3);
-
-        session.setTeams(
-                List.of(t1, t2, t3)
-        );
-
-        session.startQueue();
-
-        assertThrows(
-                ConflictException.class,
-                () -> session.addTeamToQueue(t3)
-        );
-    }
-
-    // Teste deve ser reajustado para classe de testes da WaitingQueue
-    @Test
-    void shouldNotAddTeamToQueueWhenTeamBeNull() {
-        Team t1 = createTeam(1);
-        Team t2 = createTeam(2);
-
-        session.setTeams(
-                List.of(t1, t2)
-        );
-
-        session.startQueue();
-
-        assertThrows(
-                ValidationException.class,
-                () -> session.addTeamToQueue(null)
-        );
-    }
-
-
-    // Teste deve ser reajustado para classe de testes da WaitingQueue
     @Test
     void shouldNotAddTeamToQueueWhenQueueNotInitialized() {
         Team team = createTeam(1);
@@ -319,7 +228,6 @@ class SessionTest {
         );
     }
 
-    // Teste deve ser reajustado para classe de testes da WaitingQueue
     @Test
     void shouldNotRemoveFirstTeamFromQueueWhenQueueIsEmpty() {
         assertThrows(

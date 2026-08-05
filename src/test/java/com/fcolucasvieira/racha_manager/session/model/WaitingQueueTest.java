@@ -1,6 +1,7 @@
 package com.fcolucasvieira.racha_manager.session.model;
 
 import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
+import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import org.junit.jupiter.api.BeforeEach;
@@ -126,7 +127,7 @@ class WaitingQueueTest {
         Team team = createTeam(1);
 
         assertThrows(
-                ValidationException.class,
+                NotFoundException.class,
                 () -> waitingQueue.remove(team)
         );
     }
@@ -209,5 +210,10 @@ class WaitingQueueTest {
         List<Team> list = waitingQueue.asList();
 
         assertEquals(1, list.size());
+
+        assertThrows(
+                UnsupportedOperationException.class,
+                () -> list.add(createTeam(2))
+        );
     }
 }
