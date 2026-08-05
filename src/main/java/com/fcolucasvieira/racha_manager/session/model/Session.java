@@ -106,15 +106,15 @@ public class Session {
 
         teams.remove(team);
 
-        // Se existe currentMatch, existe waitingQueue
-        waitingQueue.remove(team);
+        if(waitingQueue != null)
+            waitingQueue.remove(team);
     }
 
     // hasStarted() deveria validar se a sessão iniciou
     // Se a sessão iniciou temos: WaitingQueue (mesmo que vazia) e CurrentMatch
     // Nome de metodo melhor? (trazer + clareza)
     public boolean hasStarted() {
-        return currentMatch != null;
+        return currentMatch != null && waitingQueue != null;
     }
 
     public boolean isCurrentMatchTeam(Team team) {
@@ -151,7 +151,9 @@ public class Session {
     }
 
     public List<Team> getQueue() {
-        return waitingQueue == null ? List.of() : waitingQueue.asList();
+        return waitingQueue == null
+                ? List.of()
+                : waitingQueue.asList();
     }
 
     public void addTeamToQueue(Team team) {

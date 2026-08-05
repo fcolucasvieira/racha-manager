@@ -1,6 +1,7 @@
 package com.fcolucasvieira.racha_manager.session.model;
 
 import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
+import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.session.constant.RachaRules;
 import lombok.Getter;
@@ -51,10 +52,8 @@ public class WaitingQueue {
         if(team == null)
             throw new ValidationException("Team can't be null");
 
-        if(!teams.contains(team))
-            throw new ValidationException("Team does not exist in queue");
-
-        teams.remove(team);
+        if(!teams.remove(team))
+            throw new NotFoundException("Team not found in queue");
     }
 
     public Team poll() {
