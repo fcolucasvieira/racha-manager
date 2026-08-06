@@ -64,6 +64,10 @@ public class WaitingQueue {
         return teams.removeFirst();
     }
 
+    public boolean isEmpty() {
+        return teams.isEmpty();
+    }
+
     public int playersCount() {
         return teams.stream()
                 .mapToInt(t -> t.getPlayers().size())

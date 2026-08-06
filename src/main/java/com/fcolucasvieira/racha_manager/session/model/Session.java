@@ -120,7 +120,7 @@ public class Session {
         }
     }
 
-    // Nome de metodo melhor? (trazer + clareza)
+    // Se currentMatch não é nulo -> waitingQueue não é nulo
     public boolean hasStarted() {
         return currentMatch != null;
     }
