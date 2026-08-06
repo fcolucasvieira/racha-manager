@@ -6,7 +6,6 @@ import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.service.MatchFlowService;
-import com.fcolucasvieira.racha_manager.session.service.CurrentMatchRebalanceService;
 import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -19,21 +18,16 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FinishMatchUseCase {
     private final SessionRepository sessionRepository;
-    private final CurrentMatchRebalanceService currentMatchRebalanceService;
     private final MatchFlowService matchFlowService;
 
     private static final Logger log = LoggerFactory.getLogger(FinishMatchUseCase.class);
 
-    public void execute(UUID sessionId,
-                        Integer winnerTeamNumber,
-                        MatchResultType resultType) {
-
+    public void execute(UUID sessionId, Integer winnerTeamNumber, MatchResultType resultType) {
         Session session = sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new NotFoundException("Session not found: "  + sessionId));
+                .orElseThrow(() -> new NotFoundException("Session not found with Id: "  + sessionId));
 
-        if (!session.hasStarted()) {
+        if (!session.hasStarted())
             throw new ConflictException("Session has not started");
-        }
 
         validateResultConsistency(winnerTeamNumber, resultType);
 
@@ -43,45 +37,44 @@ public class FinishMatchUseCase {
         int previousTeamA = previousMatch.getTeamA().getNumber();
         int previousTeamB = previousMatch.getTeamB().getNumber();
 
-        if(resultType == MatchResultType.DRAW) {
+        switch (resultType) {
+            case DRAW -> {
+                matchFlowService.finishWithDraw(session);
 
-            matchFlowService.finishWithDraw(session);
+                log.info(
+                        "[MATCH_DRAW_FINISHED] sessionId={} finishedMatch={}vs{} nextMatch={}vs{}",
+                        sessionId,
+                        previousTeamA,
+                        previousTeamB,
+                        session.getCurrentMatch().getTeamA().getNumber(),
+                        session.getCurrentMatch().getTeamB().getNumber()
+                );
+            }
+            case WINNER -> {
+                matchFlowService.finishWithWinner(session, winnerTeamNumber);
 
-            log.info(
-                    "[MATCH_DRAW_FINISHED] sessionId={} finishedMatch={}vs{} nextMatch={}vs{}",
-                    sessionId,
-                    previousTeamA,
-                    previousTeamB,
-                    session.getCurrentMatch().getTeamA().getNumber(),
-                    session.getCurrentMatch().getTeamB().getNumber()
-            );
-        } else {
+                log.info(
+                        "[MATCH_FINISHED] sessionId={} winnerTeamNumber={} finishedMatch={}vs{} nextMatch={}vs{}",
+                        sessionId,
+                        winnerTeamNumber,
+                        previousTeamA,
+                        previousTeamB,
+                        session.getCurrentMatch().getTeamA().getNumber(),
+                        session.getCurrentMatch().getTeamB().getNumber()
+                );
+            }
 
-            matchFlowService.finishWithWinner(session, winnerTeamNumber);
-
-            log.info(
-                    "[MATCH_FINISHED] sessionId={} winnerTeamNumber={} finishedMatch={}vs{} nextMatch={}vs{}",
-                    sessionId,
-                    winnerTeamNumber,
-                    previousTeamA,
-                    previousTeamB,
-                    session.getCurrentMatch().getTeamA().getNumber(),
-                    session.getCurrentMatch().getTeamB().getNumber()
-            );
-
-            currentMatchRebalanceService.apply(session);
+            default -> throw new ValidationException("Unsupported match result type: " + resultType);
         }
 
         sessionRepository.save(session);
     }
 
     private void validateResultConsistency(Integer winnerTeamNumber, MatchResultType resultType) {
-        if(resultType == MatchResultType.WINNER && winnerTeamNumber == null) {
+        if(resultType == MatchResultType.WINNER && winnerTeamNumber == null)
             throw new ValidationException("Winner team number is required");
-        }
 
-        if(resultType == MatchResultType.DRAW && winnerTeamNumber != null) {
+        if(resultType == MatchResultType.DRAW && winnerTeamNumber != null)
             throw new ValidationException("Winner team number must be null on draw");
-        }
     }
 }

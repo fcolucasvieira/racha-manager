@@ -16,25 +16,28 @@ import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InitialTeamsBalancerServiceTest {
-    private InitialTeamsBalancerService service;
+    private InitialTeamsBalancerService initialTeamsBalancerService;
 
     @BeforeEach
     void setup() {
-        service = new InitialTeamsBalancerService();
+        initialTeamsBalancerService = new InitialTeamsBalancerService();
+    }
+
+    void addPlayers(Session session, int countPlayers) {
+        for (int i = 1; i <= countPlayers; i++) {
+            session.addPlayer(
+                    new Player(UUID.randomUUID(), "P" + i)
+            );
+        }
     }
 
     @Test
-    @DisplayName("Success")
-    void shouldCreateTwoTeamsFull() {
+    void shouldBalanceInitialTeams() {
         Session session = new Session();
 
-        // players suficientes adicionados a sessão
-        for(int i = 1; i <= INITIAL_PLAYERS; i++){
-            session.addPlayer(
-                    new Player(UUID.randomUUID(), "P" + i));
-        }
+        addPlayers(session, INITIAL_PLAYERS);
 
-        List<Team> teams = service.createInitialTeams(session);
+        List<Team> teams = initialTeamsBalancerService.createInitialTeams(session);
 
         assertEquals(INITIAL_TEAMS, teams.size());
 
@@ -45,7 +48,7 @@ class InitialTeamsBalancerServiceTest {
         assertEquals(TEAM_SIZE, teams.get(1).getPlayers().size());
 
         int totalPlayers = teams.stream()
-                .mapToInt(team -> team.getPlayers().size())
+                .mapToInt(t -> t.getPlayers().size())
                 .sum();
 
         assertEquals(INITIAL_PLAYERS, totalPlayers);
@@ -54,23 +57,23 @@ class InitialTeamsBalancerServiceTest {
     }
 
     @Test
-    @DisplayName("Session null")
     void shouldThrowExceptionWhenSessionIsNull() {
         assertThrows(
                 ValidationException.class,
-                () -> service.createInitialTeams(null)
+                () -> initialTeamsBalancerService.createInitialTeams(null)
         );
     }
 
     @Test
-    @DisplayName("Session already is shuffled")
     void shouldThrowExceptionWhenSessionAlreadyShuffled(){
         Session session = new Session();
 
         session.markAsShuffled();
 
-        assertThrows(ConflictException.class,
-                () -> service.createInitialTeams(session));
+        assertThrows(
+                ConflictException.class,
+                () -> initialTeamsBalancerService.createInitialTeams(session)
+        );
     }
 
     @Test
@@ -78,14 +81,11 @@ class InitialTeamsBalancerServiceTest {
     void shouldThrowExceptionWhenSessionHasLessThanInitialPlayers(){
         Session session = new Session();
 
-        for(int i = 1; i <= INITIAL_PLAYERS - 1; i++) {
-            session.addPlayer(
-                    new Player(UUID.randomUUID(), "P" + i)
-            );
-        }
+        addPlayers(session, INITIAL_PLAYERS - 1);
 
-        assertThrows(ConflictException.class,
-                () -> service.createInitialTeams(session));
+        assertThrows(
+                ConflictException.class,
+                () -> initialTeamsBalancerService.createInitialTeams(session));
     }
 
     @Test
@@ -93,14 +93,11 @@ class InitialTeamsBalancerServiceTest {
     void shouldThrowExceptionWhenSessionHasMoreThanInitialPlayers(){
         Session session = new Session();
 
-        for(int i = 1; i <= INITIAL_PLAYERS + 1; i++) {
-            session.addPlayer(
-                    new Player(UUID.randomUUID(), "P" + i)
-            );
-        }
+        addPlayers(session, INITIAL_PLAYERS + 1);
 
-        assertThrows(ConflictException.class,
-                () -> service.createInitialTeams(session));
+        assertThrows(
+                ConflictException.class,
+                () -> initialTeamsBalancerService.createInitialTeams(session));
     }
 
     @Test
@@ -108,20 +105,15 @@ class InitialTeamsBalancerServiceTest {
     void shouldThrowExceptionWhenTeamsAlreadyExist() {
         Session session = new Session();
 
-        for (int i = 1; i <= INITIAL_PLAYERS; i++) {
-            session.addPlayer(
-                    new Player(UUID.randomUUID(), "P" + i)
-            );
-        }
+        addPlayers(session, INITIAL_PLAYERS);
 
-        session.setTeams(List.of(
-                new Team(1),
-                new Team(2)
-        ));
+        session.setTeams(
+                List.of(new Team(1), new Team(2))
+        );
 
         assertThrows(
                 ConflictException.class,
-                () -> service.createInitialTeams(session)
+                () -> initialTeamsBalancerService.createInitialTeams(session)
         );
     }
 }

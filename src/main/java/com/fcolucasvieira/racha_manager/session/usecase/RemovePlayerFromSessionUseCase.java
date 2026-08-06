@@ -74,7 +74,7 @@ public class RemovePlayerFromSessionUseCase {
         teamCompletionService.complete(teamA, waitingQueue);
         teamCompletionService.complete(teamB, waitingQueue);
 
-        log.info("[CURRENT_MATCH_TEAMS_COMPLETED] sessionId={} teamA={} teamB={}",
+        log.info("[CURRENT_MATCH_TEAMS_COMPLETED] sessionId={} teamAPlayers={} teamBPlayers={}",
                 session.getId(),
                 teamA.getPlayersCount(),
                 teamB.getPlayersCount()

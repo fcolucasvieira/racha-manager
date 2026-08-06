@@ -17,21 +17,20 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CreateSessionUseCaseTest {
     @Mock
-    private SessionRepository repository;
-
+    private SessionRepository sessionRepository;
     @Mock
     private BusinessMetricsService businessMetrics;
 
     @InjectMocks
-    private CreateSessionUseCase useCase;
+    private CreateSessionUseCase createSessionUseCase;
 
     @Test
     void shouldCreateSessionSuccessfully() {
-        UUID result = useCase.execute();
+        UUID result = createSessionUseCase.execute();
 
         assertNotNull(result);
 
-        verify(repository).save(any(Session.class));
+        verify(sessionRepository).save(any(Session.class));
         verify(businessMetrics).incrementSessionsCreated();
     }
 }

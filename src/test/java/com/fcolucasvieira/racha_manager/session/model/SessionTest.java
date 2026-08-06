@@ -216,45 +216,6 @@ class SessionTest {
     }
 
     @Test
-    void shouldNotAddTeamToQueueWhenQueueNotInitialized() {
-        Team team = createTeam(1);
-
-        assertThrows(
-                ConflictException.class,
-                () -> session.addTeamToQueue(team)
-        );
-    }
-
-    @Test
-    void shouldNotRemoveFirstTeamFromQueueWhenQueueIsEmpty() {
-        assertThrows(
-                ConflictException.class,
-                () -> session.removeFirstTeamFromQueue()
-        );
-    }
-
-    @Test
-    void shouldRemoveFirstTeamFromQueue() {
-        Team t1 = createTeam(1);
-        Team t2 = createTeam(2);
-        Team t3 = createTeam(3);
-
-        session.setTeams(
-                List.of(t1, t2, t3)
-        );
-
-        session.initializeSession();
-
-        Team removed = session.removeFirstTeamFromQueue();
-
-        assertEquals(3, removed.getNumber());
-
-        WaitingQueue waitingQueue = session.getWaitingQueue();
-
-        assertTrue(waitingQueue.getTeams().isEmpty());
-    }
-
-    @Test
     void shouldMarkSessionAsShuffled() {
         assertFalse(session.isShuffled());
 

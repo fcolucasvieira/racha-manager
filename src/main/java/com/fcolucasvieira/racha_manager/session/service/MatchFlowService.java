@@ -48,6 +48,7 @@ public class MatchFlowService {
         waitingQueue.add(loser);
 
         Team next = waitingQueue.poll();
+        teamCompletionService.complete(next, waitingQueue);
 
         session.setCurrentMatch(
                 new Match(winner, next)

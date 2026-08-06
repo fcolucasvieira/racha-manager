@@ -15,7 +15,6 @@ public class GetSessionUseCase {
 
     public Session execute(UUID sessionId) {
         return sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new NotFoundException("Session not found: " + sessionId));
+                .orElseThrow(() -> new NotFoundException("Session not found with Id: " + sessionId));
     }
-
 }

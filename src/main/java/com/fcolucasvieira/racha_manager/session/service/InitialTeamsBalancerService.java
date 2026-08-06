@@ -53,20 +53,18 @@ public class InitialTeamsBalancerService {
     }
 
     private void validateInitialShuffle(Session session) {
-        if (session == null) {
+        if (session == null)
             throw new ValidationException("Session cannot be null");
-        }
 
-        if (session.isShuffled()) {
+        if (session.isShuffled())
             throw new ConflictException("Initial shuffle already performed");
-        }
 
-        if (session.getActivePlayers().size() != INITIAL_PLAYERS) {
+        if (session.getActivePlayers().size() != INITIAL_PLAYERS)
             throw new ConflictException("Initial balance requires exactly " + INITIAL_PLAYERS + " players");
-        }
 
-        if (session.getTeams() != null && !session.getTeams().isEmpty()) {
+        // Validação desnecessária (session.getTeams() != null)
+        // Se a lista de times não estiver vazia -> a lista de times não é nula
+        if (session.getTeams() != null && !session.getTeams().isEmpty())
             throw new ConflictException("Session already contains teams");
-        }
     }
 }

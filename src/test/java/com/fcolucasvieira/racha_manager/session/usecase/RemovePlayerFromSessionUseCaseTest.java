@@ -3,7 +3,6 @@ package com.fcolucasvieira.racha_manager.session.usecase;
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
-import com.fcolucasvieira.racha_manager.session.service.CurrentMatchRebalanceService;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
 import org.junit.jupiter.api.BeforeEach;

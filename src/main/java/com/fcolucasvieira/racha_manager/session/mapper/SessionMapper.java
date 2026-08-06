@@ -8,6 +8,7 @@ import com.fcolucasvieira.racha_manager.session.model.Match;
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
+import com.fcolucasvieira.racha_manager.session.model.WaitingQueue;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,21 +16,24 @@ import java.util.List;
 @Component
 public class SessionMapper {
     public SessionDTO toResponse(Session session) {
-
-        // Seleta currentMatch em uma variável
-        Match currentMatch = session.getCurrentMatch();
-
         MatchDTO currentMatchDTO =
-                (currentMatch != null)
-                        ? toMatchDTO(currentMatch)
+                session.hasStarted()
+                        ? toMatchDTO(session.getCurrentMatch())
                         : null;
+
+        WaitingQueue waitingQueue = session.getWaitingQueue();
+
+        List<TeamDTO> waitingTeamsDTO =
+                session.hasWaitingQueue()
+                        ? toTeamDTOList(waitingQueue.teams())
+                        : List.of();
 
             return new SessionDTO(
                     session.getId(),
                     session.hasStarted(),
                     toPlayerDTOList(session.getActivePlayers()),
                     currentMatchDTO,
-                    toTeamDTOList(session.getWaitingTeams())
+                    waitingTeamsDTO
             );
         }
 

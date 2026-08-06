@@ -5,7 +5,6 @@ import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.session.service.MatchFlowService;
-import com.fcolucasvieira.racha_manager.session.service.CurrentMatchRebalanceService;
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
 import com.fcolucasvieira.racha_manager.session.model.Session;
@@ -29,14 +28,12 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class FinishMatchUseCaseTest {
     @Mock
-    private SessionRepository repository;
-    @Mock
-    private CurrentMatchRebalanceService currentMatchRebalanceService;
+    private SessionRepository sessionRepository;
     @Mock
     private MatchFlowService matchFlowService;
 
     @InjectMocks
-    private FinishMatchUseCase useCase;
+    private FinishMatchUseCase finishMatchUseCase;
 
     private UUID sessionId;
 
@@ -45,16 +42,13 @@ class FinishMatchUseCaseTest {
         sessionId = UUID.randomUUID();
     }
 
-    // helper
+    // helper (criação de time)
     private Team createTeam(int number, int countPlayers) {
         Team team = new Team(number);
 
         for (int i = 1; i <= countPlayers; i++) {
             team.addPlayer(
-                    new Player(
-                            UUID.randomUUID(),
-                            "P" + i
-                    )
+                    new Player(UUID.randomUUID(), "P" + i)
             );
         }
 
@@ -70,22 +64,19 @@ class FinishMatchUseCaseTest {
         Team t2 = createTeam(2, 4);
         Team t3 = createTeam(3, 1);
 
-        session.setTeams(new ArrayList<>(List.of(t1, t2, t3)));
+        session.setTeams(
+                List.of(t1, t2, t3)
+        );
 
         session.initializeSession();
 
-        when(repository.findById(sessionId))
+        when(sessionRepository.findById(sessionId))
                 .thenReturn(Optional.of(session));
 
-        useCase.execute(
-                sessionId,
-                1,
-                MatchResultType.WINNER
-        );
+        finishMatchUseCase.execute(sessionId, 1, MatchResultType.WINNER);
 
         verify(matchFlowService).finishWithWinner(session, 1);
-        verify(currentMatchRebalanceService).apply(session);
-        verify(repository).save(session);
+        verify(sessionRepository).save(session);
     }
 
     @Test
@@ -98,44 +89,32 @@ class FinishMatchUseCaseTest {
         Team t3 = createTeam(3, 4);
         Team t4 = createTeam(4, 4);
 
-        session.setTeams(new ArrayList<>(List.of(t1, t2, t3, t4)));
+        session.setTeams(
+                List.of(t1, t2, t3, t4));
 
         session.initializeSession();
 
-        when(repository.findById(sessionId))
-                .thenReturn(Optional.of(session));
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
 
-        useCase.execute(
-                sessionId,
-                null,
-                MatchResultType.DRAW
-        );
+        finishMatchUseCase.execute(sessionId, null, MatchResultType.DRAW);
 
         verify(matchFlowService).finishWithDraw(session);
-        verify(currentMatchRebalanceService, never()).apply(any());
-        verify(repository).save(session);
-
+        verify(sessionRepository).save(session);
     }
 
     @Test
     @DisplayName("Session not found")
     void shouldThrowExceptionWhenSessionNotFound() {
-        when(repository.findById(sessionId))
-                .thenReturn(Optional.empty());
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.empty());
 
         assertThrows(
                 NotFoundException.class,
-                () -> useCase.execute(
-                        sessionId,
-                        1,
-                        MatchResultType.WINNER
-                )
+                () -> finishMatchUseCase.execute(sessionId, 1, MatchResultType.WINNER)
         );
 
         verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
         verify(matchFlowService, never()).finishWithDraw(any());
-        verify(currentMatchRebalanceService, never()).apply(any());
-        verify(repository, never()).save(any());
+        verify(sessionRepository, never()).save(any());
     }
 
     @Test
@@ -143,22 +122,16 @@ class FinishMatchUseCaseTest {
     void shouldThrowExceptionWhenSessionHasNotStarted() {
         Session session = new Session();
 
-        when(repository.findById(sessionId))
-                .thenReturn(Optional.of(session));
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
 
         assertThrows(
                 ConflictException.class,
-                () -> useCase.execute(
-                        sessionId,
-                        1,
-                        MatchResultType.WINNER
-                )
+                () -> finishMatchUseCase.execute(sessionId, 1, MatchResultType.WINNER)
         );
 
         verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
         verify(matchFlowService, never()).finishWithDraw(any());
-        verify(currentMatchRebalanceService, never()).apply(any());
-        verify(repository, never()).save(any());
+        verify(sessionRepository, never()).save(any());
     }
 
     @Test
@@ -173,22 +146,16 @@ class FinishMatchUseCaseTest {
 
         session.initializeSession();
 
-        when(repository.findById(sessionId))
-                .thenReturn(Optional.of(session));
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
 
         assertThrows(
                 ValidationException.class,
-                () -> useCase.execute(
-                        sessionId,
-                        null,
-                        MatchResultType.WINNER
-                )
+                () -> finishMatchUseCase.execute(sessionId, null, MatchResultType.WINNER)
         );
 
         verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
         verify(matchFlowService, never()).finishWithDraw(any());
-        verify(currentMatchRebalanceService, never()).apply(any());
-        verify(repository, never()).save(any());
+        verify(sessionRepository, never()).save(any());
     }
 
     @Test
@@ -203,21 +170,15 @@ class FinishMatchUseCaseTest {
 
         session.initializeSession();
 
-        when(repository.findById(sessionId))
-                .thenReturn(Optional.of(session));
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
 
         assertThrows(
                 ValidationException.class,
-                () -> useCase.execute(
-                        sessionId,
-                        1,
-                        MatchResultType.DRAW
-                )
+                () -> finishMatchUseCase.execute(sessionId, 1, MatchResultType.DRAW)
         );
 
         verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
         verify(matchFlowService, never()).finishWithDraw(any());
-        verify(currentMatchRebalanceService, never()).apply(any());
-        verify(repository, never()).save(any());
+        verify(sessionRepository, never()).save(any());
     }
 }
