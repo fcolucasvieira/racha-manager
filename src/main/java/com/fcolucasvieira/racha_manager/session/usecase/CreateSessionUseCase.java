@@ -13,7 +13,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CreateSessionUseCase {
-
     private final SessionRepository repository;
     private final BusinessMetricsService businessMetrics;
 

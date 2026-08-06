@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/*
 // Domain Service anêmico
 // Avaliar orquestração realocada em Session
 @Service
@@ -49,3 +50,4 @@ public class CurrentMatchRebalanceService {
         teamCompletionService.dissolveEmptyTeams(session);
     }
 }
+*/

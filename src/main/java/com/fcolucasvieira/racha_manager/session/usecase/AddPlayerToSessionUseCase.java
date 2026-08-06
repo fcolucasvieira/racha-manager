@@ -28,10 +28,10 @@ public class AddPlayerToSessionUseCase {
 
     public List<Team> execute(UUID sessionId, UUID playerId) {
         Session session = sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new NotFoundException("Session not found: " + sessionId));
+                .orElseThrow(() -> new NotFoundException("Session not found with Id: " + sessionId));
 
         Player player = playerRepository.findById(playerId)
-                .orElseThrow(() -> new NotFoundException("Player not found: " + playerId));
+                .orElseThrow(() -> new NotFoundException("Player not found with Id: " + playerId));
 
         session.addPlayer(player);
 
@@ -42,7 +42,7 @@ public class AddPlayerToSessionUseCase {
                 session.getActivePlayers().size()
         );
 
-        if (shouldCreateInitialTeams(session)) {
+        if (session.canStartInitialShuffle()) {
             List<Team> teams = initialTeamsBalancerService.createInitialTeams(session);
 
             session.setTeams(teams);
@@ -50,14 +50,13 @@ public class AddPlayerToSessionUseCase {
             session.initializeSession();
 
             log.info(
-                    "[QUEUE_STARTED] sessionId={} currentMatch={}vs{} queueSize={}",
+                    "[QUEUE_STARTED] sessionId={} currentMatch={}vs{} queueTeams={}",
                     sessionId,
                     session.getCurrentMatch().getTeamA().getNumber(),
                     session.getCurrentMatch().getTeamB().getNumber(),
                     session.getWaitingTeams().size()
             );
-        }
-        else if (session.hasStarted()) {
+        } else if (session.hasStarted()) {
             addPlayerToRunningSession(session, player);
 
             log.info(
@@ -73,14 +72,7 @@ public class AddPlayerToSessionUseCase {
         return session.getTeams();
     }
 
-    // Regra de negócio (Session)
-    // valida se pode iniciar o racha com base na qtde. de jogadores e se sessão não embaralhada
-    private boolean shouldCreateInitialTeams(Session session) {
-        return session.getActivePlayers().size() == INITIAL_PLAYERS &&
-                !session.isShuffled();
-    }
-
-    // Pertence ao domínio (Session)
+    // Domain Service (Sprint de refatoração arquitetural)
     private void addPlayerToRunningSession(Session session, Player player) {
         // Instancia teams da session
         List<Team> teams = session.getTeams();
@@ -88,16 +80,17 @@ public class AddPlayerToSessionUseCase {
         // Busca o último time da lista
         Team lastTeam = teams.isEmpty()
                 ? null
-                : teams.get(teams.size() - 1);
+                : teams.getLast();
 
         // Se não existe time ou último está cheio
         if (lastTeam == null || lastTeam.isFull()) {
-
             // Define número do novo time
-            int nextTeamNumber = teams.stream()
+            int nextTeamNumber =
+                    (teams.stream()
                     .mapToInt(Team::getNumber)
                     .max()
-                    .orElse(0) + 1;
+                    .orElse(0))
+                    + 1;
 
             // Cria novo time
             Team newTeam = new Team(nextTeamNumber);
@@ -109,7 +102,7 @@ public class AddPlayerToSessionUseCase {
             teams.add(newTeam);
 
             // Adiciona time a fila de prioridade (no final)
-            session.addTeamToQueue(newTeam);
+            session.getWaitingQueue().add(newTeam);
 
             return;
         }

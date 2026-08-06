@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITIAL_PLAYERS;
 import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITIAL_TEAMS;
 
 @Getter
@@ -167,5 +168,10 @@ public class Session {
 
     public void markAsShuffled() {
         this.shuffled = true;
+    }
+
+    public boolean canStartInitialShuffle() {
+        return activePlayers.size() == INITIAL_PLAYERS
+                && !isShuffled();
     }
 }
