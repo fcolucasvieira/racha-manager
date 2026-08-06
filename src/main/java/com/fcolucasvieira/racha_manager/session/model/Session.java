@@ -73,16 +73,17 @@ public class Session {
     }
 
     public Team findPlayerTeam(UUID playerId) {
-        if(playerId == null) {
-            throw new ValidationException("Player ID cannot be null");
-        }
+        if(playerId == null)
+            throw new ValidationException("Player ID can't be null");
 
         return teams.stream()
-                .filter(team -> team.getPlayers().stream()
+                .filter(t -> t.getPlayers().stream()
                         .anyMatch(player ->
                                 player.getId().equals(playerId)))
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException("Player is not in a team"));
+                .orElseThrow(
+                        () -> new NotFoundException("Player not found with Id: " + playerId)
+                );
     }
 
     // Nome de atributo melhor? (trazer + clareza)
