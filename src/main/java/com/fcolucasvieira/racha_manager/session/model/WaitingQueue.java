@@ -57,9 +57,9 @@ public class WaitingQueue {
     }
 
     public Team poll() {
-        if(teams.isEmpty()) {
+        if(teams.isEmpty())
             throw new ValidationException("Teams in queue can't be empty");
-        }
+
 
         return teams.removeFirst();
     }

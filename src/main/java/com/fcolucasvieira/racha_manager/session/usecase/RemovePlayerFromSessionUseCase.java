@@ -27,10 +27,8 @@ public class RemovePlayerFromSessionUseCase {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NotFoundException("Session not found with Id: " + sessionId));
 
-        // encontra time do jogador
         Team team = session.findPlayerTeam(playerId);
 
-        // remove do activePlayers
         session.removePlayer(playerId);
 
         log.info(

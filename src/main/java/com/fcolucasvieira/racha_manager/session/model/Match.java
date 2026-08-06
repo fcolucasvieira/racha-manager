@@ -11,22 +11,19 @@ public class Match {
     private final Team teamB;
 
     public Match(Team teamA, Team teamB) {
-        if(teamA == null || teamB == null) {
-            throw new ValidationException("Teams cannot be null");
-        }
+        if(teamA == null || teamB == null)
+            throw new ValidationException("Teams can't be null");
 
-        if(teamA.equals(teamB)) {
+        if(teamA.equals(teamB))
             throw new ConflictException("A match must have two different teams");
-        }
 
         this.teamA = teamA;
         this.teamB = teamB;
     }
 
     public Team getLoser(Team winner) {
-        if(winner == null) {
-            throw new ValidationException("Winner cannot be null");
-        }
+        if(winner == null)
+            throw new ValidationException("Winner can't be null");
 
         if (winner.equals(teamA)) return teamB;
         if (winner.equals(teamB)) return teamA;

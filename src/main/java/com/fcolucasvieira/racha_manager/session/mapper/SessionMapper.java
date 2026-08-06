@@ -24,7 +24,7 @@ public class SessionMapper {
         WaitingQueue waitingQueue = session.getWaitingQueue();
 
         List<TeamDTO> waitingTeamsDTO =
-                session.hasWaitingQueue()
+                session.hasStarted()
                         ? toTeamDTOList(waitingQueue.teams())
                         : List.of();
 

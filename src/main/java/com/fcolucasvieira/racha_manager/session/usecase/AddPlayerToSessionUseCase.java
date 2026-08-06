@@ -54,7 +54,7 @@ public class AddPlayerToSessionUseCase {
                     sessionId,
                     session.getCurrentMatch().getTeamA().getNumber(),
                     session.getCurrentMatch().getTeamB().getNumber(),
-                    session.getWaitingTeams().size()
+                    session.getWaitingQueue().teams().size()
             );
         } else if (session.hasStarted()) {
             addPlayerToRunningSession(session, player);

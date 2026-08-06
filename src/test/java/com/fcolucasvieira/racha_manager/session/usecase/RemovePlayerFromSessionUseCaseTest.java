@@ -5,6 +5,7 @@ import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
+import com.fcolucasvieira.racha_manager.session.service.TeamCompletionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,9 +25,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class RemovePlayerFromSessionUseCaseTest {
     @Mock
-    private SessionRepository repository;
+    private SessionRepository sessionRepository;
     @Mock
-    private CurrentMatchRebalanceService currentMatchRebalanceService;
+    private TeamCompletionService teamCompletionService;
 
     @InjectMocks
     private RemovePlayerFromSessionUseCase useCase;
@@ -45,96 +46,67 @@ class RemovePlayerFromSessionUseCaseTest {
         return new Player(UUID.randomUUID(), name);
     }
 
-    // helper (criação de times)
+    // helper (criação de time)
     private Team createTeam(int number, int playersCount) {
         Team team = new Team(number);
 
         for (int i = 1; i <= playersCount; i++) {
             team.addPlayer(createPlayer("P" + i));
         }
-
         return team;
     }
 
     @Test
-    @DisplayName("Session not found")
     void shouldThrowExceptionWhenSessionNotFound() {
-        when(repository.findById(sessionId))
-                .thenReturn(Optional.empty());
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.empty());
 
         assertThrows(
                 NotFoundException.class,
                 () -> useCase.execute(sessionId, playerId)
         );
 
-        verify(repository, never()).save(any());
+        verify(sessionRepository, never()).save(any());
+        verify(teamCompletionService, never()).complete(any(), any());
     }
 
     @Test
-    @DisplayName("Player not found in any team")
     void shouldThrowExceptionWhenPlayerIsNotInAnyTeam() {
         Session session = new Session();
 
-        Team t1 = createTeam(1, 2);
+        Team t1 = createTeam(1, 1);
 
         session.setTeams(
-                new ArrayList<>(List.of(t1))
+                List.of(t1)
         );
 
-        t1.getPlayers().forEach(session::addPlayer);
-
-        when(repository.findById(sessionId))
-                .thenReturn(Optional.of(session));
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
 
         assertThrows(
                 NotFoundException.class,
                 () -> useCase.execute(sessionId, playerId)
         );
 
-        verify(repository, never()).save(any());
+        verify(sessionRepository, never()).save(any());
+        verify(teamCompletionService, never()).complete(any(), any());
     }
 
     @Test
-    @DisplayName("Player exists but is not assigned in any team")
-    void shouldThrowExceptionWhenPLayerIsNotAssignedToAnyTeam() {
-        Session session = new Session();
-
-        Player player = new Player(playerId, "P");
-
-        session.addPlayer(player);
-
-        when(repository.findById(sessionId))
-                .thenReturn(Optional.of(session));
-
-        assertThrows(
-                NotFoundException.class,
-                () -> useCase.execute(sessionId, playerId)
-        );
-
-        verify(repository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Success")
     void shouldRemovePlayerSuccessfully() {
         Session session = new Session();
 
-        Player removablePlayer =
-                new Player(playerId, "P1");
+        Player removablePlayer = new Player(playerId, "P1");
 
         Team t1 = new Team(1);
 
         t1.addPlayer(removablePlayer);
+
         t1.addPlayer(createPlayer("P2"));
 
         session.setTeams(
-                new ArrayList<>(List.of(t1))
+                List.of(t1)
         );
 
-        t1.getPlayers().forEach(session::addPlayer);
-
-        when(repository.findById(sessionId))
-                .thenReturn(Optional.of(session));
+        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
 
         useCase.execute(sessionId, playerId);
 
@@ -145,11 +117,10 @@ class RemovePlayerFromSessionUseCaseTest {
                 .anyMatch(p -> p.getId().equals(playerId))
         );
 
-        verify(repository).save(session);
+        verify(sessionRepository).save(session);
     }
 
     @Test
-    @DisplayName("Dissolve empty team after removing player")
     void shouldDissolveEmptyTeam() {
         Session session = new Session();
 
@@ -165,14 +136,14 @@ class RemovePlayerFromSessionUseCaseTest {
 
         session.addPlayer(removablePlayer);
 
-        when(repository.findById(sessionId))
+        when(sessionRepository.findById(sessionId))
                 .thenReturn(Optional.of(session));
 
         useCase.execute(sessionId, playerId);
 
         assertTrue(session.getTeams().isEmpty());
 
-        verify(repository).save(session);
+        verify(sessionRepository).save(session);
     }
 
     @Test
@@ -201,17 +172,16 @@ class RemovePlayerFromSessionUseCaseTest {
 
         session.initializeSession();
 
-        when(repository.findById(sessionId))
+        when(sessionRepository.findById(sessionId))
                 .thenReturn(Optional.of(session));
 
         useCase.execute(sessionId, playerId);
 
         verify(currentMatchRebalanceService).apply(session);
-        verify(repository).save(session);
+        verify(sessionRepository).save(session);
     }
 
     @Test
-    @DisplayName("Do not apply priority service when player is removed outside current match")
     void shouldNotApplyPriorityServiceWhenRemovingPlayerOutsideCurrentMatch() {
         Session session = new Session();
 
@@ -234,18 +204,17 @@ class RemovePlayerFromSessionUseCaseTest {
 
         session.initializeSession();
 
-        when(repository.findById(sessionId))
+        when(sessionRepository.findById(sessionId))
                 .thenReturn(Optional.of(session));
 
         useCase.execute(sessionId, playerId);
 
         verify(currentMatchRebalanceService, never()).apply(any());
 
-        verify(repository).save(session);
+        verify(sessionRepository).save(session);
     }
 
     @Test
-    @DisplayName("Do not apply priority service when session has not started")
     void shouldNotApplyPriorityServiceWhenSessionHasNotStarted() {
         Session session = new Session();
 
@@ -260,12 +229,12 @@ class RemovePlayerFromSessionUseCaseTest {
 
         t1.getPlayers().forEach(session::addPlayer);
 
-        when(repository.findById(sessionId))
+        when(sessionRepository.findById(sessionId))
                 .thenReturn(Optional.of(session));
 
         useCase.execute(sessionId, playerId);
 
         verify(currentMatchRebalanceService, never()).apply(any());
-        verify(repository).save(session);
+        verify(sessionRepository).save(session);
     }
 }

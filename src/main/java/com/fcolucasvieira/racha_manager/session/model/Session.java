@@ -122,9 +122,9 @@ public class Session {
         }
     }
 
-    // Se currentMatch não é nulo -> waitingQueue não é nulo
+    // Se currentMatch não é nulo -> waitingQueue não é nulo (Mantive pela leitura)
     public boolean hasStarted() {
-        return currentMatch != null;
+        return currentMatch != null && waitingQueue != null;
     }
 
     public boolean isCurrentMatchTeam(Team team) {
@@ -155,16 +155,6 @@ public class Session {
         Team t2 = waitingQueue.poll();
 
         this.currentMatch = new Match(t1, t2);
-    }
-
-    public List<Team> getWaitingTeams() {
-        return waitingQueue == null
-                ? List.of()
-                : waitingQueue.teams();
-    }
-
-    public boolean hasWaitingQueue() {
-        return waitingQueue != null;
     }
 
     public void markAsShuffled() {

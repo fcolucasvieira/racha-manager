@@ -16,15 +16,11 @@ import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.TEAM_
 public class Team {
     private final int number;
     private final List<Player> players;
-
-    // hasPlayed (nome + descritivo)?
     private boolean played;
 
-    // Substituir Integer por int (evitar ausência de valor)
-    public Team(Integer number) {
-        if(number <= 0) {
-            throw new ValidationException("Team number must be valid");
-        }
+    public Team(int number) {
+        if(number <= 0)
+            throw new ValidationException("Team number must be more then 0");
 
         this.number = number;
         this.players = new ArrayList<>();
@@ -38,11 +34,11 @@ public class Team {
     }
 
     public Player removeFirstPlayer() {
-        if (players.isEmpty()) {
+        if (players.isEmpty())
             throw new ConflictException("Team has no players");
-        }
 
-        return players.remove(0);
+
+        return players.removeFirst();
     }
 
     // Remover através de Player ou playerId? Player! (Domínio trabalha c/ objetos)
@@ -62,16 +58,14 @@ public class Team {
     // Invariante repetida: um jogador não entra duas vezes no time
     private void validatePlayerForAddition(Player player) {
         // Retirar (player.getId() == null) (Construtor SEMPRE inicializa este atributo)
-        if(player == null || player.getId() == null) {
+        if(player == null || player.getId() == null)
             throw new ValidationException("Player or player ID cannot be null");
-        }
 
         boolean alreadyExists = players.stream()
                 .anyMatch(p -> p.getId().equals(player.getId()));
 
-        if (alreadyExists) {
+        if (alreadyExists)
             throw new ConflictException("Player already in team");
-        }
     }
 
     public boolean isFull() {
