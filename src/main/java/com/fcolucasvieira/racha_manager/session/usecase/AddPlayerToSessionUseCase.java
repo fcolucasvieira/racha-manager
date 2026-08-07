@@ -50,7 +50,7 @@ public class AddPlayerToSessionUseCase {
             session.initializeSession();
 
             log.info(
-                    "[QUEUE_STARTED] sessionId={} currentMatch={}vs{} queueTeams={}",
+                    "[WAITING_QUEUE_STARTED] sessionId={} currentMatch={}vs{} waitingTeams={}",
                     sessionId,
                     session.getCurrentMatch().getTeamA().getNumber(),
                     session.getCurrentMatch().getTeamB().getNumber(),
@@ -72,7 +72,9 @@ public class AddPlayerToSessionUseCase {
         return session.getTeams();
     }
 
-    // Domain Service (Sprint de refatoração arquitetural)
+    // TODO (Sprint de refatoração arquitetural):
+    // mover a lógica de entrada de jogadores durante uma sessão ativa
+    // para um Domain Service (ou para Session, caso a regra pertença ao agregado)
     private void addPlayerToRunningSession(Session session, Player player) {
         // Instancia teams da session
         List<Team> teams = session.getTeams();

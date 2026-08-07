@@ -22,7 +22,6 @@ class SessionTest {
         session = new Session();
     }
 
-    // helper (criar jogador)
     private Player createPlayer() {
         return new Player(
                 UUID.randomUUID(),
@@ -30,7 +29,6 @@ class SessionTest {
         );
     }
 
-    // helper (criar time)
     private Team createTeam(int number) {
         Team team = new Team(number);
 

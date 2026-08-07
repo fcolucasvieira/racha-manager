@@ -56,7 +56,7 @@ class FinishMatchUseCaseTest {
     }
 
     @Test
-    @DisplayName("Success (Winner)")
+    @DisplayName("Should finish match with winner")
     void shouldFinishMatchWithWinnerSuccessfully() {
         Session session = new Session();
 
@@ -76,11 +76,13 @@ class FinishMatchUseCaseTest {
         finishMatchUseCase.execute(sessionId, 1, MatchResultType.WINNER);
 
         verify(matchFlowService).finishWithWinner(session, 1);
+        verify(matchFlowService, never()).finishWithDraw(any());
+
         verify(sessionRepository).save(session);
     }
 
     @Test
-    @DisplayName("Success (Draw)")
+    @DisplayName("Should finish match with draw")
     void shouldFinishMatchWithDrawSuccessfully() {
         Session session = new Session();
 
@@ -94,18 +96,22 @@ class FinishMatchUseCaseTest {
 
         session.initializeSession();
 
-        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
+        when(sessionRepository.findById(sessionId))
+                .thenReturn(Optional.of(session));
 
         finishMatchUseCase.execute(sessionId, null, MatchResultType.DRAW);
 
         verify(matchFlowService).finishWithDraw(session);
+        verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
+
         verify(sessionRepository).save(session);
     }
 
     @Test
-    @DisplayName("Session not found")
+    @DisplayName("Should throw exception when session does not exist")
     void shouldThrowExceptionWhenSessionNotFound() {
-        when(sessionRepository.findById(sessionId)).thenReturn(Optional.empty());
+        when(sessionRepository.findById(sessionId))
+                .thenReturn(Optional.empty());
 
         assertThrows(
                 NotFoundException.class,
@@ -118,11 +124,12 @@ class FinishMatchUseCaseTest {
     }
 
     @Test
-    @DisplayName("Session not started")
+    @DisplayName("Should throw exception when session has not started")
     void shouldThrowExceptionWhenSessionHasNotStarted() {
         Session session = new Session();
 
-        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
+        when(sessionRepository.findById(sessionId))
+                .thenReturn(Optional.of(session));
 
         assertThrows(
                 ConflictException.class,
@@ -135,18 +142,19 @@ class FinishMatchUseCaseTest {
     }
 
     @Test
-    @DisplayName("Winner number team is null")
+    @DisplayName("Should throw exception when winner result has null winner number team")
     void shouldThrowExceptionWhenWinnerTypeHasNullWinner() {
         Session session = new Session();
 
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 4);
 
-        session.setTeams(new ArrayList<>(List.of(t1, t2)));
+        session.setTeams(List.of(t1, t2));
 
         session.initializeSession();
 
-        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
+        when(sessionRepository.findById(sessionId))
+                .thenReturn(Optional.of(session));
 
         assertThrows(
                 ValidationException.class,
@@ -159,18 +167,19 @@ class FinishMatchUseCaseTest {
     }
 
     @Test
-    @DisplayName("Draw contains winner number team")
+    @DisplayName("Should throw exception when draw contains winner number team")
     void shouldThrowExceptionWhenDrawHasWinnerNumber() {
         Session session = new Session();
 
         Team t1 = createTeam(1, 4);
         Team t2 = createTeam(2, 4);
 
-        session.setTeams(new ArrayList<>(List.of(t1, t2)));
+        session.setTeams(List.of(t1, t2));
 
         session.initializeSession();
 
-        when(sessionRepository.findById(sessionId)).thenReturn(Optional.of(session));
+        when(sessionRepository.findById(sessionId))
+                .thenReturn(Optional.of(session));
 
         assertThrows(
                 ValidationException.class,

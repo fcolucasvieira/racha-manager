@@ -29,7 +29,6 @@ public class SessionControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // helper (criação de sessão)
     private String createSessionAndReturnId() throws Exception {
         MvcResult sessionResult = mockMvc.perform(
                 post("/sessions")
@@ -45,7 +44,6 @@ public class SessionControllerTest {
         return sessionId;
     }
 
-    // helper (criação de jogador)
     private String createPlayerAndReturnId(String name) throws Exception {
         MvcResult playerResult = mockMvc.perform(
                 post("/players")
@@ -116,7 +114,7 @@ public class SessionControllerTest {
         )
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Session not found: " + randomSessionId))
+                .andExpect(jsonPath("$.message").value("Session not found with Id: " + randomSessionId))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
 
@@ -175,7 +173,7 @@ public class SessionControllerTest {
         )
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Session not found: " + randomSessionId))
+                .andExpect(jsonPath("$.message").value("Session not found with Id: " + randomSessionId))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
 
@@ -192,7 +190,7 @@ public class SessionControllerTest {
         )
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Player not found: " + randomPlayerId))
+                .andExpect(jsonPath("$.message").value("Player not found with Id: " + randomPlayerId))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
 
@@ -241,7 +239,7 @@ public class SessionControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message")
-                        .value("Player is not in a team"))
+                        .value("Player not found with Id: " + playerId))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
 
@@ -258,7 +256,7 @@ public class SessionControllerTest {
         )
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Session not found: " + randomSessionId))
+                .andExpect(jsonPath("$.message").value("Session not found with Id: " + randomSessionId))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
 
@@ -278,7 +276,7 @@ public class SessionControllerTest {
         )
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Player is not in a team"))
+                .andExpect(jsonPath("$.message").value("Player not found with Id: " + randomPlayerId))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
 
@@ -298,7 +296,7 @@ public class SessionControllerTest {
         )
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Session not found: " + randomSessionId))
+                .andExpect(jsonPath("$.message").value("Session not found with Id: " + randomSessionId))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
 

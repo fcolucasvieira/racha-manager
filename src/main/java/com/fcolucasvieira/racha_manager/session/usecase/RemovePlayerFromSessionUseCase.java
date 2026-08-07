@@ -29,6 +29,8 @@ public class RemovePlayerFromSessionUseCase {
 
         Team team = session.findPlayerTeam(playerId);
 
+        // TODO: Ajustar o comportamento de remoção de jogador da sessão em etapa única (Ajustar log também)
+        // remove de active players
         session.removePlayer(playerId);
 
         log.info(
@@ -41,6 +43,7 @@ public class RemovePlayerFromSessionUseCase {
         // remove do time
         team.removePlayerById(playerId);
 
+        // Não seria útil usar o session.removeEmptyTeams() ?
         // dissolve time se vazio
         if(!team.hasPlayers()) {
             session.removeTeam(team);

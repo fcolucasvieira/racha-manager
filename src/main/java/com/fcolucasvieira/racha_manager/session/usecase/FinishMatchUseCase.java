@@ -26,6 +26,8 @@ public class FinishMatchUseCase {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NotFoundException("Session not found with Id: "  + sessionId));
 
+        // Validação duplicada?
+        // Em matchFlowService.finish<Winner/Draw>, há uma validação semelhante, diferenciando apenas pela mensagem
         if (!session.hasStarted())
             throw new ConflictException("Session has not started");
 

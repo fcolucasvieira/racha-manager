@@ -94,7 +94,7 @@ class MatchFlowServiceTest {
         assertEquals(1, currentMatch.getTeamA().getNumber());
         assertEquals(2, currentMatch.getTeamB().getNumber());
 
-        assertTrue(session.getWaitingTeams().isEmpty());
+        assertTrue(session.getWaitingQueue().isEmpty());
 
         assertTrue(t1.isPlayed());
         assertTrue(t2.isPlayed());
@@ -155,10 +155,12 @@ class MatchFlowServiceTest {
         assertEquals(3, session.getCurrentMatch().getTeamA().getNumber());
         assertEquals(4, session.getCurrentMatch().getTeamB().getNumber());
 
-        assertEquals(2, session.getWaitingTeams().size());
+        WaitingQueue waitingQueue = session.getWaitingQueue();
 
-        assertEquals(1, session.getWaitingTeams().get(0).getNumber());
-        assertEquals(2, session.getWaitingTeams().get(1).getNumber());
+        assertEquals(2, waitingQueue.teams().size());
+
+        assertEquals(1, waitingQueue.teams().get(0).getNumber());
+        assertEquals(2, waitingQueue.teams().get(1).getNumber());
 
         assertTrue(t1.isPlayed());
         assertTrue(t2.isPlayed());
