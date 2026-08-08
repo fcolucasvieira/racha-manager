@@ -156,7 +156,7 @@ public class SessionControllerTest {
         )
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Player already in session"))
+                .andExpect(jsonPath("$.message").value("Player already in session with Id: " + playerId))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
 

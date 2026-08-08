@@ -10,7 +10,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,6 +34,7 @@ class InitialTeamsBalancerServiceTest {
     }
 
     @Test
+    @DisplayName("Should create and balance the initial teams")
     void shouldBalanceInitialTeams() {
         Session session = new Session();
 
@@ -44,11 +47,14 @@ class InitialTeamsBalancerServiceTest {
         assertEquals(1, teams.get(0).getNumber());
         assertEquals(2, teams.get(1).getNumber());
 
-        assertEquals(TEAM_SIZE, teams.get(0).getPlayers().size());
-        assertEquals(TEAM_SIZE, teams.get(1).getPlayers().size());
+        assertTrue(teams.get(0).isFull());
+        assertTrue(teams.get(1).isFull());
+
+        assertEquals(TEAM_SIZE, teams.get(0).getPlayersCount());
+        assertEquals(TEAM_SIZE, teams.get(1).getPlayersCount());
 
         int totalPlayers = teams.stream()
-                .mapToInt(t -> t.getPlayers().size())
+                .mapToInt(Team::getPlayersCount)
                 .sum();
 
         assertEquals(INITIAL_PLAYERS, totalPlayers);
@@ -57,6 +63,7 @@ class InitialTeamsBalancerServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when session is null")
     void shouldThrowExceptionWhenSessionIsNull() {
         assertThrows(
                 ValidationException.class,
@@ -65,6 +72,7 @@ class InitialTeamsBalancerServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when session was already shuffled")
     void shouldThrowExceptionWhenSessionAlreadyShuffled(){
         Session session = new Session();
 
@@ -77,8 +85,8 @@ class InitialTeamsBalancerServiceTest {
     }
 
     @Test
-    @DisplayName("Session less than quantity initial players")
-    void shouldThrowExceptionWhenSessionHasLessThanInitialPlayers(){
+    @DisplayName("Should throw exception when session has fewer than initial players")
+    void shouldThrowExceptionWhenSessionHasFewerThanInitialPlayers(){
         Session session = new Session();
 
         addPlayers(session, INITIAL_PLAYERS - 1);
@@ -89,7 +97,7 @@ class InitialTeamsBalancerServiceTest {
     }
 
     @Test
-    @DisplayName("Session more than quantity initial players")
+    @DisplayName("Should throw exception when session has more than initial players")
     void shouldThrowExceptionWhenSessionHasMoreThanInitialPlayers(){
         Session session = new Session();
 
@@ -101,7 +109,7 @@ class InitialTeamsBalancerServiceTest {
     }
 
     @Test
-    @DisplayName("Session already contains teams")
+    @DisplayName("Should throw exception when session already contains teams")
     void shouldThrowExceptionWhenTeamsAlreadyExist() {
         Session session = new Session();
 

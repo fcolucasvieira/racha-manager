@@ -7,6 +7,7 @@ import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
 import com.fcolucasvieira.racha_manager.session.model.WaitingQueue;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,7 +31,6 @@ class MatchFlowServiceTest {
     @InjectMocks
     private MatchFlowService matchFlowService;
 
-    // helper (criação de times)
     private Team createTeam(int number, int countPlayers) {
         Team team = new Team(number);
 
@@ -43,15 +43,16 @@ class MatchFlowServiceTest {
     }
 
     @Test
+    @DisplayName("Should finish match with winner when teams are waiting")
     void shouldFinishMatchWithWinnerSuccessfullyWithTeamsInQueue() {
         Session session = new Session();
 
-        Team t1 = createTeam(1, 4);
-        Team t2 = createTeam(2, 4);
-        Team t3 = createTeam(3, 2);
+        Team teamA = createTeam(1, 4);
+        Team teamB = createTeam(2, 4);
+        Team waitingTeam = createTeam(3, 2);
 
         session.setTeams(
-                List.of(t1, t2, t3)
+                new ArrayList<>(List.of(teamA, teamB, waitingTeam))
         );
 
         session.initializeSession();
@@ -65,24 +66,25 @@ class MatchFlowServiceTest {
 
         WaitingQueue waitingQueue = session.getWaitingQueue();
 
-        assertEquals(1, waitingQueue.getTeams().size());
-        assertEquals(2, waitingQueue.getTeams().getFirst().getNumber());
+        assertEquals(1, waitingQueue.teams().size());
+        assertEquals(2, waitingQueue.teams().getFirst().getNumber());
 
-        assertTrue(t1.isPlayed());
-        assertTrue(t2.isPlayed());
+        assertTrue(teamA.isPlayed());
+        assertTrue(teamB.isPlayed());
 
-        verify(teamCompletionService).complete(t3, waitingQueue);
+        verify(teamCompletionService).complete(waitingTeam, waitingQueue);
     }
 
     @Test
+    @DisplayName("Should finish match with winner when waiting queue is empty")
     void shouldFinishMatchWithWinnerSuccessfullyWithoutTeamsInQueue() {
         Session session = new Session();
 
-        Team t1 = createTeam(1, 4);
-        Team t2 = createTeam(2, 4);
+        Team teamA = createTeam(1, 4);
+        Team teamB = createTeam(2, 4);
 
         session.setTeams(
-                List.of(t1, t2)
+                new ArrayList<>(List.of(teamA, teamB))
         );
 
         session.initializeSession();
@@ -96,14 +98,15 @@ class MatchFlowServiceTest {
 
         assertTrue(session.getWaitingQueue().isEmpty());
 
-        assertTrue(t1.isPlayed());
-        assertTrue(t2.isPlayed());
+        assertTrue(teamA.isPlayed());
+        assertTrue(teamB.isPlayed());
 
         verify(teamCompletionService, never()).complete(any(), any());
 
     }
 
     @Test
+    @DisplayName("Should throw exception when session has no match in progress")
     void shouldThrowExceptionWhenNoMatchInProgress() {
         Session session = new Session();
 
@@ -114,16 +117,16 @@ class MatchFlowServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when winner team number is invalid")
     void shouldThrowExceptionWhenWinnerIsInvalid() {
         Session session = new Session();
 
-        Team t1 = createTeam(1, 4);
-        Team t2 = createTeam(2, 4);
+        Team teamA = createTeam(1, 4);
+        Team teamB = createTeam(2, 4);
 
-        List<Team> teams =
-                new ArrayList<>(List.of(t1, t2));
-
-        session.setTeams(teams);
+        session.setTeams(
+                new ArrayList<>(List.of(teamA, teamB))
+        );
 
         session.initializeSession();
 
@@ -131,29 +134,35 @@ class MatchFlowServiceTest {
                 ValidationException.class,
                 () -> matchFlowService.finishWithWinner(session, 3)
         );
+
+        assertFalse(teamA.isPlayed());
+        assertFalse(teamB.isPlayed());
+
+        verify(teamCompletionService, never()) .complete(any(), any());
     }
 
     @Test
+    @DisplayName("Should finish match with draw successfully")
     void shouldFinishMatchWithDrawSuccessfully() {
         Session session = new Session();
 
-        Team t1 = createTeam(1, 4);
-        Team t2 = createTeam(2, 4);
-        Team t3 = createTeam(3, 4);
-        Team t4 = createTeam(4, 4);
+        Team teamA = createTeam(1, 4);
+        Team teamB = createTeam(2, 4);
+        Team waitingTeamA = createTeam(3, 4);
+        Team waitingTeamB = createTeam(4, 4);
 
         session.setTeams(
-                new ArrayList<>(List.of(t1, t2, t3, t4))
+                new ArrayList<>(List.of(teamA, teamB, waitingTeamA, waitingTeamB))
         );
 
-        // currentMatch -> t1 vs t2
-        // queue -> [t3, t4]
         session.initializeSession();
 
         matchFlowService.finishWithDraw(session);
 
-        assertEquals(3, session.getCurrentMatch().getTeamA().getNumber());
-        assertEquals(4, session.getCurrentMatch().getTeamB().getNumber());
+        Match currentMatch = session.getCurrentMatch();
+
+        assertEquals(3, currentMatch.getTeamA().getNumber());
+        assertEquals(4, currentMatch.getTeamB().getNumber());
 
         WaitingQueue waitingQueue = session.getWaitingQueue();
 
@@ -162,25 +171,27 @@ class MatchFlowServiceTest {
         assertEquals(1, waitingQueue.teams().get(0).getNumber());
         assertEquals(2, waitingQueue.teams().get(1).getNumber());
 
-        assertTrue(t1.isPlayed());
-        assertTrue(t2.isPlayed());
+        assertTrue(teamA.isPlayed());
+        assertTrue(teamB.isPlayed());
+
+        verify(teamCompletionService) .complete(waitingTeamA, waitingQueue);
+        verify(teamCompletionService) .complete(waitingTeamB, waitingQueue);
     }
 
     @Test
+    @DisplayName("Should throw exception when queue has insufficient players for draw")
     void shouldThrowExceptionWhenQueueHasInsufficientPlayersForDraw() {
         Session session = new Session();
 
-        Team t1 = createTeam(1, 4);
-        Team t2 = createTeam(2, 4);
-        Team t3 = createTeam(3, 4);
-        Team t4 = createTeam(4, 2);
+        Team teamA = createTeam(1, 4);
+        Team teamB = createTeam(2, 4);
+        Team waitingTeamA = createTeam(3, 4);
+        Team waitingTeamB = createTeam(4, 2);
 
         session.setTeams(
-                new ArrayList<>(List.of(t1, t2, t3, t4))
+                new ArrayList<>(List.of(teamA, teamB, waitingTeamA, waitingTeamB))
         );
 
-        // currentMatch -> t1 vs t2
-        // queue -> [t3, t4]
         session.initializeSession();
 
         assertThrows(

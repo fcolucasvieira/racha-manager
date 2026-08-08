@@ -30,15 +30,9 @@ public class InitialTeamsBalancerService {
 
         Collections.shuffle(players);
 
-        Team t1 = new Team(1);
-        Team t2 = new Team(2);
+        List<Team> teams = createTeams();
 
-        List<Team> teams = new ArrayList<>(List.of(t1, t2));
-
-        for(int i = 0; i < INITIAL_PLAYERS; i++) {
-            teams.get(i / TEAM_SIZE)
-                    .addPlayer(players.get(i));
-        }
+        distributePlayers(players, teams);
 
         session.markAsShuffled();
 
@@ -52,6 +46,22 @@ public class InitialTeamsBalancerService {
         return teams;
     }
 
+    private List<Team> createTeams() {
+        Team teamA = new Team(1);
+        Team teamB = new Team(2);
+
+        return new ArrayList<>(
+                List.of(teamA, teamB)
+        );
+    }
+
+    private void distributePlayers(List<Player> players, List<Team> teams) {
+        for(int i = 0; i < INITIAL_PLAYERS; i++) {
+            Team team = teams.get(i / TEAM_SIZE);
+            team.addPlayer(players.get(i));
+        }
+    }
+
     private void validateInitialShuffle(Session session) {
         if (session == null)
             throw new ValidationException("Session can't be null");
@@ -62,9 +72,7 @@ public class InitialTeamsBalancerService {
         if (session.getActivePlayers().size() != INITIAL_PLAYERS)
             throw new ConflictException("Initial balance requires exactly " + INITIAL_PLAYERS + " players");
 
-        // Validação desnecessária (session.getTeams() != null)
-        // Se a lista de times não estiver vazia -> a lista de times não é nula
-        if (session.getTeams() != null && !session.getTeams().isEmpty())
+        if (!session.getTeams().isEmpty())
             throw new ConflictException("Session already contains teams");
     }
 }

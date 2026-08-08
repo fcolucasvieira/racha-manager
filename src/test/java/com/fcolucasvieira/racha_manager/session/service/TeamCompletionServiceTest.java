@@ -4,6 +4,7 @@ import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Team;
 import com.fcolucasvieira.racha_manager.session.model.WaitingQueue;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -29,6 +30,7 @@ class TeamCompletionServiceTest {
     }
 
     @Test
+    @DisplayName("Should transfer players until target team is full")
     void shouldTransferPlayersUntilTargetIsFull() {
         Team target = createTeam(1, 1);
         Team donor = createTeam(2, 4);
@@ -40,10 +42,11 @@ class TeamCompletionServiceTest {
         teamCompletionService.complete(target, queue);
 
         assertTrue(target.isFull());
-        assertEquals(1, donor.getPlayers().size());
+        assertEquals(1, donor.getPlayersCount());
     }
 
     @Test
+    @DisplayName("Should stop transferring when target team becomes full")
     void shouldStopTransferringWhenTargetIsFullEvenIfDonorHasPlayers() {
         Team target = createTeam(1, 3);
         Team donor = createTeam(2, 4);
@@ -59,6 +62,7 @@ class TeamCompletionServiceTest {
     }
 
     @Test
+    @DisplayName("Should transfer players from multiple donos teams when necessary")
     void shouldHandleMultipleDonors() {
         Team target = createTeam(1, 1);
         Team donor1 = createTeam(2, 2);
@@ -71,14 +75,17 @@ class TeamCompletionServiceTest {
         teamCompletionService.complete(target, queue);
 
         assertTrue(target.isFull());
+
         assertFalse(donor1.hasPlayers());
-        assertEquals(2, donor2.getPlayersCount());  // ainda sobram
+
+        assertEquals(2, donor2.getPlayersCount());
     }
 
     @Test
+    @DisplayName("Should keep target team incomplete when donors have no players")
     void shouldNotBreakWhenDonorHasNoPlayers() {
-        Team target = createTeam(99, 2);
-        Team donor = createTeam(1, 0); // vazio
+        Team target = createTeam(1, 2);
+        Team donor = createTeam(2, 0);
 
         WaitingQueue queue = new WaitingQueue(List.of(donor));
 
