@@ -53,6 +53,8 @@ public class MatchFlowService {
         session.setCurrentMatch(
                 new Match(winner, next)
         );
+
+        session.removeEmptyTeams();
     }
 
     public void finishWithDraw(Session session) {
