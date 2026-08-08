@@ -55,9 +55,8 @@ public class Session {
         boolean alreadyExists = activePlayers.stream()
                 .anyMatch(p-> p.getId().equals(player.getId()));
 
-        if (alreadyExists) {
-            throw new ConflictException("Player already in session");
-        }
+        if (alreadyExists)
+            throw new ConflictException("Player already in session with Id: " + player.getId());
     }
 
     public void removePlayer(UUID playerId) {
@@ -68,7 +67,7 @@ public class Session {
                 .removeIf(p -> p.getId().equals(playerId));
 
         if(!removed){
-            throw new NotFoundException("Player not found in session");
+            throw new NotFoundException("Player not found with Id: " + playerId);
         }
     }
 

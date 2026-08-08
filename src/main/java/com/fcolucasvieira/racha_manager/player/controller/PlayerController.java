@@ -63,7 +63,7 @@ public class PlayerController {
     )
     @GetMapping
     public ResponseEntity<ApiResponse<Page<PlayerDTO>>> getAll(
-            @PageableDefault(page = 0, size = 20)
+            @PageableDefault(page = 0, size = 16)
             @ParameterObject Pageable pageable) {
         var response = getAllUseCase.execute(pageable)
                 .map(player ->

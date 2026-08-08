@@ -33,7 +33,7 @@ public class InitialTeamsBalancerService {
         Team t1 = new Team(1);
         Team t2 = new Team(2);
 
-        List<Team> teams = List.of(t1, t2);
+        List<Team> teams = new ArrayList<>(List.of(t1, t2));
 
         for(int i = 0; i < INITIAL_PLAYERS; i++) {
             teams.get(i / TEAM_SIZE)
@@ -54,7 +54,7 @@ public class InitialTeamsBalancerService {
 
     private void validateInitialShuffle(Session session) {
         if (session == null)
-            throw new ValidationException("Session cannot be null");
+            throw new ValidationException("Session can't be null");
 
         if (session.isShuffled())
             throw new ConflictException("Initial shuffle already performed");
