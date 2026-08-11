@@ -42,7 +42,7 @@ class TeamCompletionServiceTest {
         teamCompletionService.complete(target, queue);
 
         assertTrue(target.isFull());
-        assertEquals(1, donor.getPlayersCount());
+        assertEquals(1, donor.playersCount());
     }
 
     @Test
@@ -58,7 +58,7 @@ class TeamCompletionServiceTest {
         teamCompletionService.complete(target, queue);
 
         assertTrue(target.isFull());
-        assertEquals(3, donor.getPlayersCount());
+        assertEquals(3, donor.playersCount());
     }
 
     @Test
@@ -78,7 +78,7 @@ class TeamCompletionServiceTest {
 
         assertFalse(donor1.hasPlayers());
 
-        assertEquals(2, donor2.getPlayersCount());
+        assertEquals(2, donor2.playersCount());
     }
 
     @Test

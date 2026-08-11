@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITIAL_PLAYERS;
-import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITIAL_TEAMS;
+import static com.fcolucasvieira.racha_manager.session.rules.RachaRules.INITIAL_PLAYERS;
+import static com.fcolucasvieira.racha_manager.session.rules.RachaRules.INITIAL_TEAMS;
 
 @Getter // Anotação -> Getters necessários
 public class Session {

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MatchFlowService {
     // Por que MatchFlowService conhece TeamCompletionService?
-    // MatchFlowService (Delegar APENAS o encerramento de partidas)
+    // MatchFlowService -> delegar apenas o encerramento de partidas
     private final TeamCompletionService teamCompletionService;
 
     public void finishWithWinner(Session session, int winnerTeamNumber) {
@@ -100,6 +100,6 @@ public class MatchFlowService {
                 tB.getNumber() != winnerTeamNumber;
 
         if(invalidNumber)
-            throw new ValidationException("Invalid winner team number");
+            throw new ValidationException("Invalid winner team number: " + winnerTeamNumber);
     }
 }

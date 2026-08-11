@@ -60,8 +60,8 @@ public class RemovePlayerFromSessionUseCase {
 
         log.info("[CURRENT_MATCH_TEAMS_COMPLETED] sessionId={} teamAPlayers={} teamBPlayers={}",
                 session.getId(),
-                teamA.getPlayersCount(),
-                teamB.getPlayersCount()
+                teamA.playersCount(),
+                teamB.playersCount()
         );
 
         session.removeEmptyTeams();

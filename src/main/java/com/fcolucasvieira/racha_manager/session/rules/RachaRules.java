@@ -1,4 +1,4 @@
-package com.fcolucasvieira.racha_manager.session.constant;
+package com.fcolucasvieira.racha_manager.session.rules;
 
 public final class RachaRules {
     public static final int TEAM_SIZE = 4;

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.UUID;
 
-import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.*;
+import static com.fcolucasvieira.racha_manager.session.rules.RachaRules.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InitialTeamsBalancerServiceTest {
@@ -48,11 +48,11 @@ class InitialTeamsBalancerServiceTest {
         assertTrue(teams.get(0).isFull());
         assertTrue(teams.get(1).isFull());
 
-        assertEquals(TEAM_SIZE, teams.get(0).getPlayersCount());
-        assertEquals(TEAM_SIZE, teams.get(1).getPlayersCount());
+        assertEquals(TEAM_SIZE, teams.get(0).playersCount());
+        assertEquals(TEAM_SIZE, teams.get(1).playersCount());
 
         int totalPlayers = teams.stream()
-                .mapToInt(Team::getPlayersCount)
+                .mapToInt(Team::playersCount)
                 .sum();
 
         assertEquals(INITIAL_PLAYERS, totalPlayers);

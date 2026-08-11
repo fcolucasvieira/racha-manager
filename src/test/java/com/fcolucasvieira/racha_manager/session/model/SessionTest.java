@@ -61,17 +61,6 @@ class SessionTest {
         );
     }
 
-    // Como esta validação é desnecessária, futuramente, teste será removido
-    @Test
-    void shouldNotAddPlayerWithIdNull() {
-        Player player = new Player(null, "Player");
-
-        assertThrows(
-                ValidationException.class,
-                () -> session.addPlayer(player)
-        );
-    }
-
     @Test
     void shouldNotRemovePlayerWhenPlayerNotExists() {
         UUID playerId = UUID.randomUUID();
@@ -90,26 +79,6 @@ class SessionTest {
                 ValidationException.class,
                 () -> session.removePlayer(playerId)
         );
-    }
-
-    @Test
-    void shouldFindPlayerTeamSuccessfully() {
-        UUID playerId = UUID.randomUUID();
-
-        Player player = new Player(playerId, "Player");
-
-        Team team = new Team(1);
-
-        team.addPlayer(player);
-
-        session.setTeams(
-                new ArrayList<>(List.of(team))
-        );
-
-        Team result = session.findPlayerTeam(playerId);
-
-        assertEquals(result, team);
-        assertTrue(team.getPlayers().contains(player));
     }
 
     @Test

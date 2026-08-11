@@ -3,13 +3,11 @@ package com.fcolucasvieira.racha_manager.session.model;
 import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
-import com.fcolucasvieira.racha_manager.session.constant.RachaRules;
-import lombok.Getter;
+import com.fcolucasvieira.racha_manager.session.rules.RachaRules;
 
 import java.util.LinkedList;
 import java.util.List;
 
-@Getter
 public class WaitingQueue {
     // Uso de LinkedList (complexidade O(1)) em inserções/remoções
     // em ínicio, meio e fim da fila
@@ -53,13 +51,12 @@ public class WaitingQueue {
             throw new ValidationException("Team can't be null");
 
         if(!teams.remove(team))
-            throw new NotFoundException("Team not found in queue");
+            throw new NotFoundException("Team not found in waiting queue with Number: " + team.getNumber());
     }
 
     public Team poll() {
         if(teams.isEmpty())
-            throw new ValidationException("Teams in queue can't be empty");
-
+            throw new ValidationException("Teams in waiting queue can't be empty");
 
         return teams.removeFirst();
     }
@@ -70,7 +67,7 @@ public class WaitingQueue {
 
     public int playersCount() {
         return teams.stream()
-                .mapToInt(t -> t.getPlayers().size())
+                .mapToInt(Team::playersCount)
                 .sum();
     }
 

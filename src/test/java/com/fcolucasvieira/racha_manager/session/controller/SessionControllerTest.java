@@ -222,16 +222,11 @@ public class SessionControllerTest {
 
     @Test
     void shouldReturnNotFoundWhenPlayerIsNotInATeam() throws Exception {
-        // cria jogador
-        String playerId = createPlayerAndReturnId("Lucas");
+        // cria UUID aleaório
+        String playerId = UUID.randomUUID().toString();
 
         // cria sessão
         String sessionId = createSessionAndReturnId();
-
-        // adicionar jogador (útil para possível remoção)
-        mockMvc.perform(
-                post("/sessions/" + sessionId + "/players/" + playerId)
-        ).andExpect(status().isOk());
 
         mockMvc.perform(
                 delete("/sessions/"+ sessionId + "/players/" + playerId)

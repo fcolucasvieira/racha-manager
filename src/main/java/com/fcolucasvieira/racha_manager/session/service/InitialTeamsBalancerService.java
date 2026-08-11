@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITIAL_PLAYERS;
-import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.TEAM_SIZE;
+import static com.fcolucasvieira.racha_manager.session.rules.RachaRules.INITIAL_PLAYERS;
+import static com.fcolucasvieira.racha_manager.session.rules.RachaRules.TEAM_SIZE;
 
 // (Futuro) Generalizar algoritmo para N times e M jogadores por time
 @Service
@@ -67,7 +67,7 @@ public class InitialTeamsBalancerService {
             throw new ValidationException("Session can't be null");
 
         if (session.isInitialTeamsCreated())
-            throw new ConflictException("Initial shuffle already performed");
+            throw new ConflictException("Initial teams already created");
 
         if (session.getActivePlayers().size() != INITIAL_PLAYERS)
             throw new ConflictException("Initial balance requires exactly " + INITIAL_PLAYERS + " players");

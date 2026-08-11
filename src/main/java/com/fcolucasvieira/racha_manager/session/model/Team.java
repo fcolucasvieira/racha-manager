@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.TEAM_SIZE;
+import static com.fcolucasvieira.racha_manager.session.rules.RachaRules.TEAM_SIZE;
 
 @Getter
 public class Team {
@@ -67,6 +67,10 @@ public class Team {
                 .anyMatch(p -> p.getId().equals(playerId));
     }
 
+    public void markAsPlayed() {
+        this.played = true;
+    }
+
     public boolean isFull() {
         return players.size() == TEAM_SIZE;
     }
@@ -79,12 +83,8 @@ public class Team {
         return !players.isEmpty();
     }
 
-    public int getPlayersCount() {
+    public int playersCount() {
         return players.size();
-    }
-
-    public void markAsPlayed() {
-        this.played = true;
     }
 
     @Override
