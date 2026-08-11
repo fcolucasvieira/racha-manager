@@ -20,7 +20,7 @@ public class Team {
 
     public Team(int number) {
         if(number <= 0)
-            throw new ValidationException("Team number must be more then 0");
+            throw new ValidationException("Team number must be greater than 0");
 
         this.number = number;
         this.players = new ArrayList<>();
@@ -28,7 +28,14 @@ public class Team {
     }
 
     public void addPlayer(Player player) {
-        validatePlayerForAddition(player);
+        if(player == null)
+            throw new ValidationException("Player can't be null");
+
+        boolean alreadyExists = players.stream()
+                .anyMatch(p -> p.getId().equals(player.getId()));
+
+        if (alreadyExists)
+            throw new ConflictException("Player already in team");
 
         players.add(player);
     }
@@ -37,35 +44,19 @@ public class Team {
         if (players.isEmpty())
             throw new ConflictException("Team has no players");
 
-
         return players.removeFirst();
     }
 
-    // Remover através de Player ou playerId? Player! (Domínio trabalha c/ objetos)
+    // Ajustar remoção por objeto
     public void removePlayerById(UUID playerId) {
-        if (playerId == null) {
-            throw new ValidationException("Player ID cannot be null");
-        }
+        if (playerId == null)
+            throw new ValidationException("Player I can't be null");
 
-        boolean removed = players.removeIf(p -> p.getId().equals(playerId));
+        boolean removed = players
+                .removeIf(p -> p.getId().equals(playerId));
 
-        if (!removed) {
-            throw new NotFoundException("Player not found in team");
-        }
-    }
-
-    // Duplicação da validação presente em Session
-    // Invariante repetida: um jogador não entra duas vezes no time
-    private void validatePlayerForAddition(Player player) {
-        // Retirar (player.getId() == null) (Construtor SEMPRE inicializa este atributo)
-        if(player == null || player.getId() == null)
-            throw new ValidationException("Player or player ID cannot be null");
-
-        boolean alreadyExists = players.stream()
-                .anyMatch(p -> p.getId().equals(player.getId()));
-
-        if (alreadyExists)
-            throw new ConflictException("Player already in team");
+        if (!removed)
+            throw new NotFoundException("Player not found in team with Id: " + playerId);
     }
 
     public boolean containsPlayer(UUID playerId) {

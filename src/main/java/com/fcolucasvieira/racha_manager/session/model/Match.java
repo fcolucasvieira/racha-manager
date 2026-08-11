@@ -4,7 +4,6 @@ import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import lombok.Getter;
 
-// (Futuro) Match deverá conhecer resultado da partida
 @Getter
 public class Match {
     private final Team teamA;
@@ -29,9 +28,5 @@ public class Match {
         if (winner.equals(teamB)) return teamA;
 
         throw new ValidationException("Winner is not part of this match");
-    }
-
-    public boolean contains(Team team) {
-        return teamA.equals(team) || teamB.equals(team);
     }
 }
