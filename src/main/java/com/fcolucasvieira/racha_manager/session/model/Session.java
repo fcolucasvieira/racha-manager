@@ -135,10 +135,9 @@ public class Session {
                 && !isInitialTeamsCreated();
     }
 
-    public void setCurrentMatch(Match match) {
-        if(match == null) {
-            throw new ValidationException("Match cannot be null");
-        }
+    public void startNextMatch(Match match) {
+        if(match == null)
+            throw new ValidationException("Match can't be null");
 
         this.currentMatch = match;
     }

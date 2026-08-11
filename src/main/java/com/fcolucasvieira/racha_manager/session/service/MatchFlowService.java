@@ -1,7 +1,6 @@
 package com.fcolucasvieira.racha_manager.session.service;
 
 import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
-import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.session.model.Match;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
@@ -21,15 +20,7 @@ public class MatchFlowService {
 
         Match currentMatch = session.getCurrentMatch();
 
-        Team teamA = currentMatch.getTeamA();
-        Team teamB = currentMatch.getTeamB();
-
-        validateWinnerNumber(teamA, teamB, winnerTeamNumber);
-
-        Team winner = teamA.getNumber() == winnerTeamNumber
-                ? teamA
-                : teamB;
-
+        Team winner = currentMatch.getWinner(winnerTeamNumber);
         Team loser = currentMatch.getLoser(winner);
 
         winner.markAsPlayed();
@@ -38,10 +29,9 @@ public class MatchFlowService {
         WaitingQueue waitingQueue = session.getWaitingQueue();
 
         if(waitingQueue.isEmpty()) {
-            session.setCurrentMatch(
+            session.startNextMatch(
                     new Match(winner, loser)
             );
-
             return;
         }
 
@@ -50,7 +40,7 @@ public class MatchFlowService {
         Team next = waitingQueue.poll();
         teamCompletionService.complete(next, waitingQueue);
 
-        session.setCurrentMatch(
+        session.startNextMatch(
                 new Match(winner, next)
         );
 
@@ -63,7 +53,7 @@ public class MatchFlowService {
         WaitingQueue waitingQueue = session.getWaitingQueue();
 
         if(!waitingQueue.hasEnoughForDraw())
-            throw new ConflictException("Cannot finish draw without enough players waiting");
+            throw new ConflictException("Can't finish draw without enough players waiting");
 
         Match currentMatch = session.getCurrentMatch();
 
@@ -82,7 +72,7 @@ public class MatchFlowService {
         Team nextTeamB = waitingQueue.poll();
         teamCompletionService.complete(nextTeamB, waitingQueue);
 
-        session.setCurrentMatch(
+        session.startNextMatch(
                 new Match(nextTeamA, nextTeamB)
         );
 
@@ -92,14 +82,5 @@ public class MatchFlowService {
     private void validateSessionState(Session session) {
         if(!session.hasStarted())
             throw new ConflictException("No match in progress");
-    }
-
-    private void validateWinnerNumber(Team tA, Team tB, int winnerTeamNumber) {
-        boolean invalidNumber =
-                tA.getNumber() != winnerTeamNumber &&
-                tB.getNumber() != winnerTeamNumber;
-
-        if(invalidNumber)
-            throw new ValidationException("Invalid winner team number: " + winnerTeamNumber);
     }
 }

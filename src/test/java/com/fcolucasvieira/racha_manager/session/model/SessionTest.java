@@ -118,12 +118,12 @@ class SessionTest {
     }
 
     @Test
-    void shouldNotSetCurrentMatchWhenMatchBeNull() {
+    void shouldNotStartNextMatchWhenMatchBeNull() {
         Match match = null;
 
         assertThrows(
                 ValidationException.class,
-                () -> session.setCurrentMatch(match)
+                () -> session.startNextMatch(match)
         );
     }
 

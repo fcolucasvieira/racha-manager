@@ -20,6 +20,16 @@ public class Match {
         this.teamB = teamB;
     }
 
+    public Team getWinner(int winnerTeamNumber) {
+        if(teamA.getNumber() == winnerTeamNumber)
+            return teamA;
+
+        if(teamB.getNumber() == winnerTeamNumber)
+            return teamB;
+
+        throw new ValidationException("Invalid winner team number: " + winnerTeamNumber);
+    }
+
     public Team getLoser(Team winner) {
         if(winner == null)
             throw new ValidationException("Winner can't be null");

@@ -12,9 +12,6 @@ public class TeamCompletionService {
     private static final Logger log = LoggerFactory.getLogger(TeamCompletionService.class);
 
     public void complete(Team target, WaitingQueue waitingQueue) {
-        // Validação em falta?
-        // (qtde. de jogadores em falta no time alvo > qtde. de jogadores da fila de espera)
-
         for (Team donor : waitingQueue.teams()) {
             while (target.isIncomplete() &&
                     donor.hasPlayers()) {
