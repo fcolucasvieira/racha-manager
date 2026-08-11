@@ -15,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -154,7 +153,7 @@ class AddPlayerToSessionUseCaseTest {
             session.addPlayer(createPlayer("P" + i));
         }
 
-        session.markAsShuffled();
+        session.markInitialTeamsAsCreated();
 
         Player p8 = new Player(playerId, "P8");
 

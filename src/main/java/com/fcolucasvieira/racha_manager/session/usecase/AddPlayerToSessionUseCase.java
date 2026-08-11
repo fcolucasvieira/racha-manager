@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
-import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITIAL_PLAYERS;
-
 @Service
 @RequiredArgsConstructor
 public class AddPlayerToSessionUseCase {
@@ -42,7 +40,7 @@ public class AddPlayerToSessionUseCase {
                 session.getActivePlayers().size()
         );
 
-        if (session.canStartInitialShuffle()) {
+        if (session.canCreateInitialTeams()) {
             List<Team> teams = initialTeamsBalancerService.createInitialTeams(session);
 
             session.setTeams(teams);

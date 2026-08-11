@@ -10,9 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -59,7 +57,7 @@ class InitialTeamsBalancerServiceTest {
 
         assertEquals(INITIAL_PLAYERS, totalPlayers);
 
-        assertTrue(session.isShuffled());
+        assertTrue(session.isInitialTeamsCreated());
     }
 
     @Test
@@ -76,7 +74,7 @@ class InitialTeamsBalancerServiceTest {
     void shouldThrowExceptionWhenSessionAlreadyShuffled(){
         Session session = new Session();
 
-        session.markAsShuffled();
+        session.markInitialTeamsAsCreated();
 
         assertThrows(
                 ConflictException.class,

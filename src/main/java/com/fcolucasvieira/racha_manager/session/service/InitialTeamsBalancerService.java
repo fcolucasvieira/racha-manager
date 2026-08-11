@@ -34,7 +34,7 @@ public class InitialTeamsBalancerService {
 
         distributePlayers(players, teams);
 
-        session.markAsShuffled();
+        session.markInitialTeamsAsCreated();
 
         log.info(
                 "[INITIAL_BALANCE_COMPLETED] sessionId={} teams={} players={}",
@@ -66,7 +66,7 @@ public class InitialTeamsBalancerService {
         if (session == null)
             throw new ValidationException("Session can't be null");
 
-        if (session.isShuffled())
+        if (session.isInitialTeamsCreated())
             throw new ConflictException("Initial shuffle already performed");
 
         if (session.getActivePlayers().size() != INITIAL_PLAYERS)

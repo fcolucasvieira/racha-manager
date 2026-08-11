@@ -68,6 +68,14 @@ public class Team {
             throw new ConflictException("Player already in team");
     }
 
+    public boolean containsPlayer(UUID playerId) {
+        if(playerId == null)
+            throw new ValidationException("Player Id can't be null");
+
+        return players.stream()
+                .anyMatch(p -> p.getId().equals(playerId));
+    }
+
     public boolean isFull() {
         return players.size() == TEAM_SIZE;
     }

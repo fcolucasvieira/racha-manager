@@ -13,32 +13,21 @@ import java.util.UUID;
 import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITIAL_PLAYERS;
 import static com.fcolucasvieira.racha_manager.session.constant.RachaRules.INITIAL_TEAMS;
 
-@Getter
+@Getter // Anotação -> Getters necessários
 public class Session {
     private final UUID id;
-
     private final List<Player> activePlayers;
-
     private List<Team> teams;
-
     private WaitingQueue waitingQueue;
-
     private Match currentMatch;
-
-    // Nome de atributo melhor? (trazer + clareza)
-    private boolean shuffled;
+    private boolean initialTeamsCreated;
 
     public Session() {
         this.id = UUID.randomUUID();
-
         this.activePlayers = new ArrayList<>();
-
-        // (Teams) Iniciar apenas quando houver da qtde. mínima de jogadores ativos p/ iniciar sessão?
         this.teams = new ArrayList<>();
-
         this.waitingQueue = null;
-
-        this.shuffled = false;
+        this.initialTeamsCreated = false;
     }
 
     public void addPlayer(Player player) {
@@ -46,11 +35,9 @@ public class Session {
         activePlayers.add(player);
     }
 
-    // Invariante repetida: um jogador não entra duas vezes na sessão
     private void validatePlayerForAddition(Player player) {
-        // Retirar (player.getId == null) (Construtor SEMPRE inicializa este atributo)
-        if(player == null || player.getId() == null)
-            throw new ValidationException("Player or player ID cannot be null");
+        if(player == null)
+            throw new ValidationException("Player can't be null");
 
         boolean alreadyExists = activePlayers.stream()
                 .anyMatch(p-> p.getId().equals(player.getId()));
@@ -61,19 +48,28 @@ public class Session {
 
     public void removePlayer(UUID playerId) {
         if (playerId == null)
-            throw new ValidationException("Player Id cannot be null");
+            throw new ValidationException("Player Id can't be null");
 
-        boolean removed = activePlayers
+        boolean activePlayersRemoved = activePlayers
                 .removeIf(p -> p.getId().equals(playerId));
 
-        if(!removed){
+        if(!activePlayersRemoved)
             throw new NotFoundException("Player not found with Id: " + playerId);
-        }
+
+        teams.stream()
+                .filter(t -> t.containsPlayer(playerId))
+                .findFirst()
+                .ifPresent(t -> {
+                    t.removePlayerById(playerId);
+
+                    if(!t.hasPlayers() && !isCurrentMatchTeam(t))
+                        removeTeam(t);
+                });
     }
 
     public Team findPlayerTeam(UUID playerId) {
         if(playerId == null)
-            throw new ValidationException("Player ID can't be null");
+            throw new ValidationException("Player Id can't be null");
 
         return teams.stream()
                 .filter(t -> t.getPlayers().stream()
@@ -85,24 +81,28 @@ public class Session {
                 );
     }
 
-    // Nome de atributo melhor? (trazer + clareza)
-    public void setTeams(List<Team> teams) {
-        if(teams == null){
-            throw new ValidationException("Teams cannot be null");
-        }
+    public List<Player> getActivePlayers() {
+        return List.copyOf(activePlayers);
+    }
 
-        this.teams = teams;
+    public List<Team> getTeams() {
+        return List.copyOf(teams);
+    }
+
+    public void setTeams(List<Team> teams) {
+        if(teams == null)
+            throw new ValidationException("Teams can't be null");
+
+        // Observar comportamento antes de finalizar Sprint
+        this.teams = new ArrayList<>(teams);
     }
 
     public void removeTeam(Team team) {
         if(team == null)
             throw new ValidationException("Team can't be null");
 
-        // Validação duplicada? (Se time estiver na partida atual, então a sessão já iniciou)
-        if(hasStarted() && isCurrentMatchTeam(team))
-            throw new ConflictException(
-                    "Team cannot be removed if the session has not started or is currently in a match"
-            );
+        if(isCurrentMatchTeam(team))
+            throw new ConflictException("Team cannot be removed while it is participating in the current match");
 
         teams.remove(team);
 
@@ -121,9 +121,19 @@ public class Session {
         }
     }
 
-    // Se currentMatch não é nulo -> waitingQueue não é nulo (Mantive pela leitura)
     public boolean hasStarted() {
-        return currentMatch != null && waitingQueue != null;
+        return currentMatch != null;
+    }
+
+    public boolean isPlayerInCurrentMatch(UUID playerId) {
+        if(playerId == null)
+            throw new ValidationException("Player Id can't be null");
+
+        if(!hasStarted())
+            return false;
+
+        return currentMatch.getTeamA().containsPlayer(playerId) ||
+                currentMatch.getTeamB().containsPlayer(playerId);
     }
 
     public boolean isCurrentMatchTeam(Team team) {
@@ -143,7 +153,7 @@ public class Session {
 
     public void initializeSession() {
         if (hasStarted())
-            throw new ConflictException("Session already started with current match and waiting queue");
+            throw new ConflictException("Session already initialized");
 
         if(teams.size() < INITIAL_TEAMS)
             throw new ConflictException("Not enough teams to start");
@@ -156,12 +166,12 @@ public class Session {
         this.currentMatch = new Match(t1, t2);
     }
 
-    public void markAsShuffled() {
-        this.shuffled = true;
+    public void markInitialTeamsAsCreated() {
+        this.initialTeamsCreated = true;
     }
 
-    public boolean canStartInitialShuffle() {
+    public boolean canCreateInitialTeams() {
         return activePlayers.size() == INITIAL_PLAYERS
-                && !isShuffled();
+                && !isInitialTeamsCreated();
     }
 }

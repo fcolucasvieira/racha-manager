@@ -215,10 +215,10 @@ class SessionTest {
 
     @Test
     void shouldMarkSessionAsShuffled() {
-        assertFalse(session.isShuffled());
+        assertFalse(session.isInitialTeamsCreated());
 
-        session.markAsShuffled();
+        session.markInitialTeamsAsCreated();
 
-        assertTrue(session.isShuffled());
+        assertTrue(session.isInitialTeamsCreated());
     }
 }

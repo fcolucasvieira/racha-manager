@@ -27,10 +27,9 @@ public class RemovePlayerFromSessionUseCase {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NotFoundException("Session not found with Id: " + sessionId));
 
-        Team team = session.findPlayerTeam(playerId);
+        boolean playerWasInCurrentMatch =
+                session.isPlayerInCurrentMatch(playerId);
 
-        // TODO: Ajustar o comportamento de remoção de jogador da sessão em etapa única (Ajustar log também)
-        // remove de active players
         session.removePlayer(playerId);
 
         log.info(
@@ -40,23 +39,7 @@ public class RemovePlayerFromSessionUseCase {
                 session.getActivePlayers().size()
         );
 
-        // remove do time
-        team.removePlayerById(playerId);
-
-        // Não seria útil usar o session.removeEmptyTeams() ?
-        // dissolve time se vazio
-        if(!team.hasPlayers()) {
-            session.removeTeam(team);
-
-            log.info(
-                    "[TEAM_DISSOLVED] sessionId={} teamNumber={}",
-                    sessionId,
-                    team.getNumber()
-            );
-        }
-
-        // reorganiza time em partida atual, caso jogador removido estivesse no time
-        if(session.isCurrentMatchTeam(team))
+        if(playerWasInCurrentMatch)
             completeCurrentMatchTeams(session);
 
         sessionRepository.save(session);
