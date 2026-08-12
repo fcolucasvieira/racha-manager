@@ -25,7 +25,7 @@ public class WaitingQueue {
             throw new ValidationException("Team can't be null");
 
         if(teams.contains(team))
-            throw new ConflictException("Team already exists in queue");
+            throw new ConflictException("Team already exists in waiting queue with Number: " + team.getNumber());
 
         if(!team.isPlayed()) {
             List<Team> rookies = teams.stream()

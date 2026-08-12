@@ -33,7 +33,7 @@ public class FinishMatchUseCase {
 
         validateResultConsistency(winnerTeamNumber, resultType);
 
-        // guarda estado anterior (observabilidade de código)
+        // estado anterior (observability code)
         var previousMatch = session.getCurrentMatch();
 
         int previousTeamA = previousMatch.getTeamA().getNumber();

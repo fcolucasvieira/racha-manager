@@ -146,9 +146,9 @@ class SessionTest {
 
         WaitingQueue waitingQueue = session.getWaitingQueue();
 
-        assertEquals(1, waitingQueue.getTeams().size());
+        assertEquals(1, waitingQueue.teams().size());
 
-        assertEquals(3, waitingQueue.getTeams().getFirst().getNumber());
+        assertEquals(3, waitingQueue.teams().getFirst().getNumber());
     }
 
     @Test

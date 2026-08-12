@@ -64,18 +64,47 @@ public class Session {
                 });
     }
 
-    // Revisar
+    public Team createNextTeam() {
+        int nextTeamNumber = teams.stream()
+                .mapToInt(Team::getNumber)
+                .max()
+                .orElse(0)
+                + 1;
+
+        return new Team(nextTeamNumber);
+    }
+
+    public void addTeam(Team team) {
+        if(team == null)
+            throw new ValidationException("Team can't be null");
+
+        if(!hasStarted())
+            throw new ConflictException("Team can't be added while session not started");
+
+        if(teams.contains(team))
+            throw new ConflictException("Team already exists with Number: " + team.getNumber());
+
+        teams.add(team);
+
+        waitingQueue.add(team);
+    }
+
     public void removeTeam(Team team) {
         if(team == null)
             throw new ValidationException("Team can't be null");
+
+        if(!hasStarted())
+            throw new ConflictException("Team can't be removed while session not started");
+
+        if(!teams.contains(team))
+            throw new NotFoundException("Team not found with Id: " + team.getNumber());
 
         if(isCurrentMatchTeam(team))
             throw new ConflictException("Team can't be removed while it is participating in the current match");
 
         teams.remove(team);
 
-        if(waitingQueue != null)
-            waitingQueue.remove(team);
+        waitingQueue.remove(team);
     }
 
     public void removeEmptyTeams() {
@@ -87,6 +116,12 @@ public class Session {
         for(Team team : emptyTeams) {
             removeTeam(team);
         }
+    }
+
+    public Team getLastTeam() {
+        return teams.isEmpty()
+                ? null
+                : teams.getLast();
     }
 
     public boolean hasStarted() {

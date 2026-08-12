@@ -4,6 +4,7 @@ import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
+import com.fcolucasvieira.racha_manager.session.service.AddPlayerToActiveSessionService;
 import com.fcolucasvieira.racha_manager.session.service.InitialTeamsBalancerService;
 import com.fcolucasvieira.racha_manager.player.repository.PlayerRepository;
 import com.fcolucasvieira.racha_manager.session.repository.SessionRepository;
@@ -21,6 +22,7 @@ public class AddPlayerToSessionUseCase {
     private final SessionRepository sessionRepository;
     private final PlayerRepository playerRepository;
     private final InitialTeamsBalancerService initialTeamsBalancerService;
+    private final AddPlayerToActiveSessionService addPlayerToActiveSessionService;
 
     private static final Logger log = LoggerFactory.getLogger(AddPlayerToSessionUseCase.class);
 
@@ -48,66 +50,26 @@ public class AddPlayerToSessionUseCase {
             session.initializeSession();
 
             log.info(
-                    "[WAITING_QUEUE_STARTED] sessionId={} currentMatch={}vs{} waitingTeams={}",
+                    "[SESSION_STARTED] sessionId={} currentMatch={}vs{} waitingTeams={}",
                     sessionId,
                     session.getCurrentMatch().getTeamA().getNumber(),
                     session.getCurrentMatch().getTeamB().getNumber(),
-                    0
+                    session.getWaitingQueue().teams().size()
             );
         } else if (session.hasStarted()) {
-            addPlayerToRunningSession(session, player);
+            addPlayerToActiveSessionService.addPlayer(session, player);
 
             log.info(
-                    "[PLAYER_ADDED_TO_RUNNING_SESSION] sessionId={} playerId={} totalTeams={}",
+                    "[PLAYER_ADDED_TO_ACTIVE_SESSION] sessionId={} playerId={} totalTeams={} waitingTeams={}",
                     sessionId,
                     playerId,
-                    session.getTeams().size()
+                    session.getTeams().size(),
+                    session.getWaitingQueue().teams().size()
             );
         }
 
         sessionRepository.save(session);
 
         return session.getTeams();
-    }
-
-    // TODO (Sprint de refatoração arquitetural):
-    // mover a lógica de entrada de jogadores durante uma sessão ativa
-    // para um Domain Service (ou para Session, caso a regra pertença ao agregado)
-    private void addPlayerToRunningSession(Session session, Player player) {
-        // Instancia teams da session
-        List<Team> teams = session.getTeams();
-
-        // Busca o último time da lista
-        Team lastTeam = teams.isEmpty()
-                ? null
-                : teams.getLast();
-
-        // Se não existe time ou último está cheio
-        if (lastTeam == null || lastTeam.isFull()) {
-            // Define número do novo time
-            int nextTeamNumber =
-                    (teams.stream()
-                    .mapToInt(Team::getNumber)
-                    .max()
-                    .orElse(0))
-                    + 1;
-
-            // Cria novo time
-            Team newTeam = new Team(nextTeamNumber);
-
-            // Adiciona o jogador ao time
-            newTeam.addPlayer(player);
-
-            // Adiciona o time (com o jogador) na lista de times
-            teams.add(newTeam);
-
-            // Adiciona time a fila de prioridade (no final)
-            session.getWaitingQueue().add(newTeam);
-
-            return;
-        }
-
-        // Adiciona no último incompleto
-        lastTeam.addPlayer(player);
     }
 }

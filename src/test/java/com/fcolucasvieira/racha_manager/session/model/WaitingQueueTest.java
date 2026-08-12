@@ -23,7 +23,6 @@ class WaitingQueueTest {
         );
     }
 
-    // helper (criar time)
     private Team createTeam(int number) {
         Team team = new Team(number);
 
@@ -69,10 +68,10 @@ class WaitingQueueTest {
 
         waitingQueue.add(t2);
 
-        assertEquals(2, waitingQueue.getTeams().size());
+        assertEquals(2, waitingQueue.teams().size());
 
-        assertEquals(t2, waitingQueue.getTeams().get(0));
-        assertEquals(t1, waitingQueue.getTeams().get(1));
+        assertEquals(t2, waitingQueue.teams().get(0));
+        assertEquals(t1, waitingQueue.teams().get(1));
     }
 
     @Test
@@ -90,11 +89,11 @@ class WaitingQueueTest {
 
         waitingQueue.add(t3);
 
-        assertEquals(3, waitingQueue.getTeams().size());
+        assertEquals(3, waitingQueue.teams().size());
 
-        assertEquals(t2, waitingQueue.getTeams().get(0));
-        assertEquals(t3, waitingQueue.getTeams().get(1));
-        assertEquals(t1, waitingQueue.getTeams().get(2));
+        assertEquals(t2, waitingQueue.teams().get(0));
+        assertEquals(t3, waitingQueue.teams().get(1));
+        assertEquals(t1, waitingQueue.teams().get(2));
     }
 
     @Test
@@ -108,10 +107,10 @@ class WaitingQueueTest {
 
         waitingQueue.add(t2);
 
-        assertEquals(2, waitingQueue.getTeams().size());
+        assertEquals(2, waitingQueue.teams().size());
 
-        assertEquals(t1, waitingQueue.getTeams().get(0));
-        assertEquals(t2, waitingQueue.getTeams().get(1));
+        assertEquals(t1, waitingQueue.teams().get(0));
+        assertEquals(t2, waitingQueue.teams().get(1));
     }
 
     @Test
@@ -140,7 +139,7 @@ class WaitingQueueTest {
 
         waitingQueue.remove(team);
 
-        assertTrue(waitingQueue.getTeams().isEmpty());
+        assertTrue(waitingQueue.teams().isEmpty());
     }
 
     @Test
@@ -163,9 +162,9 @@ class WaitingQueueTest {
 
         assertEquals(t1, polled);
 
-        assertEquals(1, waitingQueue.getTeams().size());
+        assertEquals(1, waitingQueue.teams().size());
 
-        assertEquals(t2, waitingQueue.getTeams().getFirst());
+        assertEquals(t2, waitingQueue.teams().getFirst());
     }
 
     @Test
