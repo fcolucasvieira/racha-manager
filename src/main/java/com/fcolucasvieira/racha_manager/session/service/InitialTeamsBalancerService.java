@@ -1,7 +1,5 @@
 package com.fcolucasvieira.racha_manager.session.service;
 
-import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
-import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
@@ -22,8 +20,6 @@ public class InitialTeamsBalancerService {
     private static final Logger log = LoggerFactory.getLogger(InitialTeamsBalancerService.class);
 
     public List<Team> createInitialTeams(Session session) {
-        validateInitialShuffle(session);
-
         List<Player> players = new ArrayList<>(
                 session.getActivePlayers()
         );
@@ -60,19 +56,5 @@ public class InitialTeamsBalancerService {
             Team team = teams.get(i / TEAM_SIZE);
             team.addPlayer(players.get(i));
         }
-    }
-
-    private void validateInitialShuffle(Session session) {
-        if (session == null)
-            throw new ValidationException("Session can't be null");
-
-        if (session.isInitialTeamsCreated())
-            throw new ConflictException("Initial teams already created");
-
-        if (session.getActivePlayers().size() != INITIAL_PLAYERS)
-            throw new ConflictException("Initial balance requires exactly " + INITIAL_PLAYERS + " players");
-
-        if (!session.getTeams().isEmpty())
-            throw new ConflictException("Session already contains teams");
     }
 }

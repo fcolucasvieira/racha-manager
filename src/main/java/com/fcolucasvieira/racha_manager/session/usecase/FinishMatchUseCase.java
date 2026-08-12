@@ -26,11 +26,6 @@ public class FinishMatchUseCase {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NotFoundException("Session not found with Id: "  + sessionId));
 
-        // Validação duplicada?
-        // Em matchFlowService.finish<Winner/Draw>, há uma validação semelhante, diferenciando apenas pela mensagem
-        if (!session.hasStarted())
-            throw new ConflictException("Session has not started");
-
         validateResultConsistency(winnerTeamNumber, resultType);
 
         // estado anterior (observability code)
@@ -44,8 +39,9 @@ public class FinishMatchUseCase {
                 matchFlowService.finishWithDraw(session);
 
                 log.info(
-                        "[MATCH_DRAW_FINISHED] sessionId={} finishedMatch={}vs{} nextMatch={}vs{}",
+                        "[MATCH_FINISHED] sessionId={} result={} finishedMatch={}vs{} nextMatch={}vs{}",
                         sessionId,
+                        resultType,
                         previousTeamA,
                         previousTeamB,
                         session.getCurrentMatch().getTeamA().getNumber(),
@@ -56,8 +52,9 @@ public class FinishMatchUseCase {
                 matchFlowService.finishWithWinner(session, winnerTeamNumber);
 
                 log.info(
-                        "[MATCH_FINISHED] sessionId={} winnerTeamNumber={} finishedMatch={}vs{} nextMatch={}vs{}",
+                        "[MATCH_FINISHED] sessionId={} result={} winnerTeamNumber={} finishedMatch={}vs{} nextMatch={}vs{}",
                         sessionId,
+                        resultType,
                         winnerTeamNumber,
                         previousTeamA,
                         previousTeamB,
