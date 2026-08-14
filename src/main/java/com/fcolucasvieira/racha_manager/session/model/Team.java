@@ -87,12 +87,17 @@ public class Team {
         return players.size();
     }
 
+    public List<Player> getPlayers() {
+        return List.copyOf(players);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Team team)) return false;
         return number == team.number;
     }
+
 
     @Override
     public int hashCode() {

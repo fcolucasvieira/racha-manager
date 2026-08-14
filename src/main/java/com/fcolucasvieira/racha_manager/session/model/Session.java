@@ -152,7 +152,7 @@ public class Session {
             throw new ConflictException("Session already initialized");
 
         if(teams.size() < INITIAL_TEAMS)
-            throw new ConflictException("Not enough teams to start");
+            throw new ConflictException("Not enough getTeams to start");
 
         this.waitingQueue = new WaitingQueue(teams);
 
@@ -185,5 +185,13 @@ public class Session {
 
         // Observar comportamento antes de finalizar Sprint
         this.teams = new ArrayList<>(teams);
+    }
+
+    public List<Team> getTeams() {
+        return List.copyOf(teams);
+    }
+
+    public List<Player> getActivePlayers() {
+        return List.copyOf(activePlayers);
     }
 }
