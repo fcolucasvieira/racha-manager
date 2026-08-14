@@ -43,7 +43,7 @@ class MatchFlowServiceTest {
     }
 
     @Test
-    @DisplayName("Should finish match with winner when teams are waiting")
+    @DisplayName("Should finish match with winner when getTeams are waiting")
     void shouldFinishMatchWithWinnerSuccessfullyWithTeamsInQueue() {
         Session session = new Session();
 
@@ -66,8 +66,8 @@ class MatchFlowServiceTest {
 
         WaitingQueue waitingQueue = session.getWaitingQueue();
 
-        assertEquals(1, waitingQueue.teams().size());
-        assertEquals(2, waitingQueue.teams().getFirst().getNumber());
+        assertEquals(1, waitingQueue.getTeams().size());
+        assertEquals(2, waitingQueue.getTeams().getFirst().getNumber());
 
         assertTrue(teamA.isPlayed());
         assertTrue(teamB.isPlayed());
@@ -166,10 +166,10 @@ class MatchFlowServiceTest {
 
         WaitingQueue waitingQueue = session.getWaitingQueue();
 
-        assertEquals(2, waitingQueue.teams().size());
+        assertEquals(2, waitingQueue.getTeams().size());
 
-        assertEquals(1, waitingQueue.teams().get(0).getNumber());
-        assertEquals(2, waitingQueue.teams().get(1).getNumber());
+        assertEquals(1, waitingQueue.getTeams().get(0).getNumber());
+        assertEquals(2, waitingQueue.getTeams().get(1).getNumber());
 
         assertTrue(teamA.isPlayed());
         assertTrue(teamB.isPlayed());

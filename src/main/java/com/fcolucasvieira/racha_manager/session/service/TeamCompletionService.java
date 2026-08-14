@@ -12,7 +12,7 @@ public class TeamCompletionService {
     private static final Logger log = LoggerFactory.getLogger(TeamCompletionService.class);
 
     public void complete(Team target, WaitingQueue waitingQueue) {
-        for (Team donor : waitingQueue.teams()) {
+        for (Team donor : waitingQueue.getTeams()) {
             while (target.isIncomplete() &&
                     donor.hasPlayers()) {
                 var transferredPlayer = donor.removeFirstPlayer();

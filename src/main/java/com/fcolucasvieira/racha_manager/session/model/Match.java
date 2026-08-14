@@ -14,7 +14,7 @@ public class Match {
             throw new ValidationException("Teams can't be null");
 
         if(teamA.equals(teamB))
-            throw new ConflictException("A match must have two different teams");
+            throw new ConflictException("A match must have two different getTeams");
 
         this.teamA = teamA;
         this.teamB = teamB;

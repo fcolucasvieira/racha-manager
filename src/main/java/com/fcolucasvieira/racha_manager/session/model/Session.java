@@ -13,7 +13,7 @@ import java.util.UUID;
 import static com.fcolucasvieira.racha_manager.session.rules.RachaRules.INITIAL_PLAYERS;
 import static com.fcolucasvieira.racha_manager.session.rules.RachaRules.INITIAL_TEAMS;
 
-@Getter // Anotação -> Getters necessários
+@Getter
 public class Session {
     private final UUID id;
     private final List<Player> activePlayers;
@@ -171,7 +171,15 @@ public class Session {
                 && !isInitialTeamsCreated();
     }
 
-    public void startNextMatch(Match match) {
+    public List<Team> getTeams() {
+        return List.copyOf(teams);
+    }
+
+    public List<Player> getActivePlayers() {
+        return List.copyOf(activePlayers);
+    }
+
+    public void setCurrentMatch(Match match) {
         if(match == null)
             throw new ValidationException("Match can't be null");
 
@@ -185,13 +193,5 @@ public class Session {
 
         // Observar comportamento antes de finalizar Sprint
         this.teams = new ArrayList<>(teams);
-    }
-
-    public List<Team> getTeams() {
-        return List.copyOf(teams);
-    }
-
-    public List<Player> getActivePlayers() {
-        return List.copyOf(activePlayers);
     }
 }

@@ -78,9 +78,9 @@ class AddPlayerToActiveSessionServiceTest {
 
         assertFalse(waitingQueue.isEmpty());
 
-        assertEquals(1, waitingQueue.teams().size());
+        assertEquals(1, waitingQueue.getTeams().size());
 
-        Team nextTeam = waitingQueue.teams().getFirst();
+        Team nextTeam = waitingQueue.getTeams().getFirst();
 
         assertEquals(1, nextTeam.playersCount());
 
@@ -106,9 +106,9 @@ class AddPlayerToActiveSessionServiceTest {
 
         WaitingQueue waitingQueue = session.getWaitingQueue();
 
-        assertEquals(2, waitingQueue.teams().size());
+        assertEquals(2, waitingQueue.getTeams().size());
 
-        Team nextTeam = waitingQueue.teams().getLast();
+        Team nextTeam = waitingQueue.getTeams().getLast();
 
         assertEquals(4, nextTeam.getNumber());
 

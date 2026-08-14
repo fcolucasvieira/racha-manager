@@ -62,7 +62,7 @@ class TeamCompletionServiceTest {
     }
 
     @Test
-    @DisplayName("Should transfer players from multiple donos teams when necessary")
+    @DisplayName("Should transfer players from multiple donos getTeams when necessary")
     void shouldHandleMultipleDonors() {
         Team target = createTeam(1, 1);
         Team donor1 = createTeam(2, 2);

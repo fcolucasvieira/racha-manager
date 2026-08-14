@@ -193,7 +193,7 @@ class RemovePlayerFromSessionUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should not complete teams when session has not started")
+    @DisplayName("Should not complete getTeams when session has not started")
     void shouldNotCompleteTeamsWhenSessionHasNotStarted() {
         Session session = new Session();
 

@@ -33,7 +33,7 @@ public class InitialTeamsBalancerService {
         session.markInitialTeamsAsCreated();
 
         log.info(
-                "[INITIAL_BALANCE_COMPLETED] sessionId={} teams={} players={}",
+                "[INITIAL_BALANCE_COMPLETED] sessionId={} getTeams={} players={}",
                 session.getId(),
                 teams.size(),
                 session.getActivePlayers().size()

@@ -116,12 +116,12 @@ class SessionTest {
     }
 
     @Test
-    void shouldNotStartNextMatchWhenMatchBeNull() {
+    void shouldNotSetCurrentMatchWhenMatchBeNull() {
         Match match = null;
 
         assertThrows(
                 ValidationException.class,
-                () -> session.startNextMatch(match)
+                () -> session.setCurrentMatch(match)
         );
     }
 
@@ -144,9 +144,9 @@ class SessionTest {
 
         WaitingQueue waitingQueue = session.getWaitingQueue();
 
-        assertEquals(1, waitingQueue.teams().size());
+        assertEquals(1, waitingQueue.getTeams().size());
 
-        assertEquals(3, waitingQueue.teams().getFirst().getNumber());
+        assertEquals(3, waitingQueue.getTeams().getFirst().getNumber());
     }
 
     @Test

@@ -30,7 +30,7 @@ class InitialTeamsBalancerServiceTest {
     }
 
     @Test
-    @DisplayName("Should create and balance the initial teams")
+    @DisplayName("Should create and balance the initial getTeams")
     void shouldCreateAndBalanceInitialTeams() {
         Session session = new Session();
 

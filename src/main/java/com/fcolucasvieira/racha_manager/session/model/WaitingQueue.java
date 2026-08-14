@@ -65,17 +65,17 @@ public class WaitingQueue {
         return teams.isEmpty();
     }
 
-    public int playersCount() {
+    public int getPlayersCount() {
         return teams.stream()
                 .mapToInt(Team::playersCount)
                 .sum();
     }
 
     public boolean hasEnoughForDraw() {
-        return playersCount() >= RachaRules.INITIAL_PLAYERS;
+        return getPlayersCount() >= RachaRules.INITIAL_PLAYERS;
     }
 
-    public List<Team> teams() {
+    public List<Team> getTeams() {
         return List.copyOf(teams);
     }
 }

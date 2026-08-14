@@ -96,7 +96,7 @@ class AddPlayerToSessionUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should create initial teams when eight players joins")
+    @DisplayName("Should create initial getTeams when eight players joins")
     void shouldCreateInitialTeamsWhenSessionHasEnoughPlayers() {
         Session session = new Session();
 
@@ -160,7 +160,7 @@ class AddPlayerToSessionUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should not create initial teams before minimum players")
+    @DisplayName("Should not create initial getTeams before minimum players")
     void shouldNotCreateInitialTeamsBeforeEnoughPlayers() {
         Session session = new Session();
 
@@ -182,7 +182,7 @@ class AddPlayerToSessionUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should not create initial teams when session already shuffled")
+    @DisplayName("Should not create initial getTeams when session already shuffled")
     void shouldNotCreateInitialTeamsWhenSessionAlreadyShuffled() {
         Session session = new Session();
 

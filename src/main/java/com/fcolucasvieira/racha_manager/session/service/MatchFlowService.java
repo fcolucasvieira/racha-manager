@@ -27,7 +27,7 @@ public class MatchFlowService {
         WaitingQueue waitingQueue = session.getWaitingQueue();
 
         if(waitingQueue.isEmpty()) {
-            session.startNextMatch(
+            session.setCurrentMatch(
                     new Match(winner, loser)
             );
             return;
@@ -38,7 +38,7 @@ public class MatchFlowService {
         Team next = waitingQueue.poll();
         teamCompletionService.complete(next, waitingQueue);
 
-        session.startNextMatch(
+        session.setCurrentMatch(
                 new Match(winner, next)
         );
 
@@ -70,7 +70,7 @@ public class MatchFlowService {
         Team nextTeamB = waitingQueue.poll();
         teamCompletionService.complete(nextTeamB, waitingQueue);
 
-        session.startNextMatch(
+        session.setCurrentMatch(
                 new Match(nextTeamA, nextTeamB)
         );
 
