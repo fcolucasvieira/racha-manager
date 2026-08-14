@@ -118,6 +118,18 @@ public class Session {
         }
     }
 
+    public Team findPlayerTeam(UUID playerId) {
+        if (playerId == null)
+            throw new ValidationException("Player Id can't be null");
+
+        return teams.stream()
+                .filter(team -> team.containsPlayer(playerId))
+                .findFirst()
+                .orElseThrow(() ->
+                        new NotFoundException("Player not found in session with Id: " + playerId)
+                );
+    }
+
     public Team getLastTeam() {
         return teams.isEmpty()
                 ? null

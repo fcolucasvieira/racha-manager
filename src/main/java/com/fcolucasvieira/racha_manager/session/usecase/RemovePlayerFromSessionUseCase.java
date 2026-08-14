@@ -27,10 +27,14 @@ public class RemovePlayerFromSessionUseCase {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NotFoundException("Session not found with Id: " + sessionId));
 
-        boolean playerWasInCurrentMatch =
-                session.isPlayerInCurrentMatch(playerId);
+        Team playerTeam = session.findPlayerTeam(playerId);
+
+        boolean playerTeamWasCurrentMatch = session.isCurrentMatchTeam(playerTeam);
 
         session.removePlayer(playerId);
+
+        if(playerTeamWasCurrentMatch)
+            teamCompletionService.complete(playerTeam, session.getWaitingQueue());
 
         log.info(
                 "[PLAYER_REMOVED] sessionId={} playerId={} activePlayers={}",
@@ -39,31 +43,8 @@ public class RemovePlayerFromSessionUseCase {
                 session.getActivePlayers().size()
         );
 
-        if(playerWasInCurrentMatch)
-            completeCurrentMatchTeams(session);
-
         sessionRepository.save(session);
 
         return session.getTeams();
-    }
-
-    private void completeCurrentMatchTeams(Session session) {
-        Match currentMatch = session.getCurrentMatch();
-
-        Team teamA = currentMatch.getTeamA();
-        Team teamB = currentMatch.getTeamB();
-
-        WaitingQueue waitingQueue = session.getWaitingQueue();
-
-        teamCompletionService.complete(teamA, waitingQueue);
-        teamCompletionService.complete(teamB, waitingQueue);
-
-        log.info("[CURRENT_MATCH_TEAMS_COMPLETED] sessionId={} teamAPlayers={} teamBPlayers={}",
-                session.getId(),
-                teamA.playersCount(),
-                teamB.playersCount()
-        );
-
-        session.removeEmptyTeams();
     }
 }
