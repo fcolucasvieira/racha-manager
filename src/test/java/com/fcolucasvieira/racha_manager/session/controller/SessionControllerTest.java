@@ -234,7 +234,7 @@ public class SessionControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message")
-                        .value("Player not found with Id: " + playerId))
+                        .value("Player not found in session with Id: " + playerId))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
 
@@ -271,7 +271,7 @@ public class SessionControllerTest {
         )
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Player not found with Id: " + randomPlayerId))
+                .andExpect(jsonPath("$.message").value("Player not found in session with Id: " + randomPlayerId))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
 
@@ -313,7 +313,7 @@ public class SessionControllerTest {
         )
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Session has not started"))
+                .andExpect(jsonPath("$.message").value("No match in progress"))
                 .andExpect(jsonPath("$.timestamp").exists());
     }
 

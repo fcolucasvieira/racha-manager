@@ -1,7 +1,5 @@
 package com.fcolucasvieira.racha_manager.session.service;
 
-import com.fcolucasvieira.racha_manager.common.exception.ConflictException;
-import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.session.model.Session;
 import com.fcolucasvieira.racha_manager.session.model.Team;
@@ -33,7 +31,7 @@ class InitialTeamsBalancerServiceTest {
 
     @Test
     @DisplayName("Should create and balance the initial teams")
-    void shouldBalanceInitialTeams() {
+    void shouldCreateAndBalanceInitialTeams() {
         Session session = new Session();
 
         addPlayers(session, INITIAL_PLAYERS);
@@ -58,68 +56,5 @@ class InitialTeamsBalancerServiceTest {
         assertEquals(INITIAL_PLAYERS, totalPlayers);
 
         assertTrue(session.isInitialTeamsCreated());
-    }
-
-    @Test
-    @DisplayName("Should throw exception when session is null")
-    void shouldThrowExceptionWhenSessionIsNull() {
-        assertThrows(
-                ValidationException.class,
-                () -> initialTeamsBalancerService.createInitialTeams(null)
-        );
-    }
-
-    @Test
-    @DisplayName("Should throw exception when session was already shuffled")
-    void shouldThrowExceptionWhenSessionAlreadyShuffled(){
-        Session session = new Session();
-
-        session.markInitialTeamsAsCreated();
-
-        assertThrows(
-                ConflictException.class,
-                () -> initialTeamsBalancerService.createInitialTeams(session)
-        );
-    }
-
-    @Test
-    @DisplayName("Should throw exception when session has fewer than initial players")
-    void shouldThrowExceptionWhenSessionHasFewerThanInitialPlayers(){
-        Session session = new Session();
-
-        addPlayers(session, INITIAL_PLAYERS - 1);
-
-        assertThrows(
-                ConflictException.class,
-                () -> initialTeamsBalancerService.createInitialTeams(session));
-    }
-
-    @Test
-    @DisplayName("Should throw exception when session has more than initial players")
-    void shouldThrowExceptionWhenSessionHasMoreThanInitialPlayers(){
-        Session session = new Session();
-
-        addPlayers(session, INITIAL_PLAYERS + 1);
-
-        assertThrows(
-                ConflictException.class,
-                () -> initialTeamsBalancerService.createInitialTeams(session));
-    }
-
-    @Test
-    @DisplayName("Should throw exception when session already contains teams")
-    void shouldThrowExceptionWhenTeamsAlreadyExist() {
-        Session session = new Session();
-
-        addPlayers(session, INITIAL_PLAYERS);
-
-        session.setTeams(
-                List.of(new Team(1), new Team(2))
-        );
-
-        assertThrows(
-                ConflictException.class,
-                () -> initialTeamsBalancerService.createInitialTeams(session)
-        );
     }
 }

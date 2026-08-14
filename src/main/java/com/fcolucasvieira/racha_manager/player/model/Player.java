@@ -21,7 +21,7 @@ public class Player {
 
     public Player(String name) {
         if(name == null || name.isBlank()){
-            throw new ValidationException("Name cannot be null or blank");
+            throw new ValidationException("Name can't be null or blank");
         }
 
         this.name = name;

@@ -1,6 +1,7 @@
 package com.fcolucasvieira.racha_manager.session.usecase;
 
 import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
+import com.fcolucasvieira.racha_manager.session.service.AddPlayerToActiveSessionService;
 import com.fcolucasvieira.racha_manager.session.service.InitialTeamsBalancerService;
 import com.fcolucasvieira.racha_manager.player.model.Player;
 import com.fcolucasvieira.racha_manager.player.repository.PlayerRepository;
@@ -15,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,6 +33,8 @@ class AddPlayerToSessionUseCaseTest {
     private PlayerRepository playerRepository;
     @Mock
     private InitialTeamsBalancerService initialTeamsBalancerService;
+    @Mock
+    private AddPlayerToActiveSessionService addPlayerToActiveSessionService;
 
     @InjectMocks
     private AddPlayerToSessionUseCase addPlayerToSessionUseCase;
@@ -123,6 +127,39 @@ class AddPlayerToSessionUseCaseTest {
     }
 
     @Test
+    @DisplayName("Should add player to active session")
+    void shouldAddPlayerToActiveSession() {
+        Session session = new Session();
+
+        for (int i = 1; i <= 8; i++) {
+            session.addPlayer(createPlayer("P" + i));
+        }
+
+        Player p9 = new Player(playerId, "P9");
+
+        session.setTeams(
+                new ArrayList<>(List.of(
+                        createTeam(1, 4),
+                        createTeam(2, 4))
+                )
+        );
+
+        session.initializeSession();
+
+        when(sessionRepository.findById(sessionId))
+                .thenReturn(Optional.of(session));
+        when(playerRepository.findById(playerId))
+                .thenReturn(Optional.of(p9));
+
+        addPlayerToSessionUseCase.execute(sessionId, playerId);
+
+        assertTrue(session.hasStarted());
+
+        verify(addPlayerToActiveSessionService).addPlayer(session, p9);
+        verify(sessionRepository).save(session);
+    }
+
+    @Test
     @DisplayName("Should not create initial teams before minimum players")
     void shouldNotCreateInitialTeamsBeforeEnoughPlayers() {
         Session session = new Session();
@@ -167,6 +204,4 @@ class AddPlayerToSessionUseCaseTest {
         verify(initialTeamsBalancerService, never()).createInitialTeams(any());
         verify(sessionRepository).save(session);
     }
-
-    // TODO: Adicionar testes p/ casos de entrada de jogador com a sessão acontecendo
 }

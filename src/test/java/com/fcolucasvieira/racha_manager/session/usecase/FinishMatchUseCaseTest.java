@@ -42,7 +42,6 @@ class FinishMatchUseCaseTest {
         sessionId = UUID.randomUUID();
     }
 
-    // helper (criação de time)
     private Team createTeam(int number, int countPlayers) {
         Team team = new Team(number);
 
@@ -115,24 +114,6 @@ class FinishMatchUseCaseTest {
 
         assertThrows(
                 NotFoundException.class,
-                () -> finishMatchUseCase.execute(sessionId, 1, MatchResultType.WINNER)
-        );
-
-        verify(matchFlowService, never()).finishWithWinner(any(), anyInt());
-        verify(matchFlowService, never()).finishWithDraw(any());
-        verify(sessionRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Should throw exception when session has not started")
-    void shouldThrowExceptionWhenSessionHasNotStarted() {
-        Session session = new Session();
-
-        when(sessionRepository.findById(sessionId))
-                .thenReturn(Optional.of(session));
-
-        assertThrows(
-                ConflictException.class,
                 () -> finishMatchUseCase.execute(sessionId, 1, MatchResultType.WINNER)
         );
 

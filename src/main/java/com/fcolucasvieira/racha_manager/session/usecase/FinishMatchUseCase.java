@@ -28,22 +28,14 @@ public class FinishMatchUseCase {
 
         validateResultConsistency(winnerTeamNumber, resultType);
 
-        // estado anterior (observability code)
-        var previousMatch = session.getCurrentMatch();
-
-        int previousTeamA = previousMatch.getTeamA().getNumber();
-        int previousTeamB = previousMatch.getTeamB().getNumber();
-
         switch (resultType) {
             case DRAW -> {
                 matchFlowService.finishWithDraw(session);
 
                 log.info(
-                        "[MATCH_FINISHED] sessionId={} result={} finishedMatch={}vs{} nextMatch={}vs{}",
+                        "[MATCH_FINISHED] sessionId={} result={} nextMatch={}vs{}",
                         sessionId,
                         resultType,
-                        previousTeamA,
-                        previousTeamB,
                         session.getCurrentMatch().getTeamA().getNumber(),
                         session.getCurrentMatch().getTeamB().getNumber()
                 );
@@ -52,12 +44,10 @@ public class FinishMatchUseCase {
                 matchFlowService.finishWithWinner(session, winnerTeamNumber);
 
                 log.info(
-                        "[MATCH_FINISHED] sessionId={} result={} winnerTeamNumber={} finishedMatch={}vs{} nextMatch={}vs{}",
+                        "[MATCH_FINISHED] sessionId={} result={} winnerTeamNumber={} nextMatch={}vs{}",
                         sessionId,
                         resultType,
                         winnerTeamNumber,
-                        previousTeamA,
-                        previousTeamB,
                         session.getCurrentMatch().getTeamA().getNumber(),
                         session.getCurrentMatch().getTeamB().getNumber()
                 );

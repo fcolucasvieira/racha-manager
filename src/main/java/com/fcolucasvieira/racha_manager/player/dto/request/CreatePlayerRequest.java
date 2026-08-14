@@ -8,7 +8,7 @@ public record CreatePlayerRequest(
                 example = "Lucas Vieira",
                 description = "Player name"
         )
-        @NotBlank(message = "Player name cannot be blank")
+        @NotBlank(message = "Player name can't be blank")
         String name
 ) {
 }

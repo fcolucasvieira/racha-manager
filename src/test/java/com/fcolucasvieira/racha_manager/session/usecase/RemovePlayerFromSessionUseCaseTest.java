@@ -14,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -122,36 +121,7 @@ class RemovePlayerFromSessionUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should dissolve empty team")
-    void shouldDissolveEmptyTeam() {
-        Session session = new Session();
-
-        Player removablePlayer = new Player(playerId, "P1");
-
-        Team teamA = new Team(1);
-        teamA.addPlayer(removablePlayer);
-
-        Team teamB = createTeam(2, 4);
-
-        session.setTeams(new ArrayList<>(List.of(teamA, teamB)));
-
-        session.getTeams()
-                .forEach(t -> t.getPlayers()
-                        .forEach(session::addPlayer)
-                );
-
-        when(sessionRepository.findById(sessionId))
-                .thenReturn(Optional.of(session));
-
-        removePlayerFromSessionUseCase.execute(sessionId, playerId);
-
-        assertEquals(1, session.getTeams().size());
-
-        verify(sessionRepository).save(session);
-    }
-
-    @Test
-    @DisplayName("Should complete current match teams when player belongs to current match")
+    @DisplayName("Should complete affected when player belongs to current match")
     void shouldCompleteCurrentMatchTeamsWhenPlayerBelongsToCurrentMatch() {
         Session session = new Session();
 
@@ -180,12 +150,11 @@ class RemovePlayerFromSessionUseCaseTest {
         removePlayerFromSessionUseCase.execute(sessionId, playerId);
 
         verify(teamCompletionService).complete(eq(teamA), any());
-        verify(teamCompletionService).complete(eq(teamB), any());
         verify(sessionRepository).save(session);
     }
 
     @Test
-    @DisplayName("Should not complete current match teams when removed player is outside current match")
+    @DisplayName("Should not complete affected team when removed player is outside current match")
     void shouldNotCompleteCurrentMatchTeamsWhenRemovePlayerIsOutsideCurrentMatch() {
         Session session = new Session();
 

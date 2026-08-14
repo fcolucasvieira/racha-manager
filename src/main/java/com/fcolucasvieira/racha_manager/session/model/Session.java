@@ -140,17 +140,6 @@ public class Session {
         return currentMatch != null;
     }
 
-    public boolean isPlayerInCurrentMatch(UUID playerId) {
-        if(playerId == null)
-            throw new ValidationException("Player Id can't be null");
-
-        if(!hasStarted())
-            return false;
-
-        return currentMatch.getTeamA().containsPlayer(playerId) ||
-                currentMatch.getTeamB().containsPlayer(playerId);
-    }
-
     public boolean isCurrentMatchTeam(Team team) {
         if(!hasStarted())
             return false;
