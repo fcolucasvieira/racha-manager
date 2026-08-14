@@ -83,11 +83,9 @@ class SessionTest {
 
     @Test
     void shouldNotSetTeamsWhenTeamsListBeNull() {
-        List<Team> teams = null;
-
         assertThrows(
                 ValidationException.class,
-                () -> session.setTeams(teams)
+                () -> session.setTeams(null)
         );
     }
 
