@@ -27,23 +27,25 @@ public class RemovePlayerFromSessionUseCase {
         Session session = sessionRepository.findById(sessionId)
                 .orElseThrow(() -> new NotFoundException("Session not found with Id: " + sessionId));
 
-        Team playerTeam = session.findPlayerTeam(playerId);
+        synchronized (session) {
+            Team playerTeam = session.findPlayerTeam(playerId);
 
-        boolean playerTeamWasCurrentMatch = session.isCurrentMatchTeam(playerTeam);
+            boolean playerTeamWasCurrentMatch = session.isCurrentMatchTeam(playerTeam);
 
-        session.removePlayer(playerId);
+            session.removePlayer(playerId);
 
-        if(playerTeamWasCurrentMatch)
-            teamCompletionService.complete(playerTeam, session.getWaitingQueue());
+            if (playerTeamWasCurrentMatch)
+                teamCompletionService.complete(playerTeam, session.getWaitingQueue());
 
-        log.info(
-                "[PLAYER_REMOVED] sessionId={} playerId={} activePlayers={}",
-                sessionId,
-                playerId,
-                session.getActivePlayers().size()
-        );
+            log.info(
+                    "[PLAYER_REMOVED] sessionId={} playerId={} activePlayers={}",
+                    sessionId,
+                    playerId,
+                    session.getActivePlayers().size()
+            );
 
-        sessionRepository.save(session);
+            sessionRepository.save(session);
+        }
 
         return session.getTeams();
     }

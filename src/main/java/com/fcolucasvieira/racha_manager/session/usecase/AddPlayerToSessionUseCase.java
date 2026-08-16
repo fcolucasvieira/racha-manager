@@ -33,42 +33,44 @@ public class AddPlayerToSessionUseCase {
         Player player = playerRepository.findById(playerId)
                 .orElseThrow(() -> new NotFoundException("Player not found with Id: " + playerId));
 
-        session.addPlayer(player);
-
-        log.info(
-                "[PLAYER_ADDED_TO_SESSION] sessionId={} playerId={} activePlayers={}",
-                sessionId,
-                playerId,
-                session.getActivePlayers().size()
-        );
-
-        if (session.canCreateInitialTeams()) {
-            List<Team> teams = initialTeamsBalancerService.createInitialTeams(session);
-
-            session.setTeams(teams);
-
-            session.initializeSession();
+        synchronized (session) {
+            session.addPlayer(player);
 
             log.info(
-                    "[SESSION_STARTED] sessionId={} currentMatch={}vs{} waitingTeams={}",
-                    sessionId,
-                    session.getCurrentMatch().getTeamA().getNumber(),
-                    session.getCurrentMatch().getTeamB().getNumber(),
-                    session.getWaitingQueue().getTeams().size()
-            );
-        } else if (session.hasStarted()) {
-            addPlayerToActiveSessionService.addPlayer(session, player);
-
-            log.info(
-                    "[PLAYER_ADDED_TO_ACTIVE_SESSION] sessionId={} playerId={} totalTeams={} waitingTeams={}",
+                    "[PLAYER_ADDED_TO_SESSION] sessionId={} playerId={} activePlayers={}",
                     sessionId,
                     playerId,
-                    session.getTeams().size(),
-                    session.getWaitingQueue().getTeams().size()
+                    session.getActivePlayers().size()
             );
-        }
 
-        sessionRepository.save(session);
+            if (session.canCreateInitialTeams()) {
+                List<Team> teams = initialTeamsBalancerService.createInitialTeams(session);
+
+                session.setTeams(teams);
+
+                session.initializeSession();
+
+                log.info(
+                        "[SESSION_STARTED] sessionId={} currentMatch={}vs{} waitingTeams={}",
+                        sessionId,
+                        session.getCurrentMatch().getTeamA().getNumber(),
+                        session.getCurrentMatch().getTeamB().getNumber(),
+                        session.getWaitingQueue().getTeams().size()
+                );
+            } else if (session.hasStarted()) {
+                addPlayerToActiveSessionService.addPlayer(session, player);
+
+                log.info(
+                        "[PLAYER_ADDED_TO_ACTIVE_SESSION] sessionId={} playerId={} totalTeams={} waitingTeams={}",
+                        sessionId,
+                        playerId,
+                        session.getTeams().size(),
+                        session.getWaitingQueue().getTeams().size()
+                );
+            }
+
+            sessionRepository.save(session);
+        }
 
         return session.getTeams();
     }

@@ -28,35 +28,37 @@ public class FinishMatchUseCase {
 
         validateResultConsistency(winnerTeamNumber, resultType);
 
-        switch (resultType) {
-            case DRAW -> {
-                matchFlowService.finishWithDraw(session);
+        synchronized (session) {
+            switch (resultType) {
+                case DRAW -> {
+                    matchFlowService.finishWithDraw(session);
 
-                log.info(
-                        "[MATCH_FINISHED] sessionId={} result={} nextMatch={}vs{}",
-                        sessionId,
-                        resultType,
-                        session.getCurrentMatch().getTeamA().getNumber(),
-                        session.getCurrentMatch().getTeamB().getNumber()
-                );
+                    log.info(
+                            "[MATCH_FINISHED] sessionId={} result={} nextMatch={}vs{}",
+                            sessionId,
+                            resultType,
+                            session.getCurrentMatch().getTeamA().getNumber(),
+                            session.getCurrentMatch().getTeamB().getNumber()
+                    );
+                }
+                case WINNER -> {
+                    matchFlowService.finishWithWinner(session, winnerTeamNumber);
+
+                    log.info(
+                            "[MATCH_FINISHED] sessionId={} result={} winnerTeamNumber={} nextMatch={}vs{}",
+                            sessionId,
+                            resultType,
+                            winnerTeamNumber,
+                            session.getCurrentMatch().getTeamA().getNumber(),
+                            session.getCurrentMatch().getTeamB().getNumber()
+                    );
+                }
+
+                default -> throw new ValidationException("Unsupported match result type: " + resultType);
             }
-            case WINNER -> {
-                matchFlowService.finishWithWinner(session, winnerTeamNumber);
 
-                log.info(
-                        "[MATCH_FINISHED] sessionId={} result={} winnerTeamNumber={} nextMatch={}vs{}",
-                        sessionId,
-                        resultType,
-                        winnerTeamNumber,
-                        session.getCurrentMatch().getTeamA().getNumber(),
-                        session.getCurrentMatch().getTeamB().getNumber()
-                );
-            }
-
-            default -> throw new ValidationException("Unsupported match result type: " + resultType);
+            sessionRepository.save(session);
         }
-
-        sessionRepository.save(session);
     }
 
     private void validateResultConsistency(Integer winnerTeamNumber, MatchResultType resultType) {
