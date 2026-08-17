@@ -1,0 +1,10 @@
+target/
+docs/
+.git/
+.idea/
+*.md
+.env
+.mvn/
+mvnw
+mvnw.cmd
+HELP.md
