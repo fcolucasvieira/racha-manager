@@ -11,39 +11,26 @@ API REST para gerenciamento inteligente de equipes, jogadores e partidas esporti
 <p align="center">
   <!-- Plataforma -->
   <img src="https://img.shields.io/badge/Java-21-FFD700?style=for-the-badge&logo=openjdk&logoColor=FFD700"/>
-  <img src="https://img.shields.io/badge/Spring_Boot-4.0.5-6DB33F?style=for-the-badge&logo=springboot&logoColor=6DB33F"/>
-  <img src="https://img.shields.io/badge/Spring_Data_JPA-ORM-6DB33F?style=for-the-badge&logo=spring&logoColor=6DB33F"/>
+  <img src="https://img.shields.io/badge/spring_boot-3.5.X-6DB33F?style=for-the-badge&logo=springboot"/>
+  <img src="https://img.shields.io/badge/Spring_Data_JPA-ORM-6DB33F?style=for-the-badge&logo=spring"/>
 
   <!-- Persistência -->
-  <img src="https://img.shields.io/badge/PostgreSQL-Database-316192?style=for-the-badge&logo=postgresql&logoColor=316192"/>
+  <img src="https://img.shields.io/badge/postgresql-database-blue?style=for-the-badge&logo=postgresql"/>
+  <img src="https://img.shields.io/badge/flyway-database_migrations-CC0200?style=for-the-badge"/>
 
   <!-- Infraestrutura -->
-  <img src="https://img.shields.io/badge/Docker-Containers-2496ED?style=for-the-badge&logo=docker&logoColor=2496ED"/>
-  <img src="https://img.shields.io/badge/Oracle_Cloud-OCI-F80000?style=for-the-badge&logo=oracle&logoColor=F80000"/>
+  <img src="https://img.shields.io/badge/docker-containerization-2496ED?style=for-the-badge&logo=docker"/>
 
   <!-- Qualidade -->
   <img src="https://img.shields.io/badge/JUnit_5-Testing-25A162?style=for-the-badge&logo=junit5&logoColor=25A162"/>
-  <img src="https://img.shields.io/badge/Mockito-Mocking-78A641?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/Coverage-90%25%2B-F57C00?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Mockito-Mocking-red?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Coverage-85%25%2B-F57C00?style=for-the-badge"/>
 
   <!-- Documentação -->
-  <img src="https://img.shields.io/badge/Swagger-API_Docs-85EA2D?style=for-the-badge&logo=swagger&logoColor=85EA2D"/>
+  <img src="https://img.shields.io/badge/swagger-api--docs-green?style=for-the-badge&logo=swagger"/>
 
-  <!-- Observabilidade -->
-  <img src="https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=for-the-badge&logo=prometheus&logoColor=E6522C"/>
-  <img src="https://img.shields.io/badge/Grafana-Observability-F46800?style=for-the-badge&logo=grafana&logoColor=F46800"/>
-</p>
-
-<p align="center">
-
----
-
-# 🚀 Aplicação em Produção
-
-<a href="http://147.15.45.10:8080/swagger-ui/index.html">
-🔗 Swagger UI
-</a>
-
+  <!-- Cloud -->
+  <img src="https://img.shields.io/badge/Oracle_Cloud-OCI-F80000?style=for-the-badge&logo=oracle&logoColor=F80000"/>
 </p>
 
 ---
@@ -56,19 +43,17 @@ A aplicação concentra toda a **lógica de gerenciamento** da partida, permitin
 
 O projeto nasceu para resolver um problema recorrente em jogos recreativos: organizar **quem joga, quem espera, quem entra, quem sai** e como manter **partidas equilibradas** sem depender de decisões manuais durante toda a sessão.
 
-Além de solucionar o problema de negócio, o projeto foi concebido como um estudo aprofundado em **engenharia de software**, priorizando **arquitetura orientada ao domínio (DDD), boas práticas de desenvolvimento, testes automatizados, observabilidade, conteinerização** e **publicação em ambiente de produção** utilizando **Oracle Cloud Infrastructure (OCI)**.
+Além de solucionar o problema de negócio, o projeto foi concebido como um estudo aprofundado em **engenharia de software**, priorizando **arquitetura orientada ao domínio (DDD), boas práticas de desenvolvimento, testes automatizados (incluindo testes de concorrência), conteinerização** e **publicação em ambiente de produção** utilizando **Oracle Cloud Infrastructure (OCI)**.
 
 ---
 
 # 🏛️ Arquitetura
 
-O **Racha Manager** foi projetado seguindo princípios de **Domain-Driven Design (DDD)**, buscando manter a lógica de negócio isolada da infraestrutura e modelar o domínio da forma mais próxima possível do problema real.
+O **Racha Manager** foi projetado seguindo princípios táticos de **Domain-Driven Design (DDD)**, buscando manter a lógica de negócio isolada da infraestrutura e modelar o domínio da forma mais próxima possível do problema real — em vez de um CRUD tradicional em torno de tabelas.
 
-Neste projeto, a **Session** atua como **Aggregate Root**, sendo responsável por coordenar toda a sessão de jogo e garantir a consistência entre equipes, partidas e fila de espera.
+Neste projeto, a **Session** atua como **Aggregate Root**, sendo responsável por coordenar toda a sessão de jogo e garantir a consistência entre jogadores ativos, equipes, partida em andamento e fila de espera. Toda mutação de estado passa por métodos de negócio da própria `Session` — nenhuma coleção interna é exposta diretamente, evitando que regras sejam contornadas por acesso direto ao estado.
 
 Diferentemente de aplicações CRUD tradicionais, **apenas os jogadores são persistidos em banco de dados**. Todo o restante do estado da partida existe apenas enquanto a sessão está ativa em memória, tornando a aplicação mais simples, performática e preparada para futuras evoluções.
-
----
 
 ## Modelo de Domínio
 
@@ -80,13 +65,11 @@ O modelo de domínio foi construído tendo a **Session** como entidade central, 
 
 - Gerenciar os jogadores ativos da sessão;
 - Organizar automaticamente as equipes;
-- Controlar a fila de espera;
+- Controlar a fila de espera (`WaitingQueue`), priorizando times que ainda não jogaram sobre os que já jogaram;
 - Coordenar a partida em andamento;
 - Garantir a consistência de toda a sessão de jogo.
 
 Essa abordagem mantém a lógica de negócio concentrada em um único ponto, reduzindo acoplamento entre objetos e facilitando futuras evoluções do domínio.
-
----
 
 ## Estratégia de Persistência
 
@@ -96,12 +79,12 @@ Essa abordagem mantém a lógica de negócio concentrada em um único ponto, red
 
 Uma das principais decisões arquiteturais deste projeto foi separar claramente o que pertence à **persistência** do que pertence apenas ao **estado de execução da aplicação**.
 
-| Persistido | Runtime   |
-|-------------|-----------|
-| ✅ Player | ✅ Session |
-| | ✅ Team    |
-| | ✅ Match   |
-| | ✅ Queue   |
+| Persistido | Runtime         |
+|------------|-----------------|
+| ✅ Player  | ✅ Session       |
+|            | ✅ Team          |
+|            | ✅ Match         |
+|            | ✅ WaitingQueue  |
 
 Essa estratégia oferece diversas vantagens:
 
@@ -131,6 +114,12 @@ Essa proteção foi validada com **testes de concorrência reais**, que disparam
 
 ---
 
+# ☁️ Deploy
+
+A aplicação já foi publicada em produção na **Oracle Cloud Infrastructure (OCI)**. No momento, o deploy está **pausado** enquanto os últimos ajustes da V1 são finalizados — a documentação interativa (Swagger) pode ser explorada localmente seguindo a seção [Como rodar localmente](#️-como-rodar-localmente) abaixo.
+
+---
+
 # ⚙️ Como rodar localmente
 
 ### Pré-requisitos
@@ -151,12 +140,12 @@ cp .env.example .env
 ```
 Variáveis utilizadas:
 
-| Variável      | Descrição                       | Valor padrão      |
-|---------------|----------------------------------|--------------------|
-| `DB_PORT`     | Porta do PostgreSQL              | `5432`             |
-| `DB_NAME`     | Nome do banco de dados           | `racha_manager`    |
-| `DB_USER`     | Usuário do banco                 | `postgres`         |
-| `DB_PASSWORD` | Senha do banco                   | `postgres`         |
+| Variável      | Descrição              | Valor padrão    |
+|---------------|-------------------------|------------------|
+| `DB_PORT`     | Porta do PostgreSQL     | `5432`           |
+| `DB_NAME`     | Nome do banco de dados  | `racha_manager`  |
+| `DB_USER`     | Usuário do banco        | `postgres`       |
+| `DB_PASSWORD` | Senha do banco          | `postgres`       |
 
 ### 3. Suba o banco de dados
 ```bash
@@ -187,24 +176,24 @@ Isso sobe o PostgreSQL e a aplicação, dispensando o `./mvnw spring-boot:run` d
 
 # 📡 Endpoints principais
 
-Documentação interativa completa disponível via Swagger UI (link no topo deste README, ou em `/swagger-ui/index.html` ao rodar localmente).
+Documentação interativa completa disponível via Swagger UI, em `/swagger-ui/index.html` ao rodar localmente.
 
 ### Sessões
 
-| Método   | Endpoint                                   | Descrição                                    |
-|----------|---------------------------------------------|-----------------------------------------------|
-| `POST`   | `/sessions`                                 | Cria uma nova sessão de jogo                  |
-| `GET`    | `/sessions/{sessionId}`                     | Consulta o estado atual de uma sessão         |
-| `POST`   | `/sessions/{sessionId}/players/{playerId}`  | Adiciona um jogador à sessão                  |
-| `DELETE` | `/sessions/{sessionId}/players/{playerId}`  | Remove um jogador da sessão                   |
-| `POST`   | `/sessions/{sessionId}/finish-match`        | Finaliza a partida em andamento (vitória/empate) |
+| Método   | Endpoint                                   | Descrição                                         |
+|----------|---------------------------------------------|----------------------------------------------------|
+| `POST`   | `/sessions`                                 | Cria uma nova sessão de jogo                        |
+| `GET`    | `/sessions/{sessionId}`                     | Consulta o estado atual de uma sessão               |
+| `POST`   | `/sessions/{sessionId}/players/{playerId}`  | Adiciona um jogador à sessão                        |
+| `DELETE` | `/sessions/{sessionId}/players/{playerId}`  | Remove um jogador da sessão                         |
+| `POST`   | `/sessions/{sessionId}/finish-match`        | Finaliza a partida em andamento (vitória/empate)    |
 
 ### Jogadores
 
-| Método | Endpoint    | Descrição                          |
-|--------|-------------|--------------------------------------|
-| `POST` | `/players`  | Cadastra um novo jogador             |
-| `GET`  | `/players`  | Lista os jogadores cadastrados (paginado) |
+| Método | Endpoint    | Descrição                                  |
+|--------|-------------|----------------------------------------------|
+| `POST` | `/players`  | Cadastra um novo jogador                      |
+| `GET`  | `/players`  | Lista os jogadores cadastrados (paginado)     |
 
 ---
 
@@ -219,6 +208,16 @@ Documentação interativa completa disponível via Swagger UI (link no topo dest
 
 ---
 
+# 🧪 Qualidade e Testes
+
+O projeto conta com cobertura de testes acima de 85% (JaCoCo), incluindo:
+
+- Testes unitários de modelo de domínio, serviços e *use cases*;
+- Testes de integração dos controllers;
+- **Testes de concorrência**, com múltiplas threads reais (`ExecutorService` + `CountDownLatch`), validando a proteção contra *race conditions* no `Session`.
+
+---
+
 # 🗺️ Roadmap (V2)
 
 - 🔐 Autenticação e autorização
@@ -230,9 +229,16 @@ Documentação interativa completa disponível via Swagger UI (link no topo dest
 
 ---
 
-# 🧪 Qualidade e Testes
+# 👨‍💻 Autor
 
-O projeto conta com cobertura de testes acima de 90% (JaCoCo), incluindo:
-- Testes unitários de modelo de domínio, serviços e *use cases*;
-- Testes de integração dos controllers;
-- **Testes de concorrência** com múltiplas threads reais, validando a proteção contra *race conditions* no `Session`.
+Lucas Vieira
+
+Estudante de Engenharia de Computação — UFC Sobral
+
+GitHub:
+
+https://github.com/fcolucasvieira
+
+LinkedIn:
+
+https://www.linkedin.com/in/fco-lucas-vieira/ 
