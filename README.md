@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/banner-icon-racha-manager.png" alt="Racha Manager" width="900">
+  <img src="docs/images/banner-icon-racha-manager.png" alt="Racha Manager" width="1473">
 </p>
 
 <h1 align="center">Racha Manager</h1>
@@ -7,50 +7,29 @@
 <p align="center">
 API REST para gerenciamento inteligente de equipes, jogadores e partidas esportivas amadoras.
 </p>
-
-<p align="center">
-  <!-- Plataforma -->
-  <img src="https://img.shields.io/badge/Java-21-FFD700?style=for-the-badge&logo=openjdk&logoColor=FFD700"/>
-  <img src="https://img.shields.io/badge/Spring_Boot-4.0.5-6DB33F?style=for-the-badge&logo=springboot&logoColor=6DB33F"/>
-  <img src="https://img.shields.io/badge/Spring_Data_JPA-ORM-6DB33F?style=for-the-badge&logo=spring&logoColor=6DB33F"/>
-
-  <!-- Persistência -->
-  <img src="https://img.shields.io/badge/PostgreSQL-Database-316192?style=for-the-badge&logo=postgresql&logoColor=316192"/>
-
-  <!-- Infraestrutura -->
-  <img src="https://img.shields.io/badge/Docker-Containers-2496ED?style=for-the-badge&logo=docker&logoColor=2496ED"/>
-  <img src="https://img.shields.io/badge/Oracle_Cloud-OCI-F80000?style=for-the-badge&logo=oracle&logoColor=F80000"/>
-
-  <!-- Qualidade -->
-  <img src="https://img.shields.io/badge/JUnit_5-Testing-25A162?style=for-the-badge&logo=junit5&logoColor=25A162"/>
-  <img src="https://img.shields.io/badge/Mockito-Mocking-78A641?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/Coverage-90%25%2B-F57C00?style=for-the-badge"/>
-
-  <!-- Documentação -->
-  <img src="https://img.shields.io/badge/Swagger-API_Docs-85EA2D?style=for-the-badge&logo=swagger&logoColor=85EA2D"/>
-
-  <!-- Observabilidade -->
-  <img src="https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=for-the-badge&logo=prometheus&logoColor=E6522C"/>
-  <img src="https://img.shields.io/badge/Grafana-Observability-F46800?style=for-the-badge&logo=grafana&logoColor=F46800"/>
-</p>
-
 <p align="center">
 
----
+  ![Java](https://img.shields.io/badge/Java-21-FFD700?style=for-the-badge&logo=openjdk&logoColor=FFD700)
+  ![Spring Boot](https://img.shields.io/badge/spring_boot-4.0.5-6DB33F?style=for-the-badge&logo=springboot)
+  ![Spring Data JPA](https://img.shields.io/badge/Spring_Data_JPA-ORM-6DB33F?style=for-the-badge&logo=spring)
+  ![PostgreSQL](https://img.shields.io/badge/postgresql-database-blue?style=for-the-badge&logo=postgresql)
+  ![Flyway](https://img.shields.io/badge/flyway-database_migrations-CC0200?style=for-the-badge)
+  ![Docker](https://img.shields.io/badge/docker-containerization-2496ED?style=for-the-badge&logo=docker)
+  ![JUnit](https://img.shields.io/badge/JUnit_5-Testing-25A162?style=for-the-badge&logo=junit5&logoColor=25A162)
+  ![Mockito](https://img.shields.io/badge/Mockito-Mocking-red?style=for-the-badge)
+  ![Coverage](https://img.shields.io/badge/Coverage-85%25%2B-F57C00?style=for-the-badge)
+  ![Swagger](https://img.shields.io/badge/swagger-api--docs-green?style=for-the-badge&logo=swagger)
+  ![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=for-the-badge&logo=prometheus&logoColor=E6522C)
+  ![Grafana](https://img.shields.io/badge/Grafana-Observability-F46800?style=for-the-badge&logo=grafana&logoColor=F46800)  
+  ![Oracle Cloud](https://img.shields.io/badge/Oracle_Cloud-Cloud-F80000?style=for-the-badge&logo=oracle&logoColor=F80000)
 
-# 🚀 Aplicação em Produção
-
-<a href="http://147.15.45.10:8080/swagger-ui/index.html">
-🔗 Swagger UI
-</a>
-
-</p>
+<p align="center">
 
 ---
 
 # 📌 Sobre o projeto
 
-O **Racha Manager** é uma **API REST** desenvolvida para automatizar a organização de **partidas esportivas amadoras**, eliminando a necessidade de controlar manualmente **jogadores, equipes, filas de espera** e **rodadas** durante uma sessão.
+O **Racha Manager** é uma API REST desenvolvida para automatizar a organização de "rachas" ou "peladas" de futebol, eliminando a necessidade de controlar manualmente **jogadores, equipes, filas de espera** e **rodadas** durante uma sessão.
 
 A aplicação concentra toda a **lógica de gerenciamento** da partida, permitindo que jogadores sejam adicionados ou removidos dinamicamente enquanto o sistema administra automaticamente a **formação das equipes**, a **fila de espera**, a **rotação dos times** e o **andamento das partidas**.
 
@@ -118,3 +97,119 @@ O foco da versão atual é o **gerenciamento de partidas em tempo real**, e não
 Como sessões, equipes, partidas e filas possuem um ciclo de vida temporário, persistir essas estruturas aumentaria significativamente a complexidade da aplicação sem gerar benefícios para os requisitos atuais.
 
 Essa decisão mantém o domínio enxuto, facilita a manutenção do código e permite que novas funcionalidades sejam adicionadas futuramente sem necessidade de grandes mudanças arquiteturais.
+
+---
+
+# 🧵 Concorrência
+
+Como múltiplas requisições podem tentar alterar a **mesma sessão** ao mesmo tempo (por exemplo, dois jogadores entrando simultaneamente), o `Session` é protegido contra **race conditions** usando `synchronized` nos *use cases* que executam o fluxo `buscar → decidir → alterar → salvar`.
+
+Essa proteção foi validada com **testes de concorrência reais**, que disparam múltiplas threads simultâneas contra a mesma sessão (usando `ExecutorService` + `CountDownLatch`) e garantem que o estado final permanece consistente — sem jogadores duplicados, sem times criados em duplicidade e sem exceptions inesperadas.
+
+> 💡 Essa solução é intencionalmente pensada para a versão atual (estado em memória, instância única). Na evolução com **Redis** (ver Roadmap), a estratégia de lock será migrada para um **distributed lock**, já que `synchronized` não protege estado compartilhado entre múltiplas instâncias da aplicação.
+
+---
+
+# ⚙️ Como rodar localmente
+
+### Pré-requisitos
+- Java 21
+- Docker e Docker Compose
+- Maven (ou use o `./mvnw` incluso no projeto)
+
+### 1. Clone o repositório
+```bash
+git clone https://github.com/fcolucasvieira/racha-manager.git
+cd racha-manager
+```
+
+### 2. Configure as variáveis de ambiente
+Copie o arquivo de exemplo e ajuste se necessário:
+```bash
+cp .env.example .env
+```
+Variáveis utilizadas:
+
+| Variável      | Descrição                       | Valor padrão      |
+|---------------|----------------------------------|--------------------|
+| `DB_PORT`     | Porta do PostgreSQL              | `5432`             |
+| `DB_NAME`     | Nome do banco de dados           | `racha_manager`    |
+| `DB_USER`     | Usuário do banco                 | `postgres`         |
+| `DB_PASSWORD` | Senha do banco                   | `postgres`         |
+
+### 3. Suba o banco de dados
+```bash
+docker compose up -d postgres
+```
+
+### 4. Rode a aplicação
+```bash
+./mvnw spring-boot:run
+```
+
+A aplicação estará disponível em `http://localhost:8080`.
+
+### 5. (Opcional) Suba a stack completa com observabilidade
+```bash
+docker compose --profile production up -d
+```
+Isso sobe a aplicação, o PostgreSQL, o Prometheus (`http://localhost:9090`) e o Grafana (`http://localhost:3000`).
+
+### Rodando os testes
+```bash
+./mvnw test
+```
+
+---
+
+# 📡 Endpoints principais
+
+Documentação interativa completa disponível via Swagger UI (link no topo deste README, ou em `/swagger-ui/index.html` ao rodar localmente).
+
+### Sessões
+
+| Método   | Endpoint                                   | Descrição                                    |
+|----------|---------------------------------------------|-----------------------------------------------|
+| `POST`   | `/sessions`                                 | Cria uma nova sessão de jogo                  |
+| `GET`    | `/sessions/{sessionId}`                     | Consulta o estado atual de uma sessão         |
+| `POST`   | `/sessions/{sessionId}/players/{playerId}`  | Adiciona um jogador à sessão                  |
+| `DELETE` | `/sessions/{sessionId}/players/{playerId}`  | Remove um jogador da sessão                   |
+| `POST`   | `/sessions/{sessionId}/finish-match`        | Finaliza a partida em andamento (vitória/empate) |
+
+### Jogadores
+
+| Método | Endpoint    | Descrição                          |
+|--------|-------------|--------------------------------------|
+| `POST` | `/players`  | Cadastra um novo jogador             |
+| `GET`  | `/players`  | Lista os jogadores cadastrados (paginado) |
+
+---
+
+# 🔄 Fluxo de uma sessão completa
+
+1. **Criar a sessão** — `POST /sessions`, retorna o `sessionId`.
+2. **Adicionar jogadores** — `POST /sessions/{sessionId}/players/{playerId}`, um a um. Ao atingir 8 jogadores ativos, os times iniciais são formados automaticamente e a primeira partida começa.
+3. **Jogadores extras entram na fila de espera** — a partir do 9º jogador, novos times são montados e aguardam na fila, com prioridade para times que ainda não jogaram.
+4. **Finalizar a partida** — `POST /sessions/{sessionId}/finish-match`, informando o time vencedor (ou empate). O time vencedor permanece em quadra, o perdedor vai para o fim da fila, e o próximo time da fila entra automaticamente.
+5. **Jogadores podem sair a qualquer momento** — `DELETE /sessions/{sessionId}/players/{playerId}`. Se o time ficar incompleto, o sistema tenta completá-lo automaticamente com jogadores da fila de espera.
+6. **Consultar o estado a qualquer momento** — `GET /sessions/{sessionId}`, retornando jogadores ativos, times, partida atual e fila de espera.
+
+---
+
+# 🗺️ Roadmap (V2)
+
+- 🔐 Autenticação e autorização
+- 🧠 Redis para persistência distribuída do estado da sessão (com TTL de 24h)
+- 🔒 Distributed lock (Redisson) substituindo o `synchronized` local, para suportar múltiplas instâncias
+- 🧹 Expiração automática de sessões inativas
+- ⚽ Generalização das regras para N times e M jogadores por time (hoje fixo em 4x4)
+- 🤖 Pipeline de CI (GitHub Actions) rodando os testes a cada push
+
+---
+
+# 🧪 Qualidade e Testes
+
+O projeto conta com cobertura de testes acima de 90% (JaCoCo), incluindo:
+- Testes unitários de modelo de domínio, serviços e *use cases*;
+- Testes de integração dos controllers;
+- **Testes de concorrência** com múltiplas threads reais, validando a proteção contra *race conditions* no `Session`.
