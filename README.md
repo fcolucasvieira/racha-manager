@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/banner-icon-racha-manager.png" alt="Racha Manager" width="1473">
+  <img src="docs/images/banner-icon-racha-manager.png" alt="Racha Manager" width="900">
 </p>
 
 <h1 align="center">Racha Manager</h1>
@@ -7,29 +7,50 @@
 <p align="center">
 API REST para gerenciamento inteligente de equipes, jogadores e partidas esportivas amadoras.
 </p>
-<p align="center">
 
-  ![Java](https://img.shields.io/badge/Java-21-FFD700?style=for-the-badge&logo=openjdk&logoColor=FFD700)
-  ![Spring Boot](https://img.shields.io/badge/spring_boot-4.0.5-6DB33F?style=for-the-badge&logo=springboot)
-  ![Spring Data JPA](https://img.shields.io/badge/Spring_Data_JPA-ORM-6DB33F?style=for-the-badge&logo=spring)
-  ![PostgreSQL](https://img.shields.io/badge/postgresql-database-blue?style=for-the-badge&logo=postgresql)
-  ![Flyway](https://img.shields.io/badge/flyway-database_migrations-CC0200?style=for-the-badge)
-  ![Docker](https://img.shields.io/badge/docker-containerization-2496ED?style=for-the-badge&logo=docker)
-  ![JUnit](https://img.shields.io/badge/JUnit_5-Testing-25A162?style=for-the-badge&logo=junit5&logoColor=25A162)
-  ![Mockito](https://img.shields.io/badge/Mockito-Mocking-red?style=for-the-badge)
-  ![Coverage](https://img.shields.io/badge/Coverage-85%25%2B-F57C00?style=for-the-badge)
-  ![Swagger](https://img.shields.io/badge/swagger-api--docs-green?style=for-the-badge&logo=swagger)
-  ![Prometheus](https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=for-the-badge&logo=prometheus&logoColor=E6522C)
-  ![Grafana](https://img.shields.io/badge/Grafana-Observability-F46800?style=for-the-badge&logo=grafana&logoColor=F46800)  
-  ![Oracle Cloud](https://img.shields.io/badge/Oracle_Cloud-Cloud-F80000?style=for-the-badge&logo=oracle&logoColor=F80000)
+<p align="center">
+  <!-- Plataforma -->
+  <img src="https://img.shields.io/badge/Java-21-FFD700?style=for-the-badge&logo=openjdk&logoColor=FFD700"/>
+  <img src="https://img.shields.io/badge/Spring_Boot-4.0.5-6DB33F?style=for-the-badge&logo=springboot&logoColor=6DB33F"/>
+  <img src="https://img.shields.io/badge/Spring_Data_JPA-ORM-6DB33F?style=for-the-badge&logo=spring&logoColor=6DB33F"/>
+
+  <!-- Persistência -->
+  <img src="https://img.shields.io/badge/PostgreSQL-Database-316192?style=for-the-badge&logo=postgresql&logoColor=316192"/>
+
+  <!-- Infraestrutura -->
+  <img src="https://img.shields.io/badge/Docker-Containers-2496ED?style=for-the-badge&logo=docker&logoColor=2496ED"/>
+  <img src="https://img.shields.io/badge/Oracle_Cloud-OCI-F80000?style=for-the-badge&logo=oracle&logoColor=F80000"/>
+
+  <!-- Qualidade -->
+  <img src="https://img.shields.io/badge/JUnit_5-Testing-25A162?style=for-the-badge&logo=junit5&logoColor=25A162"/>
+  <img src="https://img.shields.io/badge/Mockito-Mocking-78A641?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Coverage-90%25%2B-F57C00?style=for-the-badge"/>
+
+  <!-- Documentação -->
+  <img src="https://img.shields.io/badge/Swagger-API_Docs-85EA2D?style=for-the-badge&logo=swagger&logoColor=85EA2D"/>
+
+  <!-- Observabilidade -->
+  <img src="https://img.shields.io/badge/Prometheus-Monitoring-E6522C?style=for-the-badge&logo=prometheus&logoColor=E6522C"/>
+  <img src="https://img.shields.io/badge/Grafana-Observability-F46800?style=for-the-badge&logo=grafana&logoColor=F46800"/>
+</p>
 
 <p align="center">
 
 ---
 
+# 🚀 Aplicação em Produção
+
+<a href="http://147.15.45.10:8080/swagger-ui/index.html">
+🔗 Swagger UI
+</a>
+
+</p>
+
+---
+
 # 📌 Sobre o projeto
 
-O **Racha Manager** é uma API REST desenvolvida para automatizar a organização de "rachas" ou "peladas" de futebol, eliminando a necessidade de controlar manualmente **jogadores, equipes, filas de espera** e **rodadas** durante uma sessão.
+O **Racha Manager** é uma **API REST** desenvolvida para automatizar a organização de **partidas esportivas amadoras**, eliminando a necessidade de controlar manualmente **jogadores, equipes, filas de espera** e **rodadas** durante uma sessão.
 
 A aplicação concentra toda a **lógica de gerenciamento** da partida, permitindo que jogadores sejam adicionados ou removidos dinamicamente enquanto o sistema administra automaticamente a **formação das equipes**, a **fila de espera**, a **rotação dos times** e o **andamento das partidas**.
 
@@ -149,11 +170,13 @@ docker compose up -d postgres
 
 A aplicação estará disponível em `http://localhost:8080`.
 
-### 5. (Opcional) Suba a stack completa com observabilidade
+### 5. (Opcional) Suba a aplicação via Docker também
 ```bash
-docker compose --profile production up -d
+docker compose --profile app up -d
 ```
-Isso sobe a aplicação, o PostgreSQL, o Prometheus (`http://localhost:9090`) e o Grafana (`http://localhost:3000`).
+Isso sobe o PostgreSQL e a aplicação, dispensando o `./mvnw spring-boot:run` do passo anterior.
+
+> 📊 **Observabilidade:** a stack de Prometheus/Grafana está presente na infraestrutura (`docker compose --profile app --profile observability up -d`), mas ainda não está estabilizada — é um ajuste previsto para uma próxima versão. Hoje a aplicação conta com logging estruturado como principal ferramenta de observabilidade.
 
 ### Rodando os testes
 ```bash

@@ -17,6 +17,8 @@ services:
       timeout: 5s
       retries: 5
 
+    restart: unless-stopped
+
     volumes:
       - racha_manager_postgres_data:/var/lib/postgresql/data
 
@@ -25,7 +27,7 @@ services:
     container_name: racha-app
 
     profiles:
-      - production
+      - app
 
     depends_on:
       postgres:
@@ -39,9 +41,14 @@ services:
     ports:
       - "8080:8080"
 
+    restart: unless-stopped
+
   prometheus:
     image: prom/prometheus
     container_name: racha-prometheus
+
+    profiles:
+      - observability
 
     ports:
       - "9090:9090"
@@ -52,6 +59,9 @@ services:
   grafana:
     image: grafana/grafana
     container_name: racha-grafana
+
+    profiles:
+      - observability
 
     ports:
     - "3000:3000"
