@@ -52,7 +52,7 @@ public class PlayerController {
             description = """
     Retrieves a paginated list of players.
     
-    Example request: 
+    Example request:
     
     GET /players?page=0&size=20
 

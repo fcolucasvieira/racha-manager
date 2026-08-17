@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class GetAllPlayersUseCase {
-
     private final PlayerRepository repository;
 
     public Page<Player> execute(Pageable pageable) {

@@ -70,8 +70,8 @@ public class AddPlayerToSessionUseCase {
             }
 
             sessionRepository.save(session);
-        }
 
-        return session.getTeams();
+            return session.getTeams();
+        }
     }
 }
