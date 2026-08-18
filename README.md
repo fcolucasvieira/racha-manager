@@ -24,28 +24,6 @@ API REST para gerenciamento inteligente de equipes, jogadores e partidas esporti
 
 ---
 
-## Índice
-
-- [📌 Sobre o projeto](#-sobre-o-projeto)
-- [🎯 Problema](#-problema)
-- [💡 Solução](#-solução)
-- [🚀 Tecnologias utilizadas](#-tecnologias-utilizadas)
-- [🏛️ Arquitetura](#️-arquitetura)
-    - [Estrutura geral](#estrutura-geral)
-    - [Fluxo da requisição](#fluxo-da-requisição)
-    - [Modelo de Domínio](#modelo-de-domínio)
-    - [Estratégia de Persistência](#estratégia-de-persistência)
-- [🧵 Concorrência](#-concorrência)
-- [☁️ Deploy](#️-deploy)
-- [⚙️ Como rodar localmente](#️-como-rodar-localmente)
-- [📡 Endpoints principais](#-endpoints-principais)
-- [🔄 Fluxo de uma sessão completa](#-fluxo-de-uma-sessão-completa)
-- [🧪 Qualidade e Testes](#-qualidade-e-testes)
-- [🗺️ Roadmap](#️-roadmap)
-- [👨‍💻 Autor](#-autor)
-
----
-
 # 📌 Sobre o projeto
 
 O **Racha Manager** é uma **API REST** desenvolvida para automatizar a organização de **partidas esportivas amadoras** — os famosos "rachas" ou "peladas" de futebol —, eliminando a necessidade de controlar manualmente jogadores, equipes, filas de espera e rodadas durante uma sessão.
@@ -326,7 +304,7 @@ O projeto conta com cobertura de testes acima de 85% (JaCoCo), incluindo:
 
 # 👨‍💻 Autor
 
-**Lucas Vieira**
+**Lucas Vieira**:
 Estudante de Engenharia de Computação — UFC Sobral
 
 - GitHub: [github.com/fcolucasvieira](https://github.com/fcolucasvieira)
