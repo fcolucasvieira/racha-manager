@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/banner-icon-racha-manager.png" alt="Racha Manager" width="900">
+  <img src="docs/images/banner-icon-racha-manager.png" alt="Racha Manager" width="1473">
 </p>
 
 <h1 align="center">Racha Manager</h1>
@@ -9,51 +9,148 @@ API REST para gerenciamento inteligente de equipes, jogadores e partidas esporti
 </p>
 
 <p align="center">
-  <!-- Plataforma -->
   <img src="https://img.shields.io/badge/Java-21-FFD700?style=for-the-badge&logo=openjdk&logoColor=FFD700"/>
-  <img src="https://img.shields.io/badge/spring_boot-3.5.X-6DB33F?style=for-the-badge&logo=springboot"/>
+  <img src="https://img.shields.io/badge/spring_boot-4.0.5-6DB33F?style=for-the-badge&logo=springboot"/>
   <img src="https://img.shields.io/badge/Spring_Data_JPA-ORM-6DB33F?style=for-the-badge&logo=spring"/>
-
-  <!-- Persistência -->
   <img src="https://img.shields.io/badge/postgresql-database-blue?style=for-the-badge&logo=postgresql"/>
   <img src="https://img.shields.io/badge/flyway-database_migrations-CC0200?style=for-the-badge"/>
-
-  <!-- Infraestrutura -->
   <img src="https://img.shields.io/badge/docker-containerization-2496ED?style=for-the-badge&logo=docker"/>
-
-  <!-- Qualidade -->
+  <img src="https://img.shields.io/badge/Oracle_Cloud-OCI-F80000?style=for-the-badge&logo=oracle&logoColor=F80000"/>
   <img src="https://img.shields.io/badge/JUnit_5-Testing-25A162?style=for-the-badge&logo=junit5&logoColor=25A162"/>
   <img src="https://img.shields.io/badge/Mockito-Mocking-red?style=for-the-badge"/>
   <img src="https://img.shields.io/badge/Coverage-85%25%2B-F57C00?style=for-the-badge"/>
-
-  <!-- Documentação -->
   <img src="https://img.shields.io/badge/swagger-api--docs-green?style=for-the-badge&logo=swagger"/>
-
-  <!-- Cloud -->
-  <img src="https://img.shields.io/badge/Oracle_Cloud-OCI-F80000?style=for-the-badge&logo=oracle&logoColor=F80000"/>
 </p>
+
+---
+
+## Índice
+
+- [📌 Sobre o projeto](#-sobre-o-projeto)
+- [🎯 Problema](#-problema)
+- [💡 Solução](#-solução)
+- [🚀 Tecnologias utilizadas](#-tecnologias-utilizadas)
+- [🏛️ Arquitetura](#️-arquitetura)
+    - [Estrutura geral](#estrutura-geral)
+    - [Fluxo da requisição](#fluxo-da-requisição)
+    - [Modelo de Domínio](#modelo-de-domínio)
+    - [Estratégia de Persistência](#estratégia-de-persistência)
+- [🧵 Concorrência](#-concorrência)
+- [☁️ Deploy](#️-deploy)
+- [⚙️ Como rodar localmente](#️-como-rodar-localmente)
+- [📡 Endpoints principais](#-endpoints-principais)
+- [🔄 Fluxo de uma sessão completa](#-fluxo-de-uma-sessão-completa)
+- [🧪 Qualidade e Testes](#-qualidade-e-testes)
+- [🗺️ Roadmap](#️-roadmap)
+- [👨‍💻 Autor](#-autor)
 
 ---
 
 # 📌 Sobre o projeto
 
-O **Racha Manager** é uma **API REST** desenvolvida para automatizar a organização de **partidas esportivas amadoras**, eliminando a necessidade de controlar manualmente **jogadores, equipes, filas de espera** e **rodadas** durante uma sessão.
+O **Racha Manager** é uma **API REST** desenvolvida para automatizar a organização de **partidas esportivas amadoras** — os famosos "rachas" ou "peladas" de futebol —, eliminando a necessidade de controlar manualmente jogadores, equipes, filas de espera e rodadas durante uma sessão.
 
-A aplicação concentra toda a **lógica de gerenciamento** da partida, permitindo que jogadores sejam adicionados ou removidos dinamicamente enquanto o sistema administra automaticamente a **formação das equipes**, a **fila de espera**, a **rotação dos times** e o **andamento das partidas**.
+Além de solucionar o problema de negócio, o projeto foi concebido como um estudo aprofundado em **engenharia de software**, priorizando arquitetura orientada ao domínio (DDD), boas práticas de desenvolvimento, testes automatizados — incluindo testes de concorrência —, conteinerização e publicação em ambiente de produção utilizando **Oracle Cloud Infrastructure (OCI)**.
 
-O projeto nasceu para resolver um problema recorrente em jogos recreativos: organizar **quem joga, quem espera, quem entra, quem sai** e como manter **partidas equilibradas** sem depender de decisões manuais durante toda a sessão.
+---
 
-Além de solucionar o problema de negócio, o projeto foi concebido como um estudo aprofundado em **engenharia de software**, priorizando **arquitetura orientada ao domínio (DDD), boas práticas de desenvolvimento, testes automatizados (incluindo testes de concorrência), conteinerização** e **publicação em ambiente de produção** utilizando **Oracle Cloud Infrastructure (OCI)**.
+# 🎯 Problema
+
+Organizar um racha entre amigos parece simples, mas rapidamente vira uma fonte de atrito quando feito manualmente:
+
+- quem já jogou e quem ainda está esperando a vez;
+- como formar times de maneira aleatória e equilibrada, sem depender de alguém decidindo manualmente quem joga com quem;
+- o que fazer quando um time fica incompleto porque alguém saiu no meio do jogo;
+- quem entra na quadra quando a partida termina;
+- e tudo isso precisa ser recalculado toda vez que alguém entra ou sai da pelada.
+
+Sem um sistema que centralize essas regras, a organização acaba dependendo da memória e da boa vontade de quem está "controlando o jogo" — e erros de contagem, discussões sobre times e filas desorganizadas são praticamente garantidos à medida que o número de jogadores cresce.
+
+---
+
+# 💡 Solução
+
+O Racha Manager centraliza toda essa lógica em uma única API, automatizando decisões que antes exigiam controle manual constante:
+
+- criação e gerenciamento de sessões de jogo;
+- entrada e saída dinâmica de jogadores, a qualquer momento;
+- formação automática dos times iniciais assim que jogadores suficientes se juntam;
+- fila de espera com priorização — times que ainda não jogaram entram na frente dos que já jogaram;
+- rotação automática de partidas: o time vencedor permanece em quadra, o perdedor vai para o fim da fila;
+- recomposição automática de times incompletos, puxando jogadores da fila quando necessário;
+- proteção contra condições de corrida (*race conditions*) quando múltiplas requisições atingem a mesma sessão simultaneamente, validada com testes de concorrência reais;
+- documentação interativa via Swagger;
+- ambiente totalmente containerizado com Docker.
+
+---
+
+# 🚀 Tecnologias utilizadas
+
+| Categoria        | Tecnologias                              |
+|-------------------|-------------------------------------------|
+| Arquitetura       | DDD tático (Aggregate Root, Rich Domain Model) |
+| Linguagem         | Java 21                                    |
+| Framework         | Spring Boot                                |
+| Banco de Dados    | PostgreSQL                                 |
+| Persistência      | Spring Data JPA / Hibernate                |
+| Migrações         | Flyway                                     |
+| Testes            | JUnit 5, Mockito, testes de concorrência (`ExecutorService` + `CountDownLatch`) |
+| Cobertura         | JaCoCo                                     |
+| Documentação      | Swagger / OpenAPI                          |
+| Containerização   | Docker + Docker Compose                    |
+| Build             | Maven                                      |
+| Observabilidade   | Logging estruturado                        |
 
 ---
 
 # 🏛️ Arquitetura
 
-O **Racha Manager** foi projetado seguindo princípios táticos de **Domain-Driven Design (DDD)**, buscando manter a lógica de negócio isolada da infraestrutura e modelar o domínio da forma mais próxima possível do problema real — em vez de um CRUD tradicional em torno de tabelas.
+O Racha Manager foi projetado seguindo princípios táticos de **Domain-Driven Design (DDD)**, buscando manter a lógica de negócio isolada da infraestrutura e modelar o domínio da forma mais próxima possível do problema real — em vez de um CRUD tradicional em torno de tabelas.
 
-Neste projeto, a **Session** atua como **Aggregate Root**, sendo responsável por coordenar toda a sessão de jogo e garantir a consistência entre jogadores ativos, equipes, partida em andamento e fila de espera. Toda mutação de estado passa por métodos de negócio da própria `Session` — nenhuma coleção interna é exposta diretamente, evitando que regras sejam contornadas por acesso direto ao estado.
+A **Session** atua como **Aggregate Root**, responsável por coordenar toda a sessão de jogo e garantir a consistência entre jogadores ativos, equipes, partida em andamento e fila de espera. Toda mutação de estado passa por métodos de negócio da própria `Session` — nenhuma coleção interna é exposta diretamente, evitando que regras sejam contornadas por acesso direto ao estado.
 
-Diferentemente de aplicações CRUD tradicionais, **apenas os jogadores são persistidos em banco de dados**. Todo o restante do estado da partida existe apenas enquanto a sessão está ativa em memória, tornando a aplicação mais simples, performática e preparada para futuras evoluções.
+## Estrutura geral
+
+A aplicação está organizada por domínio de negócio, não por camada técnica:
+
+```text
+src/main/java/com/fcolucasvieira/racha_manager
+├── common       # exceptions, response padrão, observability
+├── config       # configurações gerais (Swagger, etc.)
+├── player       # cadastro de jogadores
+└── session      # núcleo do domínio: sessões, times, partidas, fila de espera
+```
+
+Dentro de `session` e `player`, cada módulo concentra seus próprios `controller`, `dto`, `model`, `repository`, `service` e `usecase` — mantendo alta coesão dentro de cada domínio e reduzindo acoplamento entre eles.
+
+## Fluxo da requisição
+
+```
+Cliente
+   │
+   ▼
+Controller
+   │
+   ▼
+   DTO
+   │
+   ▼
+Use Case
+   │
+   ▼
+Domain Model (Session / Team / Match / WaitingQueue)
+   │
+   ▼
+Repository
+```
+
+| Camada        | Responsabilidade |
+|----------------|-------------------|
+| Controller     | Receber e validar requisições HTTP |
+| DTO            | Contrato de entrada e saída da API |
+| Use Case       | Orquestrar o fluxo `buscar → decidir → alterar → salvar` |
+| Domain Model   | Aplicar as regras de negócio e proteger invariantes |
+| Repository     | Persistir o estado — em memória para `Session`, no PostgreSQL apenas para `Player` |
 
 ## Modelo de Domínio
 
@@ -63,13 +160,11 @@ Diferentemente de aplicações CRUD tradicionais, **apenas os jogadores são per
 
 O modelo de domínio foi construído tendo a **Session** como entidade central, responsável por:
 
-- Gerenciar os jogadores ativos da sessão;
-- Organizar automaticamente as equipes;
-- Controlar a fila de espera (`WaitingQueue`), priorizando times que ainda não jogaram sobre os que já jogaram;
-- Coordenar a partida em andamento;
-- Garantir a consistência de toda a sessão de jogo.
-
-Essa abordagem mantém a lógica de negócio concentrada em um único ponto, reduzindo acoplamento entre objetos e facilitando futuras evoluções do domínio.
+- gerenciar os jogadores ativos da sessão;
+- organizar automaticamente as equipes;
+- controlar a fila de espera (`WaitingQueue`), priorizando times que ainda não jogaram sobre os que já jogaram;
+- coordenar a partida em andamento;
+- garantir a consistência de toda a sessão de jogo.
 
 ## Estratégia de Persistência
 
@@ -86,31 +181,19 @@ Uma das principais decisões arquiteturais deste projeto foi separar claramente 
 |            | ✅ Match         |
 |            | ✅ WaitingQueue  |
 
-Essa estratégia oferece diversas vantagens:
-
-- 🚀 Criação instantânea de novas sessões;
-- ⚡ Manipulação extremamente rápida do estado da partida;
-- 🧠 Modelo de domínio mais limpo e coeso;
-- 📦 Banco de dados utilizado apenas para informações permanentes;
-- 🔄 Facilidade para evoluir futuramente utilizando soluções como **Redis** para distribuição do estado da sessão.
-
 ### 💡 Por que essa decisão?
 
-O foco da versão atual é o **gerenciamento de partidas em tempo real**, e não o armazenamento de histórico.
-
-Como sessões, equipes, partidas e filas possuem um ciclo de vida temporário, persistir essas estruturas aumentaria significativamente a complexidade da aplicação sem gerar benefícios para os requisitos atuais.
-
-Essa decisão mantém o domínio enxuto, facilita a manutenção do código e permite que novas funcionalidades sejam adicionadas futuramente sem necessidade de grandes mudanças arquiteturais.
+O foco da versão atual é o **gerenciamento de partidas em tempo real**, não o armazenamento de histórico. Como sessões, equipes, partidas e filas têm ciclo de vida temporário, persistir essas estruturas aumentaria a complexidade sem gerar benefício para os requisitos atuais — e mantém o domínio enxuto, rápido e fácil de evoluir (ver [Roadmap](#️-roadmap)).
 
 ---
 
 # 🧵 Concorrência
 
-Como múltiplas requisições podem tentar alterar a **mesma sessão** ao mesmo tempo (por exemplo, dois jogadores entrando simultaneamente), o `Session` é protegido contra **race conditions** usando `synchronized` nos *use cases* que executam o fluxo `buscar → decidir → alterar → salvar`.
+Como múltiplas requisições podem tentar alterar a **mesma sessão** ao mesmo tempo — por exemplo, dois jogadores entrando simultaneamente —, o `Session` é protegido contra **race conditions** usando `synchronized` nos *use cases* que executam o fluxo `buscar → decidir → alterar → salvar`.
 
-Essa proteção foi validada com **testes de concorrência reais**, que disparam múltiplas threads simultâneas contra a mesma sessão (usando `ExecutorService` + `CountDownLatch`) e garantem que o estado final permanece consistente — sem jogadores duplicados, sem times criados em duplicidade e sem exceptions inesperadas.
+Essa proteção foi validada com **testes de concorrência reais**, que disparam múltiplas threads simultâneas contra a mesma sessão (`ExecutorService` + `CountDownLatch`) e garantem que o estado final permanece consistente — sem jogadores duplicados, sem times criados em duplicidade e sem exceptions inesperadas.
 
-> 💡 Essa solução é intencionalmente pensada para a versão atual (estado em memória, instância única). Na evolução com **Redis** (ver Roadmap), a estratégia de lock será migrada para um **distributed lock**, já que `synchronized` não protege estado compartilhado entre múltiplas instâncias da aplicação.
+> 💡 Essa solução é intencionalmente pensada para a versão atual (estado em memória, instância única). Na evolução com **Redis**, a estratégia de lock será migrada para um **distributed lock**, já que `synchronized` não protege estado compartilhado entre múltiplas instâncias da aplicação.
 
 ---
 
@@ -122,52 +205,60 @@ A aplicação já foi publicada em produção na **Oracle Cloud Infrastructure (
 
 # ⚙️ Como rodar localmente
 
-### Pré-requisitos
+## Pré-requisitos
+
 - Java 21
 - Docker e Docker Compose
 - Maven (ou use o `./mvnw` incluso no projeto)
 
-### 1. Clone o repositório
+## Clonando o repositório
+
 ```bash
 git clone https://github.com/fcolucasvieira/racha-manager.git
 cd racha-manager
 ```
 
-### 2. Configure as variáveis de ambiente
+## Configurando as variáveis de ambiente
+
 Copie o arquivo de exemplo e ajuste se necessário:
+
 ```bash
 cp .env.example .env
 ```
-Variáveis utilizadas:
 
 | Variável      | Descrição              | Valor padrão    |
-|---------------|-------------------------|------------------|
-| `DB_PORT`     | Porta do PostgreSQL     | `5432`           |
-| `DB_NAME`     | Nome do banco de dados  | `racha_manager`  |
-| `DB_USER`     | Usuário do banco        | `postgres`       |
-| `DB_PASSWORD` | Senha do banco          | `postgres`       |
+|---------------|--------------------------|------------------|
+| `DB_PORT`     | Porta do PostgreSQL      | `5432`           |
+| `DB_NAME`     | Nome do banco de dados   | `racha_manager`  |
+| `DB_USER`     | Usuário do banco         | `postgres`       |
+| `DB_PASSWORD` | Senha do banco           | `postgres`       |
 
-### 3. Suba o banco de dados
+## Subindo o banco de dados
+
 ```bash
 docker compose up -d postgres
 ```
 
-### 4. Rode a aplicação
+## Executando a aplicação
+
 ```bash
 ./mvnw spring-boot:run
 ```
 
-A aplicação estará disponível em `http://localhost:8080`.
+A aplicação ficará disponível em `http://localhost:8080`.
 
-### 5. (Opcional) Suba a aplicação via Docker também
+## Executando via Docker (opcional)
+
 ```bash
 docker compose --profile app up -d
 ```
-Isso sobe o PostgreSQL e a aplicação, dispensando o `./mvnw spring-boot:run` do passo anterior.
+
+Sobe o PostgreSQL e a aplicação juntos, dispensando o passo anterior.
 
 > 📊 **Observabilidade:** a stack de Prometheus/Grafana está presente na infraestrutura (`docker compose --profile app --profile observability up -d`), mas ainda não está estabilizada — é um ajuste previsto para uma próxima versão. Hoje a aplicação conta com logging estruturado como principal ferramenta de observabilidade.
 
-### Rodando os testes
+## Executando os testes
+
 ```bash
 ./mvnw test
 ```
@@ -176,7 +267,7 @@ Isso sobe o PostgreSQL e a aplicação, dispensando o `./mvnw spring-boot:run` d
 
 # 📡 Endpoints principais
 
-Documentação interativa completa disponível via Swagger UI, em `/swagger-ui/index.html` ao rodar localmente.
+Documentação interativa completa disponível via Swagger, em `/swagger-ui/index.html` ao rodar localmente.
 
 ### Sessões
 
@@ -212,13 +303,17 @@ Documentação interativa completa disponível via Swagger UI, em `/swagger-ui/i
 
 O projeto conta com cobertura de testes acima de 85% (JaCoCo), incluindo:
 
-- Testes unitários de modelo de domínio, serviços e *use cases*;
-- Testes de integração dos controllers;
-- **Testes de concorrência**, com múltiplas threads reais (`ExecutorService` + `CountDownLatch`), validando a proteção contra *race conditions* no `Session`.
+- testes unitários de modelo de domínio, serviços e *use cases*;
+- testes de integração dos controllers;
+- **testes de concorrência**, com múltiplas threads reais (`ExecutorService` + `CountDownLatch`), validando a proteção contra *race conditions* no `Session`.
+
+```bash
+./mvnw test
+```
 
 ---
 
-# 🗺️ Roadmap (V2)
+# 🗺️ Roadmap
 
 - 🔐 Autenticação e autorização
 - 🧠 Redis para persistência distribuída do estado da sessão (com TTL de 24h)
@@ -231,14 +326,8 @@ O projeto conta com cobertura de testes acima de 85% (JaCoCo), incluindo:
 
 # 👨‍💻 Autor
 
-Lucas Vieira
-
+**Lucas Vieira**
 Estudante de Engenharia de Computação — UFC Sobral
 
-GitHub:
-
-https://github.com/fcolucasvieira
-
-LinkedIn:
-
-https://www.linkedin.com/in/fco-lucas-vieira/ 
+- GitHub: [github.com/fcolucasvieira](https://github.com/fcolucasvieira)
+- LinkedIn: [linkedin.com/in/fco-lucas-vieira](https://www.linkedin.com/in/fco-lucas-vieira/)
