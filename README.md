@@ -268,12 +268,9 @@ Documentação interativa completa disponível via Swagger, em `/swagger-ui/inde
 
 # 🔄 Fluxo de uma sessão completa
 
-1. **Criar a sessão** — `POST /sessions`, retorna o `sessionId`.
-2. **Adicionar jogadores** — `POST /sessions/{sessionId}/players/{playerId}`, um a um. Ao atingir 8 jogadores ativos, os times iniciais são formados automaticamente e a primeira partida começa.
-3. **Jogadores extras entram na fila de espera** — a partir do 9º jogador, novos times são montados e aguardam na fila, com prioridade para times que ainda não jogaram.
-4. **Finalizar a partida** — `POST /sessions/{sessionId}/finish-match`, informando o time vencedor (ou empate). O time vencedor permanece em quadra, o perdedor vai para o fim da fila, e o próximo time da fila entra automaticamente.
-5. **Jogadores podem sair a qualquer momento** — `DELETE /sessions/{sessionId}/players/{playerId}`. Se o time ficar incompleto, o sistema tenta completá-lo automaticamente com jogadores da fila de espera.
-6. **Consultar o estado a qualquer momento** — `GET /sessions/{sessionId}`, retornando jogadores ativos, times, partida atual e fila de espera.
+<p align="center">
+  <img src="docs/images/session-flow.png" width="2100">
+</p>
 
 ---
 
