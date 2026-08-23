@@ -47,7 +47,6 @@ public class Team {
         return players.removeFirst();
     }
 
-    // Ajustar remoção por objeto
     public void removePlayerById(UUID playerId) {
         if (playerId == null)
             throw new ValidationException("Player I can't be null");

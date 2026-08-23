@@ -186,12 +186,10 @@ public class Session {
         this.currentMatch = match;
     }
 
-    // Verificar uso
     public void setTeams(List<Team> teams) {
         if(teams == null)
             throw new ValidationException("Teams can't be null");
 
-        // Observar comportamento antes de finalizar Sprint
         this.teams = new ArrayList<>(teams);
     }
 }
