@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [ develop, main ]
+  pull_request:
+    branches: [ develop, main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres-17
+        env:
+          POSTGRES_DB: racha_manager
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -u postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DB_PORT: 5432
+      DB_NAME: racha_manager
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+
+    steps:
+      - name: Checkout de código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Rodar testes
+        run: ./mvnw test
+
+      - name: Gerar relatório de cobertura (JaCoCo)
+        run: ./mvnw jacoco:report
+
+      - name: Publicar relatório de cobertura
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco
