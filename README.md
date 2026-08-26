@@ -15,7 +15,7 @@ API REST para gerenciamento inteligente de equipes, jogadores e partidas esporti
   <img src="https://img.shields.io/badge/postgresql-database-blue?style=for-the-badge&logo=postgresql"/>
   <img src="https://img.shields.io/badge/flyway-database_migrations-CC0200?style=for-the-badge"/>
   <img src="https://img.shields.io/badge/docker-containerization-2496ED?style=for-the-badge&logo=docker"/>
-  <img src="https://img.shields.io/badge/Oracle_Cloud-OCI-F80000?style=for-the-badge&logo=oracle&logoColor=F80000"/>
+  <img src="https://img.shields.io/badge/AWS-EC2-FFD700?style=for-the-badge&logo=amazonaws&logoColor=white"/>
   <img src="https://img.shields.io/badge/JUnit_5-Testing-25A162?style=for-the-badge&logo=junit5&logoColor=25A162"/>
   <img src="https://img.shields.io/badge/Mockito-Mocking-red?style=for-the-badge"/>
   <img src="https://img.shields.io/badge/Coverage-85%25%2B-F57C00?style=for-the-badge"/>
@@ -28,7 +28,7 @@ API REST para gerenciamento inteligente de equipes, jogadores e partidas esporti
 
 O **Racha Manager** é uma **API REST** desenvolvida para automatizar a organização de **partidas esportivas amadoras** — os famosos "rachas" ou "peladas" de futebol —, eliminando a necessidade de controlar manualmente jogadores, equipes, filas de espera e rodadas durante uma sessão.
 
-Além de solucionar o problema de negócio, o projeto foi concebido como um estudo aprofundado em **engenharia de software**, priorizando arquitetura orientada ao domínio (DDD), boas práticas de desenvolvimento, testes automatizados — incluindo testes de concorrência —, conteinerização e publicação em ambiente de produção utilizando **Oracle Cloud Infrastructure (OCI)**.
+Além de solucionar o problema de negócio, o projeto foi concebido como um estudo aprofundado em **engenharia de software**, priorizando arquitetura orientada ao domínio (DDD), boas práticas de desenvolvimento, testes automatizados — incluindo testes de concorrência —, conteinerização, integração contínua (CI) e publicação em ambiente de produção na **AWS (EC2)**.
 
 ---
 
@@ -177,7 +177,11 @@ Essa proteção foi validada com **testes de concorrência reais**, que disparam
 
 # ☁️ Deploy
 
-A aplicação já foi publicada em produção na **Oracle Cloud Infrastructure (OCI)**. No momento, o deploy está **pausado** enquanto os últimos ajustes da V1 são finalizados — a documentação interativa (Swagger) pode ser explorada localmente seguindo a seção [Como rodar localmente](#️-como-rodar-localmente) abaixo.
+A aplicação está publicada em produção na **AWS (EC2 + Docker)**.
+
+[![Swagger UI](https://img.shields.io/badge/Swagger-TESTAR_API-green?style=for-the-badge&logo=swagger&logoColor=green)](http://35.171.106.158:8080/swagger-ui/index.html)
+
+Infraestrutura: Instância EC2 (Ubuntu), aplicação e banco rodando via `docker compose --profile app`, IP Elástico fixo, Security Group restringindo o Postgres ao acesso interno da rede Docker (porta 5432 nunca exposta publicamente). Detalhes de como reproduzir esse setup estão na seção [Como rodar localmente](#-como-rodar-localmente) abaixo.
 
 ---
 
