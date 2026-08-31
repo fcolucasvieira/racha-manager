@@ -1,4 +1,4 @@
-package com.fcolucasvieira.racha_manager.common.config;
+package com.fcolucasvieira.racha_manager.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
-    @Value("${management.endpoints.web.cors.allowed-origins}")
+    @Value("${app.cors.allowed-origins}")
     private List<String> allowedOrigins;
 
     @Override
