@@ -23,6 +23,7 @@ services:
       - racha_manager_postgres_data:/var/lib/postgresql/data
 
   app:
+    image: ghcr.io/fcolucasvieira/racha-manager:${IMAGE_TAG:latest}
     build: .
     container_name: racha-app
 
