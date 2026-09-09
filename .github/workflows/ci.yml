@@ -102,6 +102,7 @@ jobs:
           key: ${{secrets.EC2_SSH_KEY}}
           script: |
             cd ~/racha-manager
+            git pull origin main
             docker compose pull
             docker compose --profile app up -d
             docker image prune -f
