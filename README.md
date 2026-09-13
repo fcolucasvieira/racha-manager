@@ -16,6 +16,7 @@ API REST para gerenciamento inteligente de equipes, jogadores e partidas esporti
   <img src="https://img.shields.io/badge/flyway-database_migrations-CC0200?style=for-the-badge"/>
   <img src="https://img.shields.io/badge/docker-containerization-2496ED?style=for-the-badge&logo=docker"/>
   <img src="https://img.shields.io/badge/AWS-EC2-FFD700?style=for-the-badge&logo=amazonaws&logoColor=white"/>
+  <img src="https://img.shields.io/badge/GitHub_Actions-CI%2FCD-black?style=for-the-badge&logo=githubactions&logoColor=black"/>
   <img src="https://img.shields.io/badge/JUnit_5-Testing-25A162?style=for-the-badge&logo=junit5&logoColor=25A162"/>
   <img src="https://img.shields.io/badge/Mockito-Mocking-red?style=for-the-badge"/>
   <img src="https://img.shields.io/badge/Coverage-85%25%2B-F57C00?style=for-the-badge"/>
@@ -28,7 +29,7 @@ API REST para gerenciamento inteligente de equipes, jogadores e partidas esporti
 
 O **Racha Manager** é uma **API REST** desenvolvida para automatizar a organização de **partidas esportivas amadoras** — os famosos "rachas" ou "peladas" de futebol —, eliminando a necessidade de controlar manualmente jogadores, equipes, filas de espera e rodadas durante uma sessão.
 
-Além de solucionar o problema de negócio, o projeto foi concebido como um estudo aprofundado em **engenharia de software**, priorizando arquitetura orientada ao domínio (DDD), boas práticas de desenvolvimento, testes automatizados — incluindo testes de concorrência —, conteinerização, integração contínua (CI) e publicação em ambiente de produção na **AWS (EC2)**.
+Além de solucionar o problema de negócio, o projeto foi concebido como um estudo aprofundado em **engenharia de software**, priorizando arquitetura orientada ao domínio (DDD), boas práticas de desenvolvimento, testes automatizados — incluindo testes de concorrência —, conteinerização, um pipeline de integração e entrega contínuas (CI/CD) com deploy automatizado, e configuração de infraestrutura segura (HTTPS) em produção na **AWS**.
 
 ---
 
@@ -58,26 +59,24 @@ O Racha Manager centraliza toda essa lógica em uma única API, automatizando de
 - recomposição automática de times incompletos, puxando jogadores da fila quando necessário;
 - proteção contra condições de corrida (*race conditions*) quando múltiplas requisições atingem a mesma sessão simultaneamente, validada com testes de concorrência reais;
 - documentação interativa via Swagger;
-- ambiente totalmente containerizado com Docker.
+- ambiente totalmente containerizado com Docker, com **deploy automatizado e HTTPS em produção**.
 
 ---
 
 # 🚀 Tecnologias utilizadas
 
-| Categoria        | Tecnologias                              |
-|-------------------|-------------------------------------------|
-| Arquitetura       | DDD tático (Aggregate Root, Rich Domain Model) |
-| Linguagem         | Java 21                                    |
-| Framework         | Spring Boot                                |
-| Banco de Dados    | PostgreSQL                                 |
-| Persistência      | Spring Data JPA / Hibernate                |
-| Migrações         | Flyway                                     |
-| Testes            | JUnit 5, Mockito, testes de concorrência (`ExecutorService` + `CountDownLatch`) |
-| Cobertura         | JaCoCo                                     |
-| Documentação      | Swagger / OpenAPI                          |
-| Containerização   | Docker + Docker Compose                    |
-| Build             | Maven                                      |
-| Observabilidade   | Logging estruturado                        |
+| Categoria         | Tecnologias                                          |
+|--------------------|-------------------------------------------------------|
+| Arquitetura        | DDD tático (Aggregate Root, Rich Domain Model)        |
+| Linguagem / Framework | Java 21, Spring Boot                               |
+| Persistência       | PostgreSQL, Spring Data JPA / Hibernate, Flyway       |
+| Testes             | JUnit 5, Mockito, testes de concorrência, JaCoCo      |
+| Documentação       | Swagger / OpenAPI                                     |
+| Containerização    | Docker + Docker Compose                               |
+| CI/CD              | GitHub Actions (build, push, deploy) + GitHub Container Registry |
+| Infraestrutura     | AWS EC2, Nginx, Certbot / Let's Encrypt, DuckDNS      |
+| Confiabilidade     | UptimeRobot (monitoramento), `pg_dump` + `cron` (backup) |
+| Build              | Maven                                                 |
 
 ---
 
@@ -94,7 +93,7 @@ A aplicação está organizada por domínio de negócio, não por camada técnic
 ```text
 src/main/java/com/fcolucasvieira/racha_manager
 ├── common       # exceptions, response padrão, observability
-├── config       # configurações gerais (Swagger, etc.)
+├── config       # configurações gerais (Swagger, CORS, etc.)
 ├── player       # cadastro de jogadores
 └── session      # núcleo do domínio: sessões, times, partidas, fila de espera
 ```
@@ -171,17 +170,27 @@ Como múltiplas requisições podem tentar alterar a **mesma sessão** ao mesmo 
 
 Essa proteção foi validada com **testes de concorrência reais**, que disparam múltiplas threads simultâneas contra a mesma sessão (`ExecutorService` + `CountDownLatch`) e garantem que o estado final permanece consistente — sem jogadores duplicados, sem times criados em duplicidade e sem exceptions inesperadas.
 
-> 💡 Essa solução é intencionalmente pensada para a versão atual (estado em memória, instância única). Na evolução com **Redis**, a estratégia de lock será migrada para um **distributed lock**, já que `synchronized` não protege estado compartilhado entre múltiplas instâncias da aplicação.
+> 💡 Essa solução é intencionalmente pensada para a versão atual (estado em memória, instância única). Na evolução com **Redis** (ver Roadmap), a estratégia de lock será migrada para um **distributed lock**, já que `synchronized` não protege estado compartilhado entre múltiplas instâncias da aplicação.
+
+---
+
+# 📱 Frontend
+
+O Racha Manager possui uma aplicação **frontend própria**, consumindo esta API em produção — construída com auxílio de IA (**Lovable**) e publicada na **Vercel**.
+
+[![Frontend Online](https://img.shields.io/badge/Vercel-Acessar_Frontend-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://racha-manager-mobile.vercel.app/)
+
+A comunicação entre frontend e backend é protegida por uma política de **CORS** explícita (`app.cors.allowed-origins`), liberando apenas a origem publicada do frontend — nenhuma outra origem consegue consumir a API a partir do navegador.
 
 ---
 
 # ☁️ Deploy
 
-A aplicação está publicada em produção na **AWS (EC2 + Docker)**.
+A aplicação está publicada em produção na **AWS (EC2 + Docker)**, atrás de um domínio seguro (HTTPS via Nginx + Let's Encrypt).
 
-[![Swagger UI](https://img.shields.io/badge/Swagger-TESTAR_API-green?style=for-the-badge&logo=swagger&logoColor=green)](http://35.171.106.158:8080/swagger-ui/index.html)
+[![Swagger UI](https://img.shields.io/badge/Swagger-TESTAR_API-green?style=for-the-badge&logo=swagger&logoColor=green)](https://racha-manager-api.duckdns.org/swagger-ui/index.html)
 
-Infraestrutura: Instância EC2 (Ubuntu), aplicação e banco rodando via `docker compose --profile app`, IP Elástico fixo, Security Group restringindo o Postgres ao acesso interno da rede Docker (porta 5432 nunca exposta publicamente). Detalhes de como reproduzir esse setup estão na seção [Como rodar localmente](#-como-rodar-localmente) abaixo.
+O deploy é automatizado por um pipeline de CI/CD: a cada push na `main`, os testes rodam, a imagem é publicada no GitHub Container Registry, e a instância em produção é atualizada automaticamente — sem nunca compilar no próprio servidor.
 
 ---
 
@@ -208,12 +217,13 @@ Copie o arquivo de exemplo e ajuste se necessário:
 cp .env.example .env
 ```
 
-| Variável      | Descrição              | Valor padrão    |
-|---------------|--------------------------|------------------|
-| `DB_PORT`     | Porta do PostgreSQL      | `5432`           |
-| `DB_NAME`     | Nome do banco de dados   | `racha_manager`  |
-| `DB_USER`     | Usuário do banco         | `postgres`       |
-| `DB_PASSWORD` | Senha do banco           | `postgres`       |
+| Variável                | Descrição                           | Valor padrão                              |
+|--------------------------|---------------------------------------|---------------------------------------------|
+| `DB_PORT`                | Porta do PostgreSQL                   | `5432`                                       |
+| `DB_NAME`                | Nome do banco de dados                | `racha_manager`                              |
+| `DB_USER`                | Usuário do banco                      | `postgres`                                   |
+| `DB_PASSWORD`             | Senha do banco                        | `postgres`                                   |
+| `CORS_ALLOWED_ORIGINS`   | Origens liberadas para consumir a API | `http://localhost:3000,http://localhost:5173,http://localhost:4200` |
 
 ## Subindo o banco de dados
 
@@ -237,7 +247,7 @@ docker compose --profile app up -d
 
 Sobe o PostgreSQL e a aplicação juntos, dispensando o passo anterior.
 
-> 📊 **Observabilidade:** a stack de Prometheus/Grafana está presente na infraestrutura (`docker compose --profile app --profile observability up -d`), mas ainda não está estabilizada — é um ajuste previsto para uma próxima versão. Hoje a aplicação conta com logging estruturado como principal ferramenta de observabilidade.
+> 📊 **Observabilidade:** a stack de Prometheus/Grafana está presente na infraestrutura (`docker compose --profile app --profile observability up -d`), mas ainda não está estabilizada — é um ajuste previsto para uma próxima versão. Hoje a aplicação conta com logging estruturado e monitoramento externo (UptimeRobot) como principais ferramentas de observabilidade.
 
 ## Executando os testes
 
@@ -286,6 +296,8 @@ O projeto conta com cobertura de testes acima de 85% (JaCoCo), incluindo:
 - testes de integração dos controllers;
 - **testes de concorrência**, com múltiplas threads reais (`ExecutorService` + `CountDownLatch`), validando a proteção contra *race conditions* no `Session`.
 
+Toda a suíte é executada automaticamente pelo pipeline de CI a cada push — nenhum código chega à `main` sem passar pelos testes primeiro.
+
 ```bash
 ./mvnw test
 ```
@@ -294,12 +306,15 @@ O projeto conta com cobertura de testes acima de 85% (JaCoCo), incluindo:
 
 # 🗺️ Roadmap
 
-- 🔐 Autenticação e autorização
-- 🧠 Redis para persistência distribuída do estado da sessão (com TTL de 24h)
-- 🔒 Distributed lock (Redisson) substituindo o `synchronized` local, para suportar múltiplas instâncias
-- 🧹 Expiração automática de sessões inativas
-- ⚽ Generalização das regras para N times e M jogadores por time (hoje fixo em 4x4)
-- 🤖 Pipeline de CI (GitHub Actions) rodando os testes a cada push
+Próximas evoluções planejadas, em ordem de dependência:
+
+1. 🔐 **Autenticação e autorização** — login via Google (OAuth2), com o backend emitindo seu próprio JWT; introdução do conceito de `User` (organizador), isolado de `Player`, garantindo que cada usuário acesse apenas seus próprios dados.
+2. 🎛️ **Regras de sessão configuráveis** — quantidade de jogadores por time, quantidade de times iniciais, estratégias customizáveis de vitória e empate (incluindo *sudden death*), utilizando o **Strategy Pattern**.
+3. 🧠 **Redis com TTL** — persistência distribuída do estado da sessão (24h), migrando o modelo já maduro após as duas etapas anteriores.
+4. 🔒 **Distributed lock (Redisson)** — substituindo o `synchronized` local, necessário para suportar múltiplas instâncias da aplicação.
+5. 🧹 Expiração automática de sessões inativas.
+6. ⚽ Generalização das regras para N times e M jogadores por time (hoje fixo em 4x4).
+7. 📊 Estatísticas de sessão (jogador/time mais vitorioso) — proposta ainda em amadurecimento.
 
 ---
 
