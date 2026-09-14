@@ -16,7 +16,7 @@ API REST para gerenciamento inteligente de equipes, jogadores e partidas esporti
   <img src="https://img.shields.io/badge/flyway-database_migrations-CC0200?style=for-the-badge"/>
   <img src="https://img.shields.io/badge/docker-containerization-2496ED?style=for-the-badge&logo=docker"/>
   <img src="https://img.shields.io/badge/AWS-EC2-FFD700?style=for-the-badge&logo=amazonaws&logoColor=white"/>
-  <img src="https://img.shields.io/badge/GitHub_Actions-CI%2FCD-black?style=for-the-badge&logo=githubactions&logoColor=black"/>
+  <img src="https://img.shields.io/badge/GitHub_Actions-CI%2FCD-black?style=for-the-badge&logo=githubactions&logoColor=white"/>
   <img src="https://img.shields.io/badge/JUnit_5-Testing-25A162?style=for-the-badge&logo=junit5&logoColor=25A162"/>
   <img src="https://img.shields.io/badge/Mockito-Mocking-red?style=for-the-badge"/>
   <img src="https://img.shields.io/badge/Coverage-85%25%2B-F57C00?style=for-the-badge"/>
@@ -160,7 +160,7 @@ Uma das principais decisões arquiteturais deste projeto foi separar claramente 
 
 ### 💡 Por que essa decisão?
 
-O foco da versão atual é o **gerenciamento de partidas em tempo real**, não o armazenamento de histórico. Como sessões, equipes, partidas e filas têm ciclo de vida temporário, persistir essas estruturas aumentaria a complexidade sem gerar benefício para os requisitos atuais — e mantém o domínio enxuto, rápido e fácil de evoluir (ver [Roadmap](#️-roadmap)).
+O foco da versão atual é o **gerenciamento de partidas em tempo real**, não o armazenamento de histórico. Como sessões, equipes, partidas e filas têm ciclo de vida temporário, persistir essas estruturas aumentaria a complexidade sem gerar benefício para os requisitos atuais — e mantém o domínio enxuto, rápido e fácil de evoluir (ver [Roadmap](#-roadmap)).
 
 ---
 
