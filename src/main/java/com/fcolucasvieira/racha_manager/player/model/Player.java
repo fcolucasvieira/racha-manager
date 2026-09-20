@@ -1,6 +1,7 @@
 package com.fcolucasvieira.racha_manager.player.model;
 
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
+import com.fcolucasvieira.racha_manager.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,12 +20,22 @@ public class Player {
     @Column(nullable = false)
     private String name;
 
-    public Player(String name) {
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    public Player(String name, User user) {
         if(name == null || name.isBlank()){
             throw new ValidationException("Name can't be null or blank");
         }
 
         this.name = name;
+
+        if(user == null){
+            throw new ValidationException("User can't be null");
+        }
+
+        this.user = user;
     }
 
     @Override

@@ -1,0 +1,2 @@
+ALTER TABLE players
+ADD COLUMN user_id UUID NOT NULL REFERENCES users(id);
