@@ -24,6 +24,7 @@ public class Player {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // NOTE: Momentarily added to run application
     public Player(String name) {
         if(name == null || name.isBlank()){
             throw new ValidationException("Name can't be null or blank");
