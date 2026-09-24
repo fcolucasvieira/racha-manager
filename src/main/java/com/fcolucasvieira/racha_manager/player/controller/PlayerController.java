@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -36,8 +38,9 @@ public class PlayerController {
             description = "Creates a new player and returns its unique identifier."
     )
     @PostMapping
-    public ResponseEntity<ApiResponse<CreatePlayerResponse>> create(@RequestBody @Valid CreatePlayerRequest request) {
-        UUID id = createUseCase.execute(request.name());
+    public ResponseEntity<ApiResponse<CreatePlayerResponse>> create(@RequestBody @Valid CreatePlayerRequest request,
+                                                                    @AuthenticationPrincipal UUID userId) {
+        UUID id = createUseCase.execute(request.name(), userId);
 
         CreatePlayerResponse response = new CreatePlayerResponse(id);
 

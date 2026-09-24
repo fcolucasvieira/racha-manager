@@ -1,5 +1,6 @@
 package com.fcolucasvieira.racha_manager.player.model;
 
+import com.fcolucasvieira.racha_manager.common.exception.NotFoundException;
 import com.fcolucasvieira.racha_manager.common.exception.ValidationException;
 import com.fcolucasvieira.racha_manager.user.model.User;
 import jakarta.persistence.*;
@@ -25,13 +26,16 @@ public class Player {
     private User user;
 
     // NOTE: Momentarily added to run application
+    /*
     public Player(String name) {
+
         if(name == null || name.isBlank()){
             throw new ValidationException("Name can't be null or blank");
         }
 
         this.name = name;
     }
+    */
 
     public Player(String name, User user) {
         if(name == null || name.isBlank()){
@@ -41,7 +45,7 @@ public class Player {
         this.name = name;
 
         if(user == null){
-            throw new ValidationException("User can't be null");
+            throw new NotFoundException("User not found");
         }
 
         this.user = user;
