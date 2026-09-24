@@ -66,9 +66,9 @@ public class PlayerController {
     )
     @GetMapping
     public ResponseEntity<ApiResponse<Page<PlayerDTO>>> getAll(
-            @PageableDefault(page = 0, size = 16)
-            @ParameterObject Pageable pageable) {
-        var response = getAllUseCase.execute(pageable)
+            @AuthenticationPrincipal UUID userId,
+            @PageableDefault(page = 0, size = 16) @ParameterObject Pageable pageable) {
+        var response = getAllUseCase.execute(userId, pageable)
                 .map(player ->
                         new PlayerDTO(player.getId(), player.getName()));
 
